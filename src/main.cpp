@@ -526,6 +526,17 @@ bool parse_arg(int _argc,char**argv,motifList*ml,featureSet*features,seqList*tra
 				return false;
 			}
 			cargv++,argc--;
+		}else if(!strcmp(a,"-wStepTrain")){
+			if(l>=argc-1){
+				argSyntaxError();
+				return false;
+			}
+			cfg->windowStepTrain=(int)strtol(cargv[1],0,10);
+			if(cfg->windowStep<=0){
+				argSyntaxError();
+				return false;
+			}
+			cargv++,argc--;
 		}else if(!strcmp(a,"-no-homo-pairing")){
 			cfg->allowHomoPairing = false;
 		}else if(!strcmp(a,"-no-hetero-pairing")){

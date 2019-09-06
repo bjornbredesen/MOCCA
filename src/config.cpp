@@ -32,7 +32,7 @@ config _config = config {
 	true,
 	true,
 	cSVMMOCCA,
-	500,10,10,
+	500,10,250,
 	true, true,
 	kLinear,
 	dmCenters,
