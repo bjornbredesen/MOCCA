@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////////
 // MOCCA
-// Copyright, Bjørn Bredesen, 2017
-// E-mail: Bjorn.Bredesen@ii.uib.no
+// Copyright, Bjørn Bredesen, 2019
+// E-mail: bjorn@bjornbredesen.no
 ////////////////////////////////////////////////////////////////////////////////////
 // Basics
 
@@ -560,7 +560,7 @@ main
 */
 int main(int argc,char**argv){
 	timer mainTimer((char*)"Full run");
-	cout << sepline << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2019\n Bjorn.Bredesen@ii.uib.no\n" << sepline;
+	cout << sepline << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2019\n bjorn@bjornbredese.no\n" << sepline;
 	
 	svm_set_print_string_function(&libsvm_print_null);
 	
