@@ -19,14 +19,14 @@ size_t nSequenceClasses(){
 	return seqClasses.size();
 }
 
-seqClass*getSeqClassByName(char*name){
+seqClass*getSeqClassByName(std::string name){
 	double cls;
 	if(name[0]=='N'&&!name[1])cls=0.0;
 	else if(name[0]=='+'&&!name[1])cls=1.0;
 	else if(name[0]=='-'&&!name[1])cls=-1.0;
 	else if(name[0]=='+'&&name[1]=='+'&&!name[2])cls=2.0;
 	else if(name[0]=='-'&&name[1]=='-'&&!name[2])cls=-2.0;
-	else cls=strtod(name,0);
+	else cls=strtod(name.c_str(), 0);
 	for(auto& c: seqClasses)
 		if(c.cls == cls)
 			return &c;
@@ -41,12 +41,12 @@ void printSeqClasses(){
 		cout << t_indent << c.name << t_indent << "Value: " << c.cls << t_indent << "Binary flag: " << (c.flag?"+":"-") << "\n";
 }
 
-seqClass*registerSeqClass(double cls,char*name,bool flag){
+seqClass*registerSeqClass(double cls,std::string name,bool flag){
 	for(auto& c: seqClasses){
 		if(c.cls==cls){
 			cmdError("Class with the same identifier specified twice.");
 			return 0;
-		}else if(!strcmp(c.name,name)){
+		}else if(!c.name.compare(name)){
 			cmdError("Class with the same name specified twice.");
 			return 0;
 		}

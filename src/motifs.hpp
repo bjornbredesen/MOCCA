@@ -63,7 +63,7 @@ public:
 	addFromXML
 		Loads and adds motifs from an XML-file.
 	*/
-	bool addMotifsFromXML(char*path);
+	bool addMotifsFromXML(std::string path);
 	/*
 	addIUPACMotif
 		Adds an IUPAC motif

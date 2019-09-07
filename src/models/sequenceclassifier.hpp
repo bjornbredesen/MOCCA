@@ -28,8 +28,8 @@ public:
 	applyFASTA
 		Applies the classifier to a FASTA file and writes scores to a Wig file.
 	*/
-	bool applyFASTA(char*inpath,char*outpath);
-	bool predictCoreSequence(char*inpath,char*outpath);
+	bool applyFASTA(std::string inpath,std::string outpath);
+	bool predictCoreSequence(std::string inpath, std::string outpath);
 	//
 	virtual bool trainWindow(char*buf,long long pos,int bufs,seqClass*cls) = 0;
 	virtual bool trainFinish() = 0;

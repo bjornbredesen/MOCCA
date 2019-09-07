@@ -72,8 +72,8 @@ motifListMotif*motifList::addMotif(char*name,motifType type,void*data,int len){
 	return m;
 }
 
-bool motifList::addMotifsFromXML(char*path){
-	FILE*f=fopen(path,"rb");
+bool motifList::addMotifsFromXML(std::string path){
+	FILE*f=fopen(path.c_str(),"rb");
 	if(!f){
 		cout << m_error << "Could not open file \"" << path << "\".\n";
 		return false;

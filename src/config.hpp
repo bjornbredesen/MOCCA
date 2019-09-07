@@ -16,7 +16,6 @@ enum weightMode{
 	wmPREdictor,
 	wmZero,
 	wmConstant,
-	wmZZPF, // Zero frequency=>Zero weight, Pseudocounts Finally
 	wmPPV, // Weighting by Positive Predictive Value (no need for pseudocounts)
 	wmBiPPV, // Bi-directional weighting by Positive Predictive Value (no need for pseudocounts)
 };
@@ -55,13 +54,13 @@ public:
 	bool motifPairsCanOverlap;
 	double SVM_c0,SVM_C,SVM_nu,SVM_p,SVM_gamma;
 	double threshold;
-	char*inFASTA,*outWig,*outCoreSequence;
 	bool MOCCA_nOcc, MOCCA_GC, MOCCA_DNT;
 	int svmtype;
 	weightMode wmMode;
 	double loBeta;
-	char*CAnalysisExportPath;
-	char*outSCVal;
+	std::string CAnalysisExportPath;
+	std::string inFASTA, outWig, outCoreSequence;
+	std::string outSCVal;
 	/*
 	printInfo
 		Prints out information

@@ -31,5 +31,5 @@ double getPRCAUCxVP(validationPair*vp,int nvp,double x);
 
 bool printValidationMeasures(validationPair*vp,int nvp,double threshold);
 
-bool saveVPairTable(char*outpath,validationPair*vp,int nvp);
+bool saveVPairTable(std::string outpath,validationPair*vp,int nvp);
 

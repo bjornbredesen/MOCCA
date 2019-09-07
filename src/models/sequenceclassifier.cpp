@@ -125,12 +125,12 @@ double sequenceClassifier::applyWindow(char*buf,long long pos,int bufs){
 	return r-threshold;
 }
 
-bool sequenceClassifier::applyFASTA(char*inpath,char*outpath){
+bool sequenceClassifier::applyFASTA(std::string inpath, std::string outpath){
 	FILE*fout=0;
-	if(!inpath||!outpath)return false;
+	if(!inpath.length() || !outpath.length())return false;
 	timer mainTimer((char*)"Sequence scoring");
 	cmdTask task((char*)"Sequence scoring");
-	seqStreamFastaBatch*ssfb=seqStreamFastaBatch::load(inpath);
+	seqStreamFastaBatch*ssfb=seqStreamFastaBatch::load((char*)inpath.c_str());
 	if(!ssfb){
 		return false;
 	}
@@ -139,12 +139,12 @@ bool sequenceClassifier::applyFASTA(char*inpath,char*outpath){
 		bptotal+=ssfbblk->getLength();
 	}
 	delete ssfb;
-	fout=fopen(outpath,"wb");
+	fout=fopen((char*)outpath.c_str(),"wb");
 	if(!fout){
 		cmdError("Could not open file for writing.");
 		return false;
 	}
-	ssfb=seqStreamFastaBatch::load(inpath);
+	ssfb=seqStreamFastaBatch::load((char*)inpath.c_str());
 	if(!ssfb){
 		fclose(fout);
 		return false;
@@ -178,15 +178,15 @@ bool sequenceClassifier::applyFASTA(char*inpath,char*outpath){
 	return true;
 }
 
-bool sequenceClassifier::predictCoreSequence(char*inpath,char*outpath){
-	if(!inpath||!outpath)return false;
+bool sequenceClassifier::predictCoreSequence(std::string inpath, std::string outpath){
+	if(!inpath.length() || !outpath.length())return false;
 	FILE*fout=0;
-	fout=fopen(outpath,"wb");
+	fout=fopen((char*)outpath.c_str(),"wb");
 	if(!fout){
 		cmdError("Could not open file for writing.");
 		return false;
 	}
-	autodelete<seqStreamFastaBatch> ssfb(seqStreamFastaBatch::load(inpath));
+	autodelete<seqStreamFastaBatch> ssfb(seqStreamFastaBatch::load((char*)inpath.c_str()));
 	if(!ssfb.ptr){
 		fclose(fout);
 		return false;

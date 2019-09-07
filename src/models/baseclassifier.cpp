@@ -194,21 +194,6 @@ bool logoddsClassifier::do_train(){
 					weights[i]=(TP-FP)/(TP+FP);
 				}
 				break;}
-			case wmZZPF:{
-				double P=cP[i];
-				double N=cN[i];
-				if(P==0&&N==0){
-					weights[i]=0;
-				}else{
-					double mP=P;
-					double mN=N;
-					mP/=nP;
-					mN/=nN;
-					double beta=1.0;
-					if(mP==0||mN==0)mP+=beta,mN+=beta;
-					weights[i]=log(mP/mN);
-				}
-				break;}
 			default:{}
 		}
 	}
@@ -886,7 +871,7 @@ bool MultiClassSVM::train(){
 			p.clsP=&classes[x];
 			p.clsN=&classes[y];
 			char cName[256];
-			snprintf(cName, sizeof(cName), "%s - Class boundary model - %s (+) vs. %s (-)", name.c_str(), p.clsP->cls->name, p.clsN->cls->name);
+			snprintf(cName, sizeof(cName), "%s - Class boundary model - %s (+) vs. %s (-)", name.c_str(), p.clsP->cls->name.c_str(), p.clsN->cls->name.c_str());
 			fastSVMClassifier*cls=fastSVMClassifier::create(svmtype,nFeatures,std::string(cName));
 			if(!cls)return false;
 			if(featureNames.size() > 0){

@@ -35,13 +35,13 @@ fileListFile
 	Structure for file list entries.
 */
 typedef struct{
-	char*name;
-	char*path;
+	std::string name;
+	std::string path;
 }fileListFile;
 
 std::vector<fileListFile> fileList;
 
-bool registerFile(char*name,char*path){
+bool registerFile(std::string name, std::string path){
 	fileListFile f = fileListFile {
 		name,
 		path
@@ -59,6 +59,1164 @@ void printRegisteredFiles(){
 		cout << t_indent << "None\n";
 	}
 }
+
+
+////////////////////////////////////////////////////////////////////////////////////
+// Arguments
+
+#include <functional>
+#include <unordered_map>
+#define N_ARGUMENT_PASSES 2
+
+void print_help();
+
+struct cmdArg{
+	std::string arg;
+	int pass;
+	int nParam;
+	std::string example;
+	std::vector<std::string> helpLines;
+	std::function<bool (std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq)> apply;
+};
+
+cmdArg argumentTypes[] = {
+	//---------------------------
+	// Base
+	{
+		// Argument
+		"-h",
+		// Pass
+		0,
+		// Parameters
+		0,
+		// Documentation
+		"-h",
+		{ "Prints help text." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			print_help();
+			return false;
+		}
+	},
+	{
+		// Argument
+		"-seed",
+		// Pass
+		0,
+		// Parameters
+		1,
+		// Documentation
+		"-seed VALUE",
+		{ "Sets the random seed to VALUE." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->randSeed = (int) strtol(params[0].c_str(), 0, 10);
+			srand(cfg->randSeed);
+			return true;
+		}
+	},
+	//---------------------------
+	// Classes
+	{
+		// Argument
+		"-class",
+		// Pass
+		0,
+		// Parameters
+		3,
+		// Documentation
+		"-class NAME VALUE FLAG",
+		{ "Registers a sequence class with name NAME, value/ID VALUE,",
+		  "and flag FLAG (\"+\" for positive, or \"-\" for negative)." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			bool cls;
+			if(params[2][0] == '+' && !params[2][1]) cls=true;
+			else if(params[2][0] == '-' && !params[2][1]) cls=false;
+			else{
+				argSyntaxError();
+				return false;
+			}
+			if(!registerSeqClass(strtod(params[1].c_str(), 0), (char*)params[0].c_str(), cls)){
+				return false;
+			}
+			return true;
+		}
+	},
+	//---------------------------
+	// Motifs
+	{
+		// Argument
+		"-motif:IUPAC",
+		// Pass
+		1,
+		// Parameters
+		3,
+		// Documentation
+		"-motif:IUPAC NAME MOTIF MISMATCHES",
+		{ "Adds an IUPAC-motif with the name NAME, and sequence MOTIF,",
+		  "with MISMATCHES mismatches allowed." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!ml->addIUPACMotif((char*)params[0].c_str(), (char*)params[1].c_str(), (int)strtol(params[2].c_str(), 0, 10))){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:XML",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-motif:XML PATH",
+		{ "Adds motifs specified in an XML-file PATH." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!ml->addMotifsFromXML(params[0])){
+				return false;
+			}
+			if(!registerFile((char*)"Motif XML", params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:kmer",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-motif:kmer k",
+		{ "Adds all k-mers." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!ml->addKMers((int)strtol(params[0].c_str(), 0, 10))){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:Random",
+		// Pass
+		1,
+		// Parameters
+		2,
+		// Documentation
+		"-motif:Random N LEN",
+		{ "Adds N random sequences of length LEN." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!ml->addRandom((int)strtol(params[0].c_str(), 0, 10), (int)strtol(params[1].c_str(), 0, 10))){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:FSM",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-motif:FSM",
+		{ "Enable Finite State Machine for motif occurrence parsing." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->useFSM=true;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:No-FSM",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-motif:No-FSM",
+		{ "Disable Finite State Machine for motif occurrence parsing." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->useFSM=false;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:d:centers",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-motif:d:centers",
+		{ "Sets the distance mode to centered." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->distanceMode=dmCenters;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:d:between",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-motif:d:between",
+		{ "Sets the distance mode to between." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->distanceMode=dmBetween;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:d:noOverlap",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-motif:d:noOverlap",
+		{ "Disallows motif pairs to overlap when counting." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->motifPairsCanOverlap=false;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:d:overlap",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-motif:d:overlap",
+		{ "Allows motif pairs to overlap when counting." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->motifPairsCanOverlap=true;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-no-homo-pairing",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-no-homo-pairing",
+		{ "Disables pairing of the same motifs for CPREdictor." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->allowHomoPairing = false;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-no-hetero-pairing",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-no-hetero-pairing",
+		{ "Disables pairing of different motifs for CPREdictor." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->allowHeteroPairing = false;
+			return true;
+		}
+	},
+	//---------------------------
+	// General features
+	{
+		// Argument
+		"-f:nOcc",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:nOcc",
+		{ "Adds motif occurrence frequency features." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_nOcc, featureMotif_All, 0, 0, 0, 0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:nPair",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-f:nPair D",
+		{ "Adds motif pair occurrence frequency features, with distance",
+		  "cutoff D." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_nPair, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0),0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:nOccPair",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-f:nOccPair D",
+		{ "Adds motif occurrence pair occurrence frequency features, with",
+		  "distance cutoff D." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_nOccPair, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0), 0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:MDPA",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:MDPA",
+		{ "Adds Mean Distance Proximal All features." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_MDPA, featureMotif_All, 0, 0, 0, 0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:MDP",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:MDP",
+		{ "Adds Mean Distance Proximal features." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_MDP, featureMotif_All, featureMotif_All, 0, 0, 0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:MDM",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:MDM",
+		{ "Adds Mean Distance Mean features." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_MDM, featureMotif_All, featureMotif_All, 0, 0, 0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:MDDA",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:MDDA",
+		{ "Adds Mean Distance Distal All features." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_MDDA, featureMotif_All, 0, 0, 0, 0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:MDD",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:MDD",
+		{ "Adds Mean Distance Distal features." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_MDD, featureMotif_All, 0, 0, 0, 0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:GC",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:MDD",
+		{ "Adds GC-content feature." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_GC, 0, 0, 0, 0, 0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	//---------------------------
+	// SVM-MOCCA features
+	{
+		// Argument
+		"-f:MOCCA:nOcc",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:MOCCA:nOcc",
+		{ "Adds motif occurrence frequency features to SVM-MOCCA." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->MOCCA_nOcc=true;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:MOCCA:DNT",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:MOCCA:DNT",
+		{ "Adds dinucleotide features to SVM-MOCCA." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->MOCCA_DNT=true;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:MOCCA:GC",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-f:MOCCA:GC",
+		{ "Adds GC content feature to SVM-MOCCA." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->MOCCA_GC=true;
+			return true;
+		}
+	},
+	//---------------------------
+	// Classifiers
+	{
+		// Argument
+		"-C:CPREdictor",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:CPREdictor",
+		{ "Sets the classifier to the CPREdictor." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->classifier=cCPREdictor;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-C:DummyPREdictor",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:DummyPREdictor",
+		{ "Sets the classifier to the DummyPREdictor." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->classifier=cDummyPREdictor;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-C:SVM",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:SVM",
+		{ "Sets the classifier to the an SVM using separately specified",
+		  "feature spaces." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->classifier=cSEQSVM;
+			cfg->svmtype=C_SVC;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-C:SVM-MOCCA",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:SVM-MOCCA",
+		{ "Sets the classifier to SVM-MOCCA." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->classifier=cSVMMOCCA;
+			cfg->svmtype=C_SVC;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-C:SVM-MOCCA:C-SVC",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:SVM-MOCCA:C-SVC",
+		{ "Sets the classifier to SVM-MOCCA, using the C-SVC formulation." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->classifier=cSVMMOCCA;
+			cfg->svmtype=C_SVC;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-C:SVM-MOCCA:nu-SVC",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:SVM-MOCCA:nu-SVC",
+		{ "Sets the classifier to SVM-MOCCA, using the nu-SVC formulation." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->classifier=cSVMMOCCA;
+			cfg->svmtype=NU_SVC;
+			return true;
+		}
+	},
+	//---------------------------
+	// Classifier configuration
+	{
+		// Argument
+		"-C:analysis:export",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-C:analysis:export PATH",
+		{ "Exports model analysis to file." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->CAnalysisExportPath = params[0];
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-wm:PREdictor",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-wm:PREdictor",
+		{ "Sets the log-odds weight mode to the PREdictor formulation.",
+		  "When either a positive or negative class summed feature is zero,",
+		  "a pseudocount of 1 is added for both the positives and negatives." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->wmMode=wmPREdictor;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-wm:Zero",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-wm:Zero",
+		{ "Sets the log-odds weight mode to zero.",
+		  "When either a positive or negative class summed feature is zero,",
+		  "the weight is set to zero." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->wmMode=wmZero;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-wm:Constant",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-wm:Constant VALUE",
+		{ "Sets the log-odds weight mode to constant.",
+		  "A constant pseudocount is added to summed positive and negative",
+		  "features, so that they are never zero." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->loBeta=strtod(params[0].c_str(),0);
+			cfg->wmMode=wmConstant;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-wm:PPV",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-wm:PPV",
+		{ "Sets the log-odds weight mode to PPV.",
+		  "Instead of log-odds, the Positive Predictive Value is calculated",
+		  "based on motif occurrences in positives (TP) versus negatives (FP)." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->wmMode=wmPPV;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-wm:BiPPV",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-wm:BiPPV",
+		{ "Sets the log-odds weight mode to BiPPV.",
+		  "Instead of log-odds, the Bi-Positive Predictive Value is calculated",
+		  "based on motif occurrences in positives (TP) versus negatives (FP).",
+		  "BiPPV is the difference between PPV for the positives, and PPV",
+		  "for switched labels (False Discovery Rate)." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->wmMode=wmBiPPV;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-k:linear",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-k:linear",
+		{ "Sets the SVM kernel to linear." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->kernel=kLinear;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-k:quadratic",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-k:quadratic",
+		{ "Sets the SVM kernel to quadratic (poly. degree 2)." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->kernel=kQuadratic;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-k:cubic",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-k:cubic",
+		{ "Sets the SVM kernel to cubic (poly. degree 3)." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->kernel=kCubic;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-k:RBF",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-k:RBF",
+		{ "Sets the SVM kernel to Radial Basis Function." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->kernel=kRBF;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-SVM:C",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-SVM:C VALUE",
+		{ "Sets the SVM metaparameter C." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->SVM_C=strtod(params[0].c_str(), 0);
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-SVM:nu",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-SVM:nu VALUE",
+		{ "Sets the SVM metaparameter nu." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->SVM_nu=strtod(params[0].c_str(), 0);
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-SVM:p",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-SVM:p VALUE",
+		{ "Sets the SVM metaparameter p." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->SVM_p=strtod(params[0].c_str(), 0);
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-SVM:gamma",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-SVM:gamma VALUE",
+		{ "Sets the SVM kernel parameter gamma." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->SVM_gamma=strtod(params[0].c_str(), 0);
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-SVM:c0",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-SVM:c0 VALUE",
+		{ "Sets the SVM kernel parameter c0." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->SVM_c0=strtod(params[0].c_str(), 0);
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-threshold",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-threshold VALUE",
+		{ "Sets the classifier threshold." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->threshold=strtod(params[0].c_str(), 0);
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-wSize",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-wSize VALUE",
+		{ "Sets the classifier window size." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->windowSize = (int)strtol(params[0].c_str(), 0, 10);
+			if(cfg->windowSize <= 0){
+				argSyntaxError();
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-wStep",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-wStep VALUE",
+		{ "Sets the classifier window step size." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->windowStep = (int)strtol(params[0].c_str(), 0, 10);
+			if(cfg->windowStep <= 0){
+				argSyntaxError();
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-wStepTrain",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-wStepTrain VALUE",
+		{ "Sets the classifier window training step size.",
+		  "When training with sequence windows, this can be set in order to",
+		  "control model complexity growth." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->windowStepTrain = (int)strtol(params[0].c_str(), 0, 10);
+			if(cfg->windowStepTrain <= 0){
+				argSyntaxError();
+				return false;
+			}
+			return true;
+		}
+	},
+	//---------------------------
+	// Sequences
+	{
+		// Argument
+		"-train:FASTA",
+		// Pass
+		1,
+		// Parameters
+		3,
+		// Documentation
+		"-train:FASTA PATH CLASS MODE",
+		{ "Adds a training sequence file.",
+		  "PATH: Path to FASTA file.",
+		  "CLASS: A class ID, defined with \"-class\", or one of the",
+		  "pre-specified binary classes: \"+\" for positive or \"-\"",
+		  "for negative.",
+		  "MODE: Can be \"win\", for training with all windows within",
+		  "each training sequence file, or \"full\", for training with",
+		  "the full sequences." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!trainseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[1]), getTrainModeByName((char*)params[2].c_str()))){
+				return false;
+			}
+			if(!registerFile("Training sequences",params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-validate:FASTA",
+		// Pass
+		1,
+		// Parameters
+		2,
+		// Documentation
+		"-validate:FASTA PATH CLASS",
+		{ "Adds a validation sequence file.",
+		  "PATH: Path to FASTA file.",
+		  "CLASS: A class ID, defined with \"-class\", or one of the",
+		  "pre-specified binary classes: \"+\" for positive or \"-\"",
+		  "for negative." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!valseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[1]), train_Full)){
+				return false;
+			}
+			if(!registerFile("Validation sequences",params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-validate:no",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-validate:no",
+		{ "Disables validation." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->validate = false;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-validate:outSCTable",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-validate:outSCTable PATH",
+		{ "Outputs validation set score and class table to file." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->outSCVal = params[0];
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-in:FASTA",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-in:FASTA PATH",
+		{ "Sets an input FASTA file to be scored." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->inFASTA = params[0];
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-out:Wig",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-out:Wig PATH",
+		{ "Sets an output Wiggle file for scored sequences." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->outWig = params[0];
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-out:core-sequence",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-out:core-sequence PATH",
+		{ "Sets an output FASTA file for predicted core sequences",
+		  "from input FASTA file." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->outCoreSequence = params[0];
+			return true;
+		}
+	},
+};
+
+/*
+print_help
+	Outputs help message.
+*/
+void print_help(){
+	cout << " Usage:\n";
+	char argFmtStr[] = " %35s - %s\n";
+	char argFmtStrC[] = " %35s   %s\n";
+	for(auto argType: argumentTypes) {
+		printf(argFmtStr, argType.example.c_str(), argType.helpLines[0].c_str());
+		for(unsigned int i = 1; i < argType.helpLines.size(); i++) {
+			printf(argFmtStrC, "", argType.helpLines[i].c_str());
+		}
+	}
+	cout << sepline;
+}
+
+/*
+parse_arg
+	Parses application arguments.
+	Also fills in motif list, feature set and training set.
+*/
+bool parse_arg(int _argc,char**argv,motifList*ml,featureSet*features,seqList*trainseq,seqList*valseq){
+	if(!ml||!trainseq||!valseq)return false;
+	config*cfg=getConfiguration();
+	std::unordered_map<std::string, cmdArg> argumentMap;
+	for(auto argType: argumentTypes) {
+		argumentMap[argType.arg] = argType;
+	}
+	for(int pass = 0; pass < N_ARGUMENT_PASSES; pass ++) {
+		char**cargv = argv;
+		int argc = _argc;
+		for(int l=0; l<argc; l++, cargv++){
+			if (!(*cargv)) continue;
+			std::string cArg = std::string(*cargv);
+			auto cArgTypeF = argumentMap.find(cArg);
+			// Ensure argument type is familiar
+			if (cArgTypeF == argumentMap.end()) {
+				cout << m_error << "Invalid command-line argument \"" << cArg << "\". Aborting.\n";
+				return false;
+			}
+			// Skip if for different pass
+			auto cArgType = cArgTypeF->second;
+			// Ensure we have enough arguments
+			if(l >= argc-cArgType.nParam){
+				argSyntaxError();
+				return false;
+			}
+			// Accumulate arguments to list
+			char**ccargv = cargv+1;
+			std::vector<std::string> params;
+			for(int y=0; y<cArgType.nParam; y++, ccargv++){
+				params.push_back(std::string(*ccargv));
+			}
+			if (cArgType.pass == pass) {
+				// Call argument processor
+				if(!cArgType.apply(params, cfg, ml, features, trainseq, valseq))
+					return false;
+				// Remove argument (null-arguments are skipped above)
+				ccargv = cargv;
+				for(int y=0; y<=cArgType.nParam; y++, ccargv++)
+					*ccargv = 0;
+			}
+			cargv += cArgType.nParam, argc -= cArgType.nParam;
+		}
+		// Add standard sequence classes if none have been explicitly registered
+		if(pass == 0 && !nSequenceClasses()){
+			if(!registerSeqClass(1,(char*)"Positive",true)){
+				return false;
+			}
+			if(!registerSeqClass(-1,(char*)"Negative",false)){
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////////////
 // Main
@@ -123,429 +1281,22 @@ bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqLis
 			if(!cls.ptr->getValidationTable(valseq,vp.ptr,nvp))return false;
 			cout << t_indent << "Validation set\n";
 			if(cfg->validate)printValidationMeasures(vp,nvp,cls.ptr->threshold);
-			if(cfg->outSCVal)if(!saveVPairTable(cfg->outSCVal,vp.ptr,nvp))return false;
+			if(cfg->outSCVal.length() > 0)if(!saveVPairTable(cfg->outSCVal, vp.ptr, nvp))return false;
 		}
-		if(cfg->inFASTA&&cfg->outWig){
+		if(cfg->inFASTA.length() > 0 && cfg->outWig.length() > 0){
 			cmdSection("FASTA scoring");
-			cls.ptr->applyFASTA(cfg->inFASTA,cfg->outWig);
+			cls.ptr->applyFASTA(cfg->inFASTA, cfg->outWig);
 		}
-		if(cfg->inFASTA&&cfg->outCoreSequence){
+		if(cfg->inFASTA.length() > 0 && cfg->outCoreSequence.length() > 0){
 			cmdSection("FASTA scoring");
 			cls.ptr->predictCoreSequence(cfg->inFASTA,cfg->outCoreSequence);
 		}
-		if(cfg->CAnalysisExportPath){
+		if(cfg->CAnalysisExportPath.length() > 0){
 			cmdSection("Classifier analysis export");
 			cls.ptr->exportAnalysisData(cfg->CAnalysisExportPath);
 		}
 	}
 	cout << sepline;
-	return true;
-}
-
-/*
-print_help
-	Outputs help message.
-*/
-void print_help(){
-	cout << " Usage:\n";
-	char argFmtStr[] = " %35s - %s\n";
-	printf(argFmtStr, "-C:SVM-MOCCA", "Use SVM-MOCCA.");
-	printf(argFmtStr, "-C:SVM-MOCCA:C-SVC", "Use SVM-MOCCA with C-SVC.");
-	printf(argFmtStr, "-C:SVM-MOCCA:nu-SVC", "Use SVM-MOCCA with nu-SVC.");
-	printf(argFmtStr, "-C:CPREdictor", "Use CPREdictor.");
-	printf(argFmtStr, "-C:DummyPREdictor", "Use dummy PREdictor.");
-	printf(argFmtStr, "-k:linear", "Use linear kernel.");
-	printf(argFmtStr, "-k:quadratic", "Use quadratic kernel.");
-	printf(argFmtStr, "-k:cubic", "Use cubic kernel.");
-	printf(argFmtStr, "-k:RBF", "Use radial basis function kernel.");
-	printf(argFmtStr, "-wSize SIZE", "Sets the window size to SIZE.");
-	printf(argFmtStr, "-wStep SIZE", "Sets the window step size to SIZE.");
-	printf(argFmtStr, "-motif:IUPAC NAME MOTIF MISMATCHES", "Adds an IUPAC-motif with the name NAME, and sequence MOTIF,");
-	printf(argFmtStr, "", "with MISMATCHES mismatches allowed.");
-	printf(argFmtStr, "-motif:XML PATH", "Adds motifs specified in an XML-file PATH.");
-	printf(argFmtStr, "-f:MOCCA:nOcc", "Adds motif occurrence frequency features to SVM-MOCCA.");
-	printf(argFmtStr, "-f:MOCCA:DNT", "Adds dinucleotide features to SVM-MOCCA.");
-	printf(argFmtStr, "-train:FASTA PATH CLASS MODE", "Adds a training sequence file.");
-	printf(argFmtStr, "", "PATH: Path to FASTA file.");
-	printf(argFmtStr, "", "CLASS: A class ID, defined with `-class`, or one of the");
-	printf(argFmtStr, "", "pre-specified binary classes: '+' for positive or '-'");
-	printf(argFmtStr, "", "for negative.");
-	printf(argFmtStr, "", "MODE: Can be \"win\", for training with all windows within");
-	printf(argFmtStr, "", "each training sequence file, or \"full\", for training with");
-	printf(argFmtStr, "", "the full sequences.");
-	printf(argFmtStr, "-validate:FASTA PATH CLASS", "Adds a validation sequence file.");
-	printf(argFmtStr, "", "PATH: Path to FASTA file.");
-	printf(argFmtStr, "", "CLASS: A class ID, defined with \"-class\", or one of the");
-	printf(argFmtStr, "", "pre-specified binary classes: \"+\" for positive or \"-\"");
-	printf(argFmtStr, "", "for negative.");
-	printf(argFmtStr, "-validate:outSCTable PATH", "Writes scores and classes for each validation sequence to");
-	printf(argFmtStr, "", "a tab-separated table file, PATH.");
-	printf(argFmtStr, "-class NAME VALUE FLAG", "Registers a sequence class with name NAME, value/ID VALUE,");
-	printf(argFmtStr, "", "and flag FLAG (\"+\" for positive, or \"-\" for negative)");
-	cout << sepline;
-}
-
-/*
-parse_arg
-	Parses application arguments.
-	Also fills in motif list, feature set and training set.
-*/
-bool parse_arg(int _argc,char**argv,motifList*ml,featureSet*features,seqList*trainseq,seqList*valseq){
-	if(!ml||!trainseq||!valseq)return false;
-	config*cfg=getConfiguration();
-	// Pass 1
-	char**cargv=argv;
-	int argc=_argc;
-	for(int l=0;l<argc;l++,cargv++){
-		char*a=*cargv;
-		// Check them against the valid arguments.
-		if(!strcmp(a,"-class")){
-			if(l>=argc-3){
-				argSyntaxError();
-				return false;
-			}
-			bool cls;
-			if(cargv[3][0]=='+'&&!cargv[3][1])cls=true;
-			else if(cargv[3][0]=='-'&&!cargv[3][1])cls=false;
-			else{
-				argSyntaxError();
-				return false;
-			}
-			if(!registerSeqClass(strtod(cargv[2],0),cargv[1],cls)){
-				return false;
-			}
-			cargv[0]=cargv[1]=cargv[2]=cargv[3]=0;
-			cargv+=3,argc-=3;
-		}else if(!strcmp(a,"-seed")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->randSeed=(int)strtol(cargv[1],0,10);
-			srand(cfg->randSeed);
-			cargv[0]=cargv[1]=0;
-			cargv++,argc--;
-		}else if(!strcmp(a,"-h")||!strcmp(a,"-help")){
-			print_help();
-			return false;
-		}
-	}
-	// Add default, binary classes if none were specified.
-	if(!nSequenceClasses()){
-		if(!registerSeqClass(1,(char*)"Positive",true)){
-			return false;
-		}
-		if(!registerSeqClass(-1,(char*)"Negative",false)){
-			return false;
-		}
-	}
-	// Pass 2
-	cargv=argv;
-	argc=_argc;
-	for(int l=0;l<argc;l++,cargv++){
-		char*a=*cargv;
-		// Skip arguments from the first pass.
-		if(!a)continue;
-		// Check them against the valid arguments.
-		if(!strcmp(a,"-motif:IUPAC")){
-			if(l>=argc-3){
-				argSyntaxError();
-				return false;
-			}
-			if(!ml->addIUPACMotif(cargv[1],cargv[2],(int)strtol(cargv[3],0,10))){
-				return false;
-			}
-			cargv+=3,argc-=3;
-		}else if(!strcmp(a,"-motif:kmer")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			if(!ml->addKMers((int)strtol(cargv[1],0,10))){
-				return false;
-			}
-			cargv++,argc--;
-		}else if(!strcmp(a,"-motif:Random")){
-			if(l>=argc-2){
-				argSyntaxError();
-				return false;
-			}
-			if(!ml->addRandom((int)strtol(cargv[1],0,10),(int)strtol(cargv[2],0,10))){
-				return false;
-			}
-			cargv+=2,argc-=2;
-		}else if(!strcmp(a,"-motif:XML")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			if(!ml->addMotifsFromXML(cargv[1])){
-				return false;
-			}
-			if(!registerFile((char*)"Motif XML",cargv[1])){
-				return false;
-			}
-			cargv++,argc--;
-		}else if(!strcmp(a,"-motif:FSM")){
-			cfg->useFSM=true;
-		}else if(!strcmp(a,"-motif:d:centers")){
-			cfg->distanceMode=dmCenters;
-		}else if(!strcmp(a,"-motif:d:between")){
-			cfg->distanceMode=dmBetween;
-		}else if(!strcmp(a,"-motif:d:noOverlap")){
-			cfg->motifPairsCanOverlap=false;
-		}else if(!strcmp(a,"-motif:d:overlap")){
-			cfg->motifPairsCanOverlap=true;
-			
-		}else if(!strcmp(a,"-f:nOcc")){
-			if(!features->addFeature(featureType_nOcc,featureMotif_All,0,0,0,0,1,0)){
-				return false;
-			}
-		}else if(!strcmp(a,"-f:nPair")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			if(!features->addFeature(featureType_nPair,featureMotif_All,featureMotif_All,featureMotif_All,strtod(cargv[1],0),0,1,0)){
-				return false;
-			}
-			cargv++,argc--;
-		}else if(!strcmp(a,"-f:nOccPair")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			if(!features->addFeature(featureType_nOccPair,featureMotif_All,featureMotif_All,featureMotif_All,strtod(cargv[1],0),0,1,0)){
-				return false;
-			}
-			cargv++,argc--;
-			
-		}else if(!strcmp(a,"-f:MDPA")){
-			if(!features->addFeature(featureType_MDPA,featureMotif_All,0,0,0,0,1,0)){
-				return false;
-			}
-		}else if(!strcmp(a,"-f:MDP")){
-			if(!features->addFeature(featureType_MDP,featureMotif_All,featureMotif_All,0,0,0,1,0)){
-				return false;
-			}
-		}else if(!strcmp(a,"-f:MDM")){
-			if(!features->addFeature(featureType_MDM,featureMotif_All,featureMotif_All,0,0,0,1,0)){
-				return false;
-			}
-		}else if(!strcmp(a,"-f:MDDA")){
-			if(!features->addFeature(featureType_MDDA,featureMotif_All,0,0,0,0,1,0)){
-				return false;
-			}
-		}else if(!strcmp(a,"-f:MDD")){
-			if(!features->addFeature(featureType_MDD,featureMotif_All,featureMotif_All,0,0,0,1,0)){
-				return false;
-			}
-		}else if(!strcmp(a,"-f:GC")){
-			if(!features->addFeature(featureType_GC,0,0,0,0,0,1,0)){
-				return false;
-			}
-			
-		}else if(!strcmp(a,"-wm:PREdictor")){
-			cfg->wmMode=wmPREdictor;
-		}else if(!strcmp(a,"-wm:Zero")){
-			cfg->wmMode=wmZero;
-		}else if(!strcmp(a,"-wm:Constant")){
-			cfg->wmMode=wmConstant;
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->loBeta=strtod(cargv[1],0);
-			cargv++,argc--;
-		}else if(!strcmp(a,"-wm:ZZPF")){
-			cfg->wmMode=wmZZPF;
-		}else if(!strcmp(a,"-wm:PPV")){
-			cfg->wmMode=wmPPV;
-		}else if(!strcmp(a,"-wm:BiPPV")){
-			cfg->wmMode=wmBiPPV;
-		}else if(!strcmp(a,"-train:FASTA")){
-			if(l>=argc-3){
-				argSyntaxError();
-				return false;
-			}
-			if(!trainseq->loadFastaBatch(cargv[1],getSeqClassByName(cargv[2]),getTrainModeByName(cargv[3]))){
-				return false;
-			}
-			if(!registerFile((char*)"Training sequences",cargv[1])){
-				return false;
-			}
-			cargv+=3,argc-=3;
-		}else if(!strcmp(a,"-validate:FASTA")){
-			if(l>=argc-2){
-				argSyntaxError();
-				return false;
-			}
-			if(!valseq->loadFastaBatch(cargv[1],getSeqClassByName(cargv[2]),train_Full)){
-				return false;
-			}
-			if(!registerFile((char*)"Validation sequences",cargv[1])){
-				return false;
-			}
-			cargv+=2,argc-=2;
-		}else if(!strcmp(a,"-validate:outSCTable")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->outSCVal=cargv[1];
-			cargv++,argc--;
-			
-		}else if(!strcmp(a,"-validate:no")){
-			cfg->validate = false;
-			
-		}else if(!strcmp(a,"-C:CPREdictor")){
-			cfg->classifier=cCPREdictor;
-		}else if(!strcmp(a,"-C:DummyPREdictor")){
-			cfg->classifier=cDummyPREdictor;
-		}else if(!strcmp(a,"-C:SVM")){
-			cfg->classifier=cSEQSVM;
-			cfg->svmtype=C_SVC;
-			
-		}else if(!strcmp(a,"-C:SVM-MOCCA")){
-			cfg->classifier=cSVMMOCCA;
-			cfg->svmtype=C_SVC;
-		}else if(!strcmp(a,"-C:SVM-MOCCA:C-SVC")){
-			cfg->classifier=cSVMMOCCA;
-			cfg->svmtype=C_SVC;
-		}else if(!strcmp(a,"-C:SVM-MOCCA:nu-SVC")){
-			cfg->classifier=cSVMMOCCA;
-			cfg->svmtype=NU_SVC;
-		}else if(!strcmp(a,"-C:SVM-MOCCA:One-class")){
-			cfg->classifier=cSVMMOCCA;
-			cfg->svmtype=ONE_CLASS;
-			
-		}else if(!strcmp(a,"-C:analysis:export")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->CAnalysisExportPath=cargv[1];
-			cargv++,argc--;
-
-		}else if(!strcmp(a,"-k:linear")){
-			cfg->kernel=kLinear;
-		}else if(!strcmp(a,"-k:quadratic")){
-			cfg->kernel=kQuadratic;
-		}else if(!strcmp(a,"-k:cubic")){
-			cfg->kernel=kCubic;
-		}else if(!strcmp(a,"-k:RBF")){
-			cfg->kernel=kRBF;
-		}else if(!strcmp(a,"-in:FASTA")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->inFASTA=cargv[1];
-			cargv++,argc--;
-		}else if(!strcmp(a,"-out:Wig")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->outWig=cargv[1];
-			cargv++,argc--;
-		}else if(!strcmp(a,"-out:core-sequence")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->outCoreSequence=cargv[1];
-			cargv++,argc--;
-		}else if(!strcmp(a,"-SVM:C")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->SVM_C=strtod(cargv[1],0);
-			cargv++,argc--;
-		}else if(!strcmp(a,"-SVM:gamma")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->SVM_gamma=strtod(cargv[1],0);
-			cargv++,argc--;
-		}else if(!strcmp(a,"-SVM:c0")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->SVM_c0=strtod(cargv[1],0);
-			cargv++,argc--;
-		}else if(!strcmp(a,"-SVM:p")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->SVM_p=strtod(cargv[1],0);
-			cargv++,argc--;
-		}else if(!strcmp(a,"-SVM:nu")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->SVM_nu=strtod(cargv[1],0);
-			cargv++,argc--;
-		}else if(!strcmp(a,"-threshold")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->threshold=strtod(cargv[1],0);
-			cargv++,argc--;
-		}else if(!strcmp(a,"-f:MOCCA:nOcc")){
-			cfg->MOCCA_nOcc=true;
-		}else if(!strcmp(a,"-f:MOCCA:GC")){
-			cfg->MOCCA_GC=true;
-		}else if(!strcmp(a,"-f:MOCCA:DNT")){
-			cfg->MOCCA_DNT=true;
-		}else if(!strcmp(a,"-wSize")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->windowSize=(int)strtol(cargv[1],0,10);
-			if(cfg->windowSize<=0){
-				argSyntaxError();
-				return false;
-			}
-			cargv++,argc--;
-		}else if(!strcmp(a,"-wStep")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->windowStep=(int)strtol(cargv[1],0,10);
-			if(cfg->windowStep<=0){
-				argSyntaxError();
-				return false;
-			}
-			cargv++,argc--;
-		}else if(!strcmp(a,"-wStepTrain")){
-			if(l>=argc-1){
-				argSyntaxError();
-				return false;
-			}
-			cfg->windowStepTrain=(int)strtol(cargv[1],0,10);
-			if(cfg->windowStep<=0){
-				argSyntaxError();
-				return false;
-			}
-			cargv++,argc--;
-		}else if(!strcmp(a,"-no-homo-pairing")){
-			cfg->allowHomoPairing = false;
-		}else if(!strcmp(a,"-no-hetero-pairing")){
-			cfg->allowHeteroPairing = false;
-		}else{
-			cout << m_error << "Invalid command-line argument \"" << a << "\". Aborting.\n";
-			return false;
-		}
-	}
 	return true;
 }
 

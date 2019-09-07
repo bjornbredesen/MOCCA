@@ -120,8 +120,8 @@ bool printValidationMeasures(validationPair*vp,int nvp,double threshold){
 	return true;
 }
 
-bool saveVPairTable(char*outpath,validationPair*vp,int nvp){
-	FILE*fout=fopen(outpath,"wb");
+bool saveVPairTable(std::string outpath, validationPair*vp, int nvp){
+	FILE*fout=fopen((char*)outpath.c_str(), "wb");
 	if(!fout){
 		cout << m_error << "Could not open file \"" << outpath << "\" for writing.\n";
 		return false;

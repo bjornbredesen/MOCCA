@@ -15,12 +15,12 @@ seqClass
 	Classification class specification.
 */
 typedef struct{
-	double cls;		// Class identifier value.
-	char*name;		// Name of the class.
-	bool flag;		// True if this class should be treated as true.
+	double cls;				// Class identifier value.
+	std::string name;		// Name of the class.
+	bool flag;				// True if this class should be treated as true.
 }seqClass;
 
-seqClass*getSeqClassByName(char*name);
+seqClass*getSeqClassByName(std::string name);
 
 /*
 printSeqClasses
@@ -35,7 +35,7 @@ registerSeqClass
 		Otherwise, pointers may be in use, and memory reallocation
 		may invalidate these.
 */
-seqClass*registerSeqClass(double cls,char*name,bool flag);
+seqClass*registerSeqClass(double cls,std::string name,bool flag);
 
 size_t nSequenceClasses();
 

@@ -39,14 +39,14 @@ config _config = config {
 	true,
 	0.0,1.0,0.5,0.995,1.0,
 	0.0,
-	0,0,0,
 	//bool MOCCA_nOcc, MOCCA_GC, MOCCA_DNT;
 	false, false, false,
 	EPSILON_SVR,
 	wmPREdictor,
 	0.00000001,
-	0,
-	0,
+	"",
+	"","","",
+	"",
 };
 
 config*getConfiguration(){
@@ -74,7 +74,6 @@ void config::printInfo(){
 		case wmPREdictor:cout << "PREdictor";break;
 		case wmZero:cout << "Zero for missing frequencies";break;
 		case wmConstant:cout << "Constant pseudocounts (beta=" << loBeta << ")";break;
-		case wmZZPF:cout << "ZZPF (Zero frequency => Zero weight, Pseudocounts Finally)";break;
 		case wmPPV:cout << "Positive Predictive Value weights";break;
 		case wmBiPPV:cout << "Bi-directional Positive Predictive Value weights";break;
 		default:{}
