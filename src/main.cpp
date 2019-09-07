@@ -69,6 +69,7 @@ void printRegisteredFiles(){
 #define N_ARGUMENT_PASSES 2
 
 void print_help();
+void print_licenses();
 
 struct cmdArg{
 	std::string arg;
@@ -95,6 +96,22 @@ cmdArg argumentTypes[] = {
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
 			print_help();
+			return false;
+		}
+	},
+	{
+		// Argument
+		"-license",
+		// Pass
+		0,
+		// Parameters
+		0,
+		// Documentation
+		"-license",
+		{ "Prints license information." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			print_licenses();
 			return false;
 		}
 	},
@@ -1157,6 +1174,93 @@ void print_help(){
 }
 
 /*
+print_help
+	Outputs license information.
+*/
+void print_licenses(){
+	cout << " Licenses:\n";
+	cout << sepline;
+	cout << t_bold("SVM-MOCCA") << "\n\n";
+	cout << "MIT License\n\
+\n\
+Copyright (c) 2019 Bjørn André Bredesen\n\
+\n\
+Permission is hereby granted, free of charge, to any person obtaining a copy\n\
+of this software and associated documentation files (the \"Software\"), to deal\n\
+in the Software without restriction, including without limitation the rights\n\
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n\
+copies of the Software, and to permit persons to whom the Software is\n\
+furnished to do so, subject to the following conditions:\n\
+\n\
+The above copyright notice and this permission notice shall be included in all\n\
+copies or substantial portions of the Software.\n\
+\n\
+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n\
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n\
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n\
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n\
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n\
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n\
+SOFTWARE.\n";
+	cout << sepline;
+	cout << t_bold("Dependency license: LibSVM") << "\n\
+\n\
+Copyright (c) 2000-2013 Chih-Chung Chang and Chih-Jen Lin\n\
+All rights reserved.\n\
+\n\
+Redistribution and use in source and binary forms, with or without\n\
+modification, are permitted provided that the following conditions\n\
+are met:\n\
+\n\
+1. Redistributions of source code must retain the above copyright\n\
+notice, this list of conditions and the following disclaimer.\n\
+\n\
+2. Redistributions in binary form must reproduce the above copyright\n\
+notice, this list of conditions and the following disclaimer in the\n\
+documentation and/or other materials provided with the distribution.\n\
+\n\
+3. Neither name of copyright holders nor the names of its contributors\n\
+may be used to endorse or promote products derived from this software\n\
+without specific prior written permission.\n\
+\n\
+\n\
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS\n\
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT\n\
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR\n\
+A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR\n\
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,\n\
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,\n\
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR\n\
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF\n\
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\n\
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n\
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n";
+	cout << sepline;
+	cout << t_bold("Dependency license: RapidXML") << "\n\
+\n\
+Copyright (c) 2006, 2007 Marcin Kalicinski\n\
+\n\
+Permission is hereby granted, free of charge, to any person obtaining a copy \n\
+of this software and associated documentation files (the \"Software\"), to deal \n\
+in the Software without restriction, including without limitation the rights \n\
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies \n\
+of the Software, and to permit persons to whom the Software is furnished to do so, \n\
+subject to the following conditions:\n\
+\n\
+The above copyright notice and this permission notice shall be included in all \n\
+copies or substantial portions of the Software.\n\
+\n\
+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR \n\
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, \n\
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL \n\
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER \n\
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, \n\
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS \n\
+IN THE SOFTWARE.\n";
+	cout << sepline;
+}
+
+/*
 parse_arg
 	Parses application arguments.
 	Also fills in motif list, feature set and training set.
@@ -1311,7 +1415,7 @@ main
 */
 int main(int argc,char**argv){
 	timer mainTimer((char*)"Full run");
-	cout << sepline << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2019\n bjorn@bjornbredese.no\n" << sepline;
+	cout << sepline << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2019\n bjorn@bjornbredesen.no\n" << sepline;
 	
 	svm_set_print_string_function(&libsvm_print_null);
 	
@@ -1326,6 +1430,7 @@ int main(int argc,char**argv){
 	cout.precision(15);
 	
 	if(argc<=1){
+		print_licenses();
 		print_help();
 		return -1;
 	}
