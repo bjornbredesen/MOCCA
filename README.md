@@ -5,11 +5,11 @@ Copyright Bjørn Bredesen, 2011-2019
 
 ## About
 MOCCA (Motif Occurrence Combinatorics Classification Algorithms) is a suite for modelling DNA cis-regulatory element sequences.
-Several types of motif-based models are included within MOCCA: a reimplementation of the PREdictor (Ringrose et al. 2003), implementations of the Dummy PREdictor and SVM-MOCCA (Bredesen et al. 2019), as various motif-based kernel functions that can be combined with log-odds and Support Vector Machine models.
+Several types of motif-based models are included within MOCCA: a reimplementation of the PREdictor (Ringrose *et al.* 2003), implementations of the Dummy PREdictor and SVM-MOCCA (Bredesen *et al.* 2019), as various motif-based kernel functions that can be combined with log-odds and Support Vector Machine models.
 
 #### References
- * Bredesen *et al* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
- * Ringrose *et al* 2003: https://www.sciencedirect.com/science/article/pii/S153458070300337X
+ * Bredesen *et al.* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
+ * Ringrose *et al.* 2003: https://www.sciencedirect.com/science/article/pii/S153458070300337X
 
 -------------------------------------------------
 
