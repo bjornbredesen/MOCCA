@@ -8,21 +8,19 @@
 #pragma once
 
 ////////////////////////////////////////////////////////////////////////////////////
-// SEQSVM
+// SEQDummy
 
-class SEQSVM:public sequenceClassifier{
+class SEQDummy:public sequenceClassifier{
 private:
 	autodelete<motifWindow> mwin;
 	motifOccContainer*moc;
 	motifList*motifs;
 	featureSet*features;
 	autodelete<featureWindow> fwin;
-	autodelete<fastSVMClassifier> classifier;
-	int svmtype;
-	SEQSVM(int nf);
+	SEQDummy(int nf);
 public:
-	static SEQSVM*create(motifList*motifs,featureSet*fs,int _svmtype);
-	virtual ~SEQSVM(){  }
+	static SEQDummy*create(motifList*motifs,featureSet*fs);
+	virtual ~SEQDummy(){  }
 	bool trainWindow(char*buf,long long pos,int bufs,seqClass*cls);
 	bool trainFinish();
 	bool flush();

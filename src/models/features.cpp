@@ -255,7 +255,7 @@ void featureSet::printInfo(){
 			case featureType_nPairCosI:cout << "(" << f->da << ", " << f->db << ", " << (f->cf/2) << ")";break;
 			case featureType_nOccPair:cout << "(" << f->da << ")";break;
 			case featureType_GC:break;
-			case featureType_nPair2D:cout << "(" << f->da << ")";break;
+			case featureType_nPair2D:cout << "(" << f->da << ", " << f->db << ", " << (f->icf?"Y-axis":"X-axis") << ")";break;
 			case featureType_nPairRgn:cout << "(" << f->da << ")";break;
 		}
 		cout << "\n";
@@ -299,7 +299,7 @@ void featureSet::printInstFeatureName(featureSetInstFeature*f,motifList*ml){
 		case featureType_nOccPair:cout << "(" << f->fsf->da << ")";break;
 		case featureType_GC:break;
 		case featureType_nPair2D:{
-			cout << "(" << f->fsf->da << ")" << t_indent << (f->icf?"Y axis":"X axis");
+			cout << "(" << f->fsf->da << ", " << f->fsf->db << ")" << t_indent << (f->icf?"Y-axis":"X-axis");
 			break;}
 		case featureType_nPairRgn:{
 			bool strand=f->icf&1;
@@ -348,7 +348,7 @@ std::vector<std::string> featureSet::getInstFeatureNames(motifList*ml){
 			case featureType_nOccPair:cname << "(" << f->fsf->da << ")";break;
 			case featureType_GC:break;
 			case featureType_nPair2D:{
-				cname << "(" << f->fsf->da << ")" << t_indent << (f->icf?"Y axis":"X axis");
+				cname << "(" << f->fsf->da << ", " << f->fsf->db << ")" << t_indent << (f->icf?"Y-axis":"X-axis");
 				break;}
 			case featureType_nPairRgn:{
 				bool strand=f->icf&1;
@@ -679,10 +679,10 @@ double*featureWindow::extractFeatures(char*wseq,long long wpos,int wlen,bool doR
 				v=double(iv)*normv;
 				break;}
 			case featureType_nPair2D:{
-				// New. Cardinality x 4
 				double s=0;
-				bool strand=fsif->icf&1;
+				//bool strand=fsif->icf&1;
 				bool axis=fsif->icf&2;
+				double freq=fsf->db;
 				int nPairCut=int(fsf->da);
 				if(fsif->ia==fsif->ib){
 					motifOcc*o=occContainer->getFirst(fsif->ia),*o2,*no;
@@ -694,11 +694,8 @@ double*featureWindow::extractFeatures(char*wseq,long long wpos,int wlen,bool doR
 							double d_gamma=(double(o2->start)+double(o2->mot->len)/2.0)
 												-(double(o->start)+double(o->mot->len)/2.0);
 							if(d_gamma<0)d_gamma=-d_gamma;
-							if(d_gamma<=nPairCut
-							&&(	(!strand&&o->strand==o2->strand)
-							||	(strand&&o->strand!=o2->strand)
-							)){
-								double ph=d_gamma/10.5;
+							if(d_gamma<=nPairCut){
+								double ph=d_gamma/freq;
 								if(ph<0)ph=-ph;
 								s+=axis?sin(ph*3.141592654*2.0):cos(ph*3.141592654*2.0);
 							}
@@ -715,11 +712,8 @@ double*featureWindow::extractFeatures(char*wseq,long long wpos,int wlen,bool doR
 							if(o2->skip){o2=occContainer->getNextSame(o2);continue;}
 							double d_gamma=(double(o2->start)+double(o2->mot->len)/2.0)
 												-(double(o->start)+double(o->mot->len)/2.0);
-							if(d_gamma<=nPairCut&&d_gamma>=-nPairCut
-							&&(	(!strand&&o->strand==o2->strand)
-							||	(strand&&o->strand!=o2->strand)
-							)){
-								double ph=d_gamma/10.5;
+							if(d_gamma<=nPairCut&&d_gamma>=-nPairCut){
+								double ph=d_gamma/freq;
 								if(o->strand)ph=-ph;
 								s+=axis?sin(ph*3.141592654*2.0):cos(ph*3.141592654*2.0);
 							}

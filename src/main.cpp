@@ -26,6 +26,8 @@ using namespace rapidxml;
 #include "models/cpredictor.hpp"
 #include "models/dummypredictor.hpp"
 #include "models/seqsvm.hpp"
+#include "models/seqlo.hpp"
+#include "models/seqdummy.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////
 // File list
@@ -522,11 +524,32 @@ cmdArg argumentTypes[] = {
 		// Parameters
 		0,
 		// Documentation
-		"-f:MDD",
+		"-f:GC",
 		{ "Adds GC-content feature." },
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_GC, 0, 0, 0, 0, 0, 1, 0)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:nPair2D",
+		// Pass
+		1,
+		// Parameters
+		2,
+		// Documentation
+		"-f:nPair2D",
+		{ "Adds 2D oscillatory motif pair feature." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_nPair2D, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0), strtod(params[1].c_str(), 0), 1, 0)){
+				return false;
+			}
+			if(!features->addFeature(featureType_nPair2D, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0), strtod(params[1].c_str(), 0), 1, 1)){
 				return false;
 			}
 			return true;
@@ -618,6 +641,40 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-C:LO",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:LO",
+		{ "Sets the classifier to log-odds, using separately specified",
+		  "feature spaces." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->classifier=cSEQLO;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-C:Dummy",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:Dummy",
+		{ "Sets the classifier to dummy (un-weighted sum), using separately",
+		  "specified, feature spaces." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->classifier=cSEQDummy;
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-C:SVM",
 		// Pass
 		1,
@@ -625,7 +682,7 @@ cmdArg argumentTypes[] = {
 		0,
 		// Documentation
 		"-C:SVM",
-		{ "Sets the classifier to the an SVM using separately specified",
+		{ "Sets the classifier to SVM, using separately specified",
 		  "feature spaces." },
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
@@ -1337,6 +1394,8 @@ sequenceClassifier*constructClassifier(motifList*motifs,featureSet*features,seqL
 		case cCPREdictor:cls=CPREdictor::create(motifs);break;
 		case cDummyPREdictor:cls=DummyPREdictor::create(motifs);break;
 		case cSEQSVM:cls=SEQSVM::create(motifs,features,cfg->svmtype);break;
+		case cSEQLO:cls=SEQLO::create(motifs,features);break;
+		case cSEQDummy:cls=SEQDummy::create(motifs,features);break;
 		default:cmdError("Invalid classifier.");return 0;
 	}
 	if(!cls)return 0;
@@ -1367,7 +1426,7 @@ bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqLis
 	}
 	// Basic pipeline
 	{
-		if(cfg->classifier == cSEQSVM)
+		if(cfg->classifier == cSEQSVM || cfg->classifier == cSEQLO || cfg->classifier == cSEQDummy)
 			features->printInfo();
 		cmdSection("Classifier");
 		cls.ptr->printInfo();

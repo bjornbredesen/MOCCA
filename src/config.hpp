@@ -39,6 +39,8 @@ enum classifierT{
 	cSVMMOCCA,
 	cDummyPREdictor,
 	cSEQSVM,
+	cSEQLO,
+	cSEQDummy,
 };
 
 class config{

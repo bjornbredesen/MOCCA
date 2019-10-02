@@ -16,14 +16,14 @@
 #include "baseclassifier.hpp"
 #include "sequenceclassifier.hpp"
 #include "features.hpp"
-#include "seqsvm.hpp"
+#include "seqlo.hpp"
 
 ////////////////////////////////////////////////////////////////////////////////////
-// SEQSVM
+// SEQLO
 
-SEQSVM::SEQSVM(int nf):sequenceClassifier(nf){  }
+SEQLO::SEQLO(int nf):sequenceClassifier(nf){  }
 
-SEQSVM*SEQSVM::create(motifList*motifs,featureSet*fs,int _svmtype){
+SEQLO*SEQLO::create(motifList*motifs,featureSet*fs){
 	if(!motifs){cmdError("Null-pointer argument.");return 0;}
 	autodelete<motifWindow> _mwin;
 	autodelete<featureWindow> _fwin;
@@ -37,22 +37,21 @@ SEQSVM*SEQSVM::create(motifList*motifs,featureSet*fs,int _svmtype){
 	}
 	int nfeatures = _fwin.ptr->getNFeatures();
 	if(!nfeatures){
-		cmdError("No features for SEQSVM classifier");
+		cmdError("No features for SEQLO classifier");
 		return 0;
 	}
-	autodelete<SEQSVM> r(new SEQSVM(nfeatures));
+	autodelete<SEQLO> r(new SEQLO(nfeatures));
 	if(!r.ptr){
 		outOfMemory();
 		return 0;
 	}
 	r.ptr->mwin.ptr = _mwin.disown();
 	r.ptr->fwin.ptr = _fwin.disown();
-	r.ptr->svmtype=_svmtype;
 	r.ptr->moc=r.ptr->mwin.ptr->occContainer;
 	r.ptr->motifs=r.ptr->mwin.ptr->motifs;
 	r.ptr->features=fs;
 	cout << r.ptr->nFeatures;
-	r.ptr->classifier.ptr = fastSVMClassifier::create(_svmtype,nfeatures,std::string("SEQSVM"));
+	r.ptr->classifier.ptr = logoddsClassifier::create(nfeatures);
 	if(!r.ptr->classifier.ptr){
 		return 0;
 	}
@@ -63,35 +62,35 @@ SEQSVM*SEQSVM::create(motifList*motifs,featureSet*fs,int _svmtype){
 	return r.disown();
 }
 
-bool SEQSVM::trainWindow(char*buf,long long pos,int bufs,seqClass*cls){
+bool SEQLO::trainWindow(char*buf,long long pos,int bufs,seqClass*cls){
 	double*fvec=fwin.ptr->extractFeatures(buf,pos,bufs,true);
 	if(!fvec)return false;
 	classifier.ptr->addTrain(fvec,nFeatures,cls);
 	return true;
 }
 
-bool SEQSVM::trainFinish(){
+bool SEQLO::trainFinish(){
 	if(!classifier.ptr->train())return false;
 	return true;
 }
 
-bool SEQSVM::flush(){
+bool SEQLO::flush(){
 	return mwin.ptr->flush();
 }
 
-double SEQSVM::do_applyWindow(char*buf,long long pos,int bufs){
+double SEQLO::do_applyWindow(char*buf,long long pos,int bufs){
 	double*fvec=fwin.ptr->extractFeatures(buf,pos,bufs,true);
 	if(!fvec)return -1;
 	return classifier.ptr->apply(fvec,nFeatures);
 }
 
-bool SEQSVM::printInfo(){
-	cout << t_indent << "SEQSVM classifier\n";
-	classifier.ptr->printInfo((char*)"SVM");
+bool SEQLO::printInfo(){
+	cout << t_indent << "SEQLO classifier\n";
+	classifier.ptr->printInfo((char*)"Log-odds");
 	return true;
 }
 
-bool SEQSVM::exportAnalysisData(string path){
+bool SEQLO::exportAnalysisData(string path){
 	/*
 	FILE*f=fopen(path.c_str(),"wb");
 	int i=0;
@@ -106,7 +105,7 @@ bool SEQSVM::exportAnalysisData(string path){
 	}
 	fclose(f);
 	cout << "Saved classifier analysis data to \"" << path << "\"\n";*/
-	cout << "Model analysis export not yet supported for SEQSVM";
+	cout << "Model analysis export not yet supported for SEQLO";
 	return false;
 }
 
