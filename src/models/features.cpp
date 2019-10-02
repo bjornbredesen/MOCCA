@@ -680,7 +680,6 @@ double*featureWindow::extractFeatures(char*wseq,long long wpos,int wlen,bool doR
 				break;}
 			case featureType_nPair2D:{
 				double s=0;
-				//bool strand=fsif->icf&1;
 				bool axis=fsif->icf&2;
 				double freq=fsf->db;
 				int nPairCut=int(fsf->da);
