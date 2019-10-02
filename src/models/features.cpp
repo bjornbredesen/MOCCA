@@ -252,7 +252,6 @@ void featureSet::printInfo(){
 			case featureType_MDDA:break;
 			case featureType_MDD:break;
 			case featureType_MDM:break;
-			case featureType_nPairCosI:cout << "(" << f->da << ", " << f->db << ", " << (f->cf/2) << ")";break;
 			case featureType_nOccPair:cout << "(" << f->da << ")";break;
 			case featureType_GC:break;
 			case featureType_nPair2D:cout << "(" << f->da << ", " << f->db << ", " << (f->icf?"Y-axis":"X-axis") << ")";break;
@@ -290,12 +289,7 @@ void featureSet::printInstFeatureName(featureSetInstFeature*f,motifList*ml){
 		case featureType_MDDA:break;
 		case featureType_MDD:break;
 		case featureType_MDM:break;
-		case featureType_nPairCosI:{
-			int res=f->fsf->cf/2;
-			bool strand=f->icf>=res?true:false;
-			int interval=strand?(f->icf-res):f->icf;
-			cout << "(" << f->fsf->da << ", " << f->fsf->db << ", " << (f->fsf->cf/2) << ")" << t_indent "Interval " << (interval+1) << t_indent << (strand?"Opposite strand":"Same strand");
-			break;}
+
 		case featureType_nOccPair:cout << "(" << f->fsf->da << ")";break;
 		case featureType_GC:break;
 		case featureType_nPair2D:{
@@ -339,12 +333,6 @@ std::vector<std::string> featureSet::getInstFeatureNames(motifList*ml){
 			case featureType_MDDA:break;
 			case featureType_MDD:break;
 			case featureType_MDM:break;
-			case featureType_nPairCosI:{
-				int res=f->fsf->cf/2;
-				bool strand=f->icf>=res?true:false;
-				int interval=strand?(f->icf-res):f->icf;
-				cname << "(" << f->fsf->da << ", " << f->fsf->db << ", " << (f->fsf->cf/2) << ")" << t_indent "Interval " << (interval+1) << t_indent << (strand?"Opposite strand":"Same strand");
-				break;}
 			case featureType_nOccPair:cname << "(" << f->fsf->da << ")";break;
 			case featureType_GC:break;
 			case featureType_nPair2D:{
@@ -816,38 +804,6 @@ double*featureWindow::extractFeatures(char*wseq,long long wpos,int wlen,bool doR
 					}
 				}
 				v*=normv/2.0;
-				break;}
-			case featureType_nPairCosI:{
-				// Find basic feature information.
-				int res=fsf->cf/2;
-				bool strand=fsif->icf>=res?true:false;
-				int interval=strand?(fsif->icf-res):fsif->icf;
-				v=0;
-				int nPairCut=int(fsf->da);
-				double p=fsf->db;
-				double ph=double(interval)/double(res);
-				// Go through pairs.
-				motifOcc*o=occContainer->getFirst(fsif->ia);
-				while(o){
-					if(o->skip){o=occContainer->getNextSame(o);continue;}
-					motifOcc*o2=occContainer->getFirst(fsif->ib);
-					while(o2){
-						if(o2->skip){o2=occContainer->getNextSame(o2);continue;}
-						// Use distance between motif centers, also considering sign.
-						double d_gamma=(double(o2->start)+double(o2->mot->len)/2.0)
-											-(double(o->start)+double(o->mot->len)/2.0);
-						if(o->strand)d_gamma=-d_gamma; // If the first is on the '-' strand, reverse distance.
-						// Now, make sure the strand combination matches that for the feature.
-						if(d_gamma<=nPairCut&&d_gamma>=-nPairCut&&((o->strand==o2->strand&&!strand)||(o->strand!=o2->strand&&strand))){
-							double Ci=(d_gamma/p)+ph;
-							double C=cos((Ci)*3.141592654*2.0);
-							v+=(C+1.0)/2.0;
-						}
-						o2=occContainer->getNextSame(o2);
-					}
-					o=occContainer->getNextSame(o);
-				}
-				v*=normv;
 				break;}
 			case featureType_PEDI:{
 				v=0;
