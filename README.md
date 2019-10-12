@@ -15,8 +15,14 @@ Several types of motif-based models are included within MOCCA: a reimplementatio
 
 ## Installing
 
-To install, run
-`autoreconf --install && ./configure && make && make install`
+To build, run
+`autoreconf --install && ./configure && make`
+
+After building, MOCCA can be installed by running
+`sudo make install`
+
+Similarly, MOCCA can be uninstalled by running
+`sudo make uninstall`
 
 -------------------------------------------------
 
