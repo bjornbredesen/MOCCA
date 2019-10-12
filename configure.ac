@@ -1,0 +1,14 @@
+AC_INIT(mocca, 1.0)
+
+AM_INIT_AUTOMAKE
+
+AC_PROG_MAKE_SET
+
+AC_LANG(C++)
+AC_PROG_CXX
+
+CXXFLAGS="-std=c++11 -fPIC"
+
+AC_CONFIG_FILES([Makefile src/Makefile])
+AC_OUTPUT
+

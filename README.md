@@ -13,6 +13,13 @@ Several types of motif-based models are included within MOCCA: a reimplementatio
 
 -------------------------------------------------
 
+## Installing
+
+To install, run
+`autoreconf --install && ./configure && make && make install`
+
+-------------------------------------------------
+
 ## License
 
 MIT License

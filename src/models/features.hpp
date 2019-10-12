@@ -29,11 +29,9 @@ enum featureType{
 	featureType_MDD,
 	featureType_PEDI,
 	featureType_nPairDH,
-	featureType_nPairCosI,
 	featureType_nOccPair,
 	featureType_GC,
 	featureType_nPair2D,
-	featureType_nPairRgn,
 };
 
 /*

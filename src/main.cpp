@@ -542,14 +542,60 @@ cmdArg argumentTypes[] = {
 		// Parameters
 		2,
 		// Documentation
-		"-f:nPair2D",
-		{ "Adds 2D oscillatory motif pair feature." },
+		"-f:nPair2D D F",
+		{ "Adds 2D oscillatory motif pair feature.",
+		  "Pair occurrence within D base pairs is weighted by the sine",
+		  "and cosine of the distance separately, with the periodicity",
+		  "scaled to F." },
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_nPair2D, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0), strtod(params[1].c_str(), 0), 1, 0)){
 				return false;
 			}
 			if(!features->addFeature(featureType_nPair2D, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0), strtod(params[1].c_str(), 0), 1, 1)){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:PEDI",
+		// Pass
+		1,
+		// Parameters
+		3,
+		// Documentation
+		"-f:PEDI D F P",
+		{ "Adds oscillatory motif pair feature.",
+		  "Pair occurrence within D base pairs is weighted by the cosine",
+		  "of the distance, with the periodicity scaled to F, and phase",
+		  "shifted by P." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_PEDI, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[2].c_str(), 0), strtod(params[1].c_str(), 0), 1, strtod(params[0].c_str(), 0))){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-f:nPairDH",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-f:nPairDH D",
+		{ "Adds B-DNA oscillatory motif pair feature.",
+		  "Pairs within D base pairs are weighted by their distance with",
+		  "a cosine curve with a frequency of 10.5 base pairs, with the",
+		  "curve shifted by 5.25 base pairs for occurrences on opposite",
+		  "strands." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			if(!features->addFeature(featureType_nPairDH, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0), 0, 1, 0)){
 				return false;
 			}
 			return true;

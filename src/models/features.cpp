@@ -64,11 +64,9 @@ s_featureInfo featureInfo[N_FEATURES]={
 	{	(char*)"MDD", 			featureCardinality_Quadratic,	},
 	{	(char*)"PEDI", 			featureCardinality_QuadraticReflexive,	},
 	{	(char*)"nPairDH",		featureCardinality_QuadraticReflexive,	},
-	{	(char*)"nPairCosI",		featureCardinality_QuadraticReflexive,	},
 	{	(char*)"nOccPair",		featureCardinality_Quadratic,	},
 	{	(char*)"GC content", 	featureCardinality_Singleton,	},
 	{	(char*)"nPair2D",		featureCardinality_QuadraticReflexive,	},
-	{	(char*)"nPairRgn",		featureCardinality_QuadraticReflexive,	},
 };
 
 
@@ -255,7 +253,6 @@ void featureSet::printInfo(){
 			case featureType_nOccPair:cout << "(" << f->da << ")";break;
 			case featureType_GC:break;
 			case featureType_nPair2D:cout << "(" << f->da << ", " << f->db << ", " << (f->icf?"Y-axis":"X-axis") << ")";break;
-			case featureType_nPairRgn:cout << "(" << f->da << ")";break;
 		}
 		cout << "\n";
 	}
@@ -295,13 +292,6 @@ void featureSet::printInstFeatureName(featureSetInstFeature*f,motifList*ml){
 		case featureType_nPair2D:{
 			cout << "(" << f->fsf->da << ", " << f->fsf->db << ")" << t_indent << (f->icf?"Y-axis":"X-axis");
 			break;}
-		case featureType_nPairRgn:{
-			bool strand=f->icf&1;
-			int rgn=f->icf>>1;
-			char*rgnn[3]={ (char*)"Upstream", (char*)"Proximal", (char*)"Downstream" };
-			char*strn[2]={ (char*)"Same strand", (char*)"Opposite strand" };
-			cout << "(" << f->fsf->da << ")" << t_indent << rgnn[rgn] << t_indent << strn[strand];
-			break;}
 	}
 	if(cardl>=1)
 		cout << t_indent << ml->motifs[f->ia].name;
@@ -337,13 +327,6 @@ std::vector<std::string> featureSet::getInstFeatureNames(motifList*ml){
 			case featureType_GC:break;
 			case featureType_nPair2D:{
 				cname << "(" << f->fsf->da << ", " << f->fsf->db << ")" << t_indent << (f->icf?"Y-axis":"X-axis");
-				break;}
-			case featureType_nPairRgn:{
-				bool strand=f->icf&1;
-				int rgn=f->icf>>1;
-				char*rgnn[3]={ (char*)"Upstream", (char*)"Proximal", (char*)"Downstream" };
-				char*strn[2]={ (char*)"Same strand", (char*)"Opposite strand" };
-				cname << "(" << f->fsf->da << ")" << t_indent << rgnn[rgn] << t_indent << strn[strand];
 				break;}
 		}
 		if(cardl>=1)
@@ -711,58 +694,6 @@ double*featureWindow::extractFeatures(char*wseq,long long wpos,int wlen,bool doR
 				}
 				v=s*normv;
 				break;}
-			case featureType_nPairRgn:{
-				// Cardinality x 6 (regions and strands)
-				double s=0;
-				
-				int nPairCut=int(fsf->da);
-				bool strand=fsif->icf&1;
-				int rgn=fsif->icf>>1;
-				
-				double dMin=0,dMax=0;
-				
-				double left=-double(nPairCut)/2.0;
-				double dd=double(nPairCut)/3.0;
-				
-				switch(rgn){
-				case 0: dMin=left; dMax=left+dd; break;
-				case 1: dMin=left+dd; dMax=left+dd*2.0; break;
-				case 2: dMin=left+dd*2.0; dMax=left+dd*3.0; break;
-				default:cmdWarning("Invalid region");
-				}
-
-				
-				motifOcc*o=occContainer->getFirst(fsif->ia);
-				while(o){
-					if(o->skip){o=occContainer->getNextSame(o);continue;}
-					motifOcc*o2=occContainer->getFirst(fsif->ib);
-					while(o2){
-						if(o2->skip){o2=occContainer->getNextSame(o2);continue;}
-						
-						// Only consider pairs with the right strand combination.
-						if( (!strand&&o->strand!=o2->strand)
-						||	(strand&&o->strand==o2->strand) ){
-							o2=occContainer->getNextSame(o2);
-							continue;
-						}
-
-						double d_gamma=(double(o2->start)+double(o2->mot->len)/2.0)
-											-(double(o->start)+double(o->mot->len)/2.0);
-
-						// If main occurrence is on the other strand, reverse the distance
-						if(o->strand)d_gamma=-d_gamma;
-						
-						if(d_gamma>=dMin&&d_gamma<=dMax){
-							s+=1.0;
-						}
-
-						o2=occContainer->getNextSame(o2);
-					}
-					o=occContainer->getNextSame(o);
-				}
-
-				v=s*normv;
-				break;}
 			case featureType_nPairDH:{
 				v=0;
 				int nPairCut=int(fsf->da);
@@ -807,7 +738,7 @@ double*featureWindow::extractFeatures(char*wseq,long long wpos,int wlen,bool doR
 				break;}
 			case featureType_PEDI:{
 				v=0;
-				int nPairCut=int(fsf->da);
+				int nPairCut=int(fsf->icf);
 				double delta=fsf->db;
 				motifOcc*o=occContainer->getFirst(fsif->ia);
 				while(o){
@@ -815,11 +746,21 @@ double*featureWindow::extractFeatures(char*wseq,long long wpos,int wlen,bool doR
 					motifOcc*o2=occContainer->getFirst(fsif->ib);
 					while(o2){
 						if(o2->skip){o2=occContainer->getNextSame(o2);continue;}
+						/*
 						int d1=int(o2->start-(o->start+o->mot->len));
 						int d2=int(o->start-(o2->start+o2->mot->len));
 						int d_alpha=max(max(d1,d2),0);
 						if(d_alpha<=nPairCut){
 							double C=cos((double(d_alpha)/delta)*3.141592654*2.0);
+							v+=(C+1.0)/2.0;
+						}
+						*/
+						double d_gamma=(double(o2->start)+double(o2->mot->len)/2.0)
+											-(double(o->start)+double(o->mot->len)/2.0);
+						if(d_gamma<0)d_gamma=-d_gamma;
+						d_gamma+=fsf->da;
+						if(d_gamma<=nPairCut){
+							double C=cos((double(d_gamma)/delta)*3.141592654*2.0);
 							v+=(C+1.0)/2.0;
 						}
 						o2=occContainer->getNextSame(o2);
