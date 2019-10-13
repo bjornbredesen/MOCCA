@@ -1,5 +1,5 @@
 Source: mocca
-Section: unknown
+Section: devel
 Priority: optional
 Maintainer: Bjørn Bredesen <bjorn@bjornbredesen.no>
 Build-Depends: debhelper (>=9)
@@ -10,9 +10,10 @@ Vcs-Git: https://github.com/bjornbredesen/MOCCA
 Package: mocca
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
-Description: Models cis-regulatory module sequences in terms of motif enrichment
- MOCCA models cis-regulatory module DNA sequences in terms of their motif composition,
- given training sequences and motifs. MOCCA contains a reimplementation of the
- PREdictor algorithm, an implementation of the SVM-MOCCA algorithm, as well as
- a variety of feature space formulations that can be combined with either
+Description: Models cis-regulatory module sequences in terms of motifs
+ enrichment MOCCA models cis-regulatory module DNA sequences in terms
+ of their motif composition, given training sequences and motifs.
+ MOCCA contains a reimplementation of the PREdictor algorithm, an
+ implementation of the SVM-MOCCA algorithm, as well as a variety of
+ feature space formulations that can be combined with either
  un-weighted summation, log-odds weighting or Support Vector Machines.

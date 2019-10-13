@@ -1,0 +1,746 @@
+<!doctype refentry PUBLIC "-//OASIS//DTD DocBook V4.1//EN" [
+
+<!-- Process this file with docbook-to-man to generate an nroff manual
+     page: `docbook-to-man manpage.sgml > manpage.1'.  You may view
+     the manual page with: `docbook-to-man manpage.sgml | nroff -man |
+     less'.  A typical entry in a Makefile or Makefile.am is:
+
+manpage.1: manpage.sgml
+	docbook-to-man $< > $@
+
+
+	The docbook-to-man binary is found in the docbook-to-man package.
+	Please remember that if you create the nroff version in one of the
+	debian/rules file targets (such as build), you will need to include
+	docbook-to-man in your Build-Depends control field.
+
+  -->
+
+  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
+  <!ENTITY dhfirstname "<firstname>Bjørn André</firstname>">
+  <!ENTITY dhsurname   "<surname>Bredesen</surname>">
+  <!-- Please adjust the date whenever revising the manpage. -->
+  <!ENTITY dhdate      "<date>October 13 2019</date>">
+  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
+       allowed: see man(7), man(1). -->
+  <!ENTITY dhsection   "<manvolnum>MOCCA</manvolnum>">
+  <!ENTITY dhemail     "<email>bjorn@bjornbredesen.no</email>">
+  <!ENTITY dhusername  "Bjørn Bredesen">
+  <!ENTITY dhucpackage "<refentrytitle>MOCCA</refentrytitle>">
+  <!ENTITY dhpackage   "mocca">
+
+  <!ENTITY debian      "<productname>Debian</productname>">
+  <!ENTITY gnu         "<acronym>GNU</acronym>">
+  <!ENTITY gpl         "&gnu; <acronym>GPL</acronym>">
+]>
+
+<refentry>
+  <refentryinfo>
+    <address>
+      &dhemail;
+    </address>
+    <author>
+      &dhfirstname;
+      &dhsurname;
+    </author>
+    <copyright>
+      <year>2019</year>
+      <holder>&dhusername;</holder>
+    </copyright>
+    &dhdate;
+  </refentryinfo>
+  <refmeta>
+    &dhucpackage;
+
+    &dhsection;
+  </refmeta>
+  <refnamediv>
+    <refname>MOCCA</refname>
+
+    <refpurpose>Models motif occurrence combinatorics of cis-regulatory module DNA sequences</refpurpose>
+  </refnamediv>
+  <refsect1>
+    <title>OPTIONS</title>
+
+    <variablelist>
+    
+      <varlistentry>
+        <term>
+        	<option>-h</option>
+          	<option>--help</option>
+        </term>
+        <listitem>
+          <para>Shows help text.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-license</option>
+        </term>
+        <listitem>
+          <para>Shows licenses.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-seed</option>
+        </term>
+        <listitem>
+          <para>Sets the random seed.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-class NAME VALUE FLAG</option>
+        </term>
+        <listitem>
+          <para>Registers a sequence class with name NAME, value/ID VALUE, and flag FLAG ("+" for positive, or "-" for negative).</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:IUPAC NAME MOTIF MISMATCHES</option>
+        </term>
+        <listitem>
+          <para>Adds an IUPAC-motif with the name NAME, and sequence MOTIF, with MISMATCHES mismatches allowed.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:XML PATH</option>
+        </term>
+        <listitem>
+          <para>Adds motifs specified in an XML-file PATH..</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:kmer k</option>
+        </term>
+        <listitem>
+          <para>Adds all k-mers.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:Random</option>
+        </term>
+        <listitem>
+          <para>Adds N random sequences of length LEN.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:FSM</option>
+        </term>
+        <listitem>
+          <para>Enable Finite State Machine for motif occurrence parsing.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:No-FSM</option>
+        </term>
+        <listitem>
+          <para>Disable Finite State Machine for motif occurrence parsing.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:d:centers</option>
+        </term>
+        <listitem>
+          <para>Sets the distance mode to centered.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:d:between</option>
+        </term>
+        <listitem>
+          <para>Sets the distance mode to between.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:d:noOverlap</option>
+        </term>
+        <listitem>
+          <para>Disallows motif pairs to overlap when counting.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:d:overlap</option>
+        </term>
+        <listitem>
+          <para>Allows motif pairs to overlap when counting.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-no-homo-pairing</option>
+        </term>
+        <listitem>
+          <para>Disables pairing of the same motifs for CPREdictor.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-no-hetero-pairing</option>
+        </term>
+        <listitem>
+          <para>Disables pairing of different motifs for CPREdictor.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:nOcc</option>
+        </term>
+        <listitem>
+          <para>Adds motif occurrence frequency features.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:nPair D</option>
+        </term>
+        <listitem>
+          <para>Adds motif pair occurrence frequency features, with distance cutoff D.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:nOccPair D</option>
+        </term>
+        <listitem>
+          <para>Adds motif occurrence pair occurrence frequency features, with distance cutoff D.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:MDPA</option>
+        </term>
+        <listitem>
+          <para>Adds Mean Distance Proximal All features.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>--f:MDP</option>
+        </term>
+        <listitem>
+          <para>Adds Mean Distance Proximal features.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:MDM</option>
+        </term>
+        <listitem>
+          <para>Adds Mean Distance Mean features.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:MDDA</option>
+        </term>
+        <listitem>
+          <para>Adds Mean Distance Distal All features.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:MDD</option>
+        </term>
+        <listitem>
+          <para>Adds Mean Distance Distal features.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:GC</option>
+        </term>
+        <listitem>
+          <para>Adds GC-content feature.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:nPair2D D F</option>
+        </term>
+        <listitem>
+          <para>Adds 2D oscillatory motif pair feature. Pair occurrence within D base pairs is weighted by the sine and cosine of the distance separately, with the periodicity scaled to F.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:PEDI D F P</option>
+        </term>
+        <listitem>
+          <para>Adds oscillatory motif pair feature. Pair occurrence within D base pairs is weighted by the cosine of the distance, with the periodicity scaled to F, and phase shifted by P.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:MOCCA:nOcc</option>
+        </term>
+        <listitem>
+          <para>Adds motif occurrence frequency features to SVM-MOCCA.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:MOCCA:DNT</option>
+        </term>
+        <listitem>
+          <para>Adds dinucleotide features to SVM-MOCCA.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-f:MOCCA:GC</option>
+        </term>
+        <listitem>
+          <para>Adds GC content feature to SVM-MOCCA.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-C:CPREdictor</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier to the CPREdictor.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-C:DummyPREdictor</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier to the DummyPREdictor.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-C:LO</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier to log-odds, using separately specified feature spaces.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-C:Dummy</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier to dummy (un-weighted sum), using separately specified, feature spaces.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-C:SVM</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier to SVM, using separately specified feature spaces.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-C:SVM-MOCCA</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier to SVM-MOCCA.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-C:SVM-MOCCA:C-SVC</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier to SVM-MOCCA, using the C-SVC formulation.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-C:SVM-MOCCA:nu-SVC</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier to SVM-MOCCA, using the nu-SVC formulation.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-C:analysis:export PATH</option>
+        </term>
+        <listitem>
+          <para>Exports model analysis to file.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-wm:PREdictor</option>
+        </term>
+        <listitem>
+          <para>Sets the log-odds weight mode to the PREdictor formulation. When either a positive or negative class summed feature is zero, a pseudocount of 1 is added for both the positives and negatives.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-wm:Zero</option>
+        </term>
+        <listitem>
+          <para>Sets the log-odds weight mode to zero. When either a positive or negative class summed feature is zero, the weight is set to zero..</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-wm:Constant VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the log-odds weight mode to constant. A constant pseudocount is added to summed positive and negative features, so that they are never zero.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-wm:PPV</option>
+        </term>
+        <listitem>
+          <para>Sets the log-odds weight mode to PPV. Instead of log-odds, the Positive Predictive Value is calculated based on motif occurrences in positives (TP) versus negatives (FP).</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-wm:BiPPV</option>
+        </term>
+        <listitem>
+          <para>Sets the log-odds weight mode to BiPPV. Instead of log-odds, the Bi-Positive Predictive Value is calculated based on motif occurrences in positives (TP) versus negatives (FP). BiPPV is the difference between PPV for the positives, and PPV for switched labels (False Discovery Rate).</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-k:linear</option>
+        </term>
+        <listitem>
+          <para>Sets the SVM kernel to linear.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-k:quadratic</option>
+        </term>
+        <listitem>
+          <para>Sets the SVM kernel to quadratic (poly. degree 2).</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-k:cubic</option>
+        </term>
+        <listitem>
+          <para>Sets the SVM kernel to cubic (poly. degree 3).</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-k:RBF</option>
+        </term>
+        <listitem>
+          <para>Sets the SVM kernel to Radial Basis Function.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-SVM:C VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the SVM metaparameter C.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-SVM:nu VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the SVM metaparameter nu.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-SVM:p VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the SVM metaparameter p.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-SVM:gamma VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the SVM kernel parameter gamma.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-SVM:c0 VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the SVM kernel parameter c0.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-threshold VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier threshold.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-wSize VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier window size.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-wStep VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier window step size.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-wStepTrain VALUE</option>
+        </term>
+        <listitem>
+          <para>Sets the classifier window training step size. When training with sequence windows, this can be set in order to control model complexity growth.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-train:FASTA PATH CLASS MODE</option>
+        </term>
+        <listitem>
+          <para>Adds a training sequence file. PATH: Path to FASTA file. CLASS: A class ID, defined with "-class", or one of the pre-specified binary classes: "+" for positive or "-" for negative. MODE: Can be "win", for training with all windows within each training sequence file, or "full", for training with the full sequences.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-validate:FASTA PATH CLASS</option>
+        </term>
+        <listitem>
+          <para>Adds a validation sequence file. PATH: Path to FASTA file. CLASS: A class ID, defined with "-class", or one of the pre-specified binary classes: "+" for positive or "-" for negative.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-validate:no</option>
+        </term>
+        <listitem>
+          <para>Disables validation.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-validate:outSCTable PATH</option>
+        </term>
+        <listitem>
+          <para>Outputs validation set score and class table to file.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-in:FASTA PATH</option>
+        </term>
+        <listitem>
+          <para>Sets an input FASTA file to be scored.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-out:Wig PATH</option>
+        </term>
+        <listitem>
+          <para>Sets an output Wiggle file for scored sequences.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-out:core-sequence PATH</option>
+        </term>
+        <listitem>
+          <para>Sets an output FASTA file for predicted core sequences from input FASTA file.</para>
+        </listitem>
+      </varlistentry>
+      
+    </variablelist>
+  </refsect1>
+  <refsect1>
+    <title>LICENSE - MOCCA</title>
+
+    <para>MIT License</para>
+
+<para>Copyright (c) 2019 Bjørn André Bredesen</para>
+
+<para>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</para>
+
+<para>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</para>
+
+<para>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</para>
+  </refsect1>
+  
+  <refsect1>
+    <title>LICENSE - LibSVM</title>
+
+    <para>Copyright (c) 2000-2013 Chih-Chung Chang and Chih-Jen Lin
+All rights reserved.</para>
+
+<para>Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions
+are met:</para>
+
+<para>1. Redistributions of source code must retain the above copyright
+notice, this list of conditions and the following disclaimer.</para>
+
+<para>2. Redistributions in binary form must reproduce the above copyright
+notice, this list of conditions and the following disclaimer in the
+documentation and/or other materials provided with the distribution.</para>
+
+<para>3. Neither name of copyright holders nor the names of its contributors
+may be used to endorse or promote products derived from this software
+without specific prior written permission.</para>
+
+
+<para>THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+``AS IS'' AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE REGENTS OR
+CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
+NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.</para>
+  </refsect1>
+  <refsect1>
+    <title>LICENSE - RapidXML</title>
+
+    <para>Copyright (c) 2006, 2007 Marcin Kalicinski</para>
+
+<para>Permission is hereby granted, free of charge, to any person obtaining a copy 
+of this software and associated documentation files (the "Software"), to deal 
+in the Software without restriction, including without limitation the rights 
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do so, 
+subject to the following conditions:</para>
+
+<para>The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.</para>
+
+<para>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL 
+THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
+IN THE SOFTWARE.</para>
+  </refsect1>
+</refentry>
+
+<!-- Keep this comment at the end of the file
+Local variables:
+mode: sgml
+sgml-omittag:t
+sgml-shorttag:t
+sgml-minimize-attributes:nil
+sgml-always-quote-attributes:t
+sgml-indent-step:2
+sgml-indent-data:t
+sgml-parent-document:nil
+sgml-default-dtd-file:nil
+sgml-exposed-tags:nil
+sgml-local-catalogs:nil
+sgml-local-ecat-files:nil
+End:
+-->

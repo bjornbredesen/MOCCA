@@ -1,6 +1,6 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: mocca
-Source: <url://example.com>
+Source: https://github.com/bjornbredesen/MOCCA/
 
 Files: *
 Copyright: 2019, Bjørn Bredesen, bjorn@bjornbredesen.no

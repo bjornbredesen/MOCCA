@@ -103,6 +103,22 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"--help",
+		// Pass
+		0,
+		// Parameters
+		0,
+		// Documentation
+		"--help",
+		{ "Prints help text." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			print_help();
+			return false;
+		}
+	},
+	{
+		// Argument
 		"-license",
 		// Pass
 		0,
