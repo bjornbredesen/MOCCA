@@ -23,10 +23,10 @@ manpage.1: manpage.sgml
   <!ENTITY dhdate      "<date>October 13 2019</date>">
   <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
        allowed: see man(7), man(1). -->
-  <!ENTITY dhsection   "<manvolnum>MOCCA</manvolnum>">
+  <!ENTITY dhsection   "<manvolnum>1</manvolnum>">
   <!ENTITY dhemail     "<email>bjorn@bjornbredesen.no</email>">
   <!ENTITY dhusername  "Bjørn Bredesen">
-  <!ENTITY dhucpackage "<refentrytitle>MOCCA</refentrytitle>">
+  <!ENTITY dhucpackage "<refentrytitle>mocca</refentrytitle>">
   <!ENTITY dhpackage   "mocca">
 
   <!ENTITY debian      "<productname>Debian</productname>">
@@ -55,7 +55,7 @@ manpage.1: manpage.sgml
     &dhsection;
   </refmeta>
   <refnamediv>
-    <refname>MOCCA</refname>
+    <refname>mocca</refname>
 
     <refpurpose>Models motif occurrence combinatorics of cis-regulatory module DNA sequences</refpurpose>
   </refnamediv>

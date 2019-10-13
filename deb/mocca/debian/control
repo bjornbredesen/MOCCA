@@ -2,7 +2,7 @@ Source: mocca
 Section: devel
 Priority: optional
 Maintainer: Bjørn Bredesen <bjorn@bjornbredesen.no>
-Build-Depends: debhelper (>=9)
+Build-Depends: debhelper (>=9), docbook-to-man
 Standards-Version: 3.9.6
 Homepage: https://github.com/bjornbredesen/MOCCA
 Vcs-Git: https://github.com/bjornbredesen/MOCCA
