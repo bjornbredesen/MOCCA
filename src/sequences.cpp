@@ -88,15 +88,16 @@ bool seqStreamBuffer::setpos(long pos){
 // seqStreamRandom
 
 seqStreamRandom::seqStreamRandom(double da,double dc,double dg){ // dt = 1-da-dc-dg.
-	rA=da;
-	rC1=da+dc;
-	rC2=rC1+dg;
+	rA = da;
+	rC1 = da+dc;
+	rC2 = rC1+dg;
 }
 
 bool seqStreamRandom::train(seqStream*input){
 	cmdTask task((char*)"Training i.i.d. background model");
 	#define FGCSBUFSIZE 256
 	autofree<char> buf((char*)malloc(FGCSBUFSIZE));
+	// Extract occurrence frequencies per nucleotide
 	int nNT[5]={0,0,0,0,0};
 	long nti=0;
 	for(long wind=0;;wind++){
@@ -113,6 +114,13 @@ bool seqStreamRandom::train(seqStream*input){
 		nti+=nread;
 		if(!(wind%100))task.setLongT(nti,(char*)"nt");
 	}
+	// Calculate weights
+	int bptotal = nNT[0]+nNT[1]+nNT[2]+nNT[3];
+	int bpinvalid = nNT[4];
+	rA = double(nNT[0])/double(bptotal);
+	rC1 = double(nNT[1])/double(bptotal);
+	rC2 = double(nNT[2])/double(bptotal);
+	//P_T=rT=double(nNT[3])/double(bptotal);
 	return true;
 }
 
