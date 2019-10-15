@@ -47,6 +47,7 @@ config _config = config {
 	"",
 	"","","",
 	"",
+	"","","",
 };
 
 config*getConfiguration(){
@@ -78,6 +79,7 @@ void config::printInfo(){
 		case wmBiPPV:cout << "Bi-directional Positive Predictive Value weights";break;
 		default:{}
 	}
+	if(genomeFASTAPath.length() > 0) cout << t_indent << "Genome: " << genomeFASTAPath;
 	cout << "\n";
 }
 

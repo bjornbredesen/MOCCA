@@ -63,6 +63,9 @@ public:
 	std::string CAnalysisExportPath;
 	std::string inFASTA, outWig, outCoreSequence;
 	std::string outSCVal;
+	std::string genomeFASTAPath;
+	std::string predictGFFPath;
+	std::string predictWigPath;
 	/*
 	printInfo
 		Prints out information

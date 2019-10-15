@@ -178,6 +178,104 @@ bool sequenceClassifier::applyFASTA(std::string inpath, std::string outpath){
 	return true;
 }
 
+/*
+typedef struct {
+	int start, end;
+}predictionRegion;
+*/
+
+bool sequenceClassifier::predictGenomewideFASTA(std::string inFASTAPath, std::string outGFFPath, std::string outWigPath){
+	FILE*fout=0;
+	if(!inFASTAPath.length())return false;
+	timer mainTimer((char*)"Genome-wide prediction");
+	cmdTask task((char*)"Genome-wide prediction");
+	seqStreamFastaBatch*ssfb=seqStreamFastaBatch::load((char*)inFASTAPath.c_str());
+	if(!ssfb){
+		return false;
+	}
+	long long bptotal=0;
+	for(seqStreamFastaBatchBlock*ssfbblk;(ssfbblk=ssfb->getBlock());){
+		bptotal+=ssfbblk->getLength();
+	}
+	delete ssfb;
+	ssfb=seqStreamFastaBatch::load((char*)inFASTAPath.c_str());
+	if(!ssfb){
+		return false;
+	}
+	ofstream ofGFF;
+	if(outGFFPath.length())
+		ofGFF.open(outGFFPath);
+	ofstream ofWig;
+	if(outWigPath.length())
+		ofWig.open(outWigPath);
+	int nPredictions = 0;
+	int cit = 0;
+	for(seqStreamFastaBatchBlock*ssfbblk;(ssfbblk=ssfb->getBlock());){
+		std::string streamName = std::string(ssfbblk->getName());
+		size_t ti = streamName.find(" ");
+		std::string chromName = ti == std::string::npos ? streamName : streamName.substr(0, ti);
+		cmdTask task((char*)chromName.c_str());
+		if(ofWig.is_open())
+			ofWig << "fixedStep chrom=" << chromName << " start=1 step=" << cfg->windowStep << " span=" << cfg->windowSize << "\n";
+		//
+		int pStart = -1;
+		int pEnd = -1;
+		double pScore = 0.;
+		//
+		seqStreamWindow*ssw=seqStreamWindow::create(ssfbblk,cfg->windowSize,cfg->windowStep);
+		if(!ssw){
+			delete ssfb;
+			return false;
+		}
+		// Apply in windows.
+		char*rb;
+		int rbn;
+		long nextSi=0;
+		double cvalue;
+		flush();
+		for(long i=0;(rbn=ssw->get(rb));i+=cfg->windowStep){
+			cit += rbn - (cfg->windowSize-cfg->windowStep);
+			if(cit>=nextSi){
+				nextSi+=50000;
+				task.setPercent((double(cit)/double(bptotal))*100.0);
+			}
+			cvalue=applyWindow(rb,i,rbn);
+			if(ofWig.is_open())
+				ofWig << (cvalue+threshold) << "\n";
+			if(cvalue>=0.){
+				if(pEnd==-1){
+					pStart=i;
+					pScore=cvalue+threshold;
+				}else{
+					pScore=max(cvalue+threshold,pScore);
+				}
+				pEnd=i+rbn;
+			}else if(pEnd != -1 && i > pEnd){
+				cmdTask::wipe();
+				cout << t_indent << "Predicted: " << chromName << ":" << pStart << ".." << pEnd << " - score: " << pScore << "\n";
+				cmdTask::refresh();
+				if(ofGFF.is_open())
+					ofGFF << chromName << "\tMOCCA\tPrediction\t" << pStart << "\t" << pEnd << "\t" << pScore << "\t.\t.\t1\n";
+				pEnd = -1;
+				nPredictions++;
+			}
+		}
+		if(pEnd != -1){
+			cmdTask::wipe();
+			cout << t_indent << "Predicted: " << chromName << ":" << pStart << ".." << pEnd << " - score: " << pScore << "\n";
+			cmdTask::refresh();
+			if(ofGFF.is_open())
+				ofGFF << chromName << "\tMOCCA\tPrediction\t" << pStart << "\t" << pEnd << "\t" << pScore << "\t.\t.\t1\n";
+			nPredictions++;
+		}
+		delete ssw;
+	}
+	delete ssfb;
+	cmdTask::wipe();
+	cout << t_indent << "Made " << nPredictions << " predictions genome-wide\n";
+	return true;
+}
+
 bool sequenceClassifier::predictCoreSequence(std::string inpath, std::string outpath){
 	if(!inpath.length() || !outpath.length())return false;
 	FILE*fout=0;

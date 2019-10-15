@@ -31,6 +31,12 @@ public:
 	bool applyFASTA(std::string inpath,std::string outpath);
 	bool predictCoreSequence(std::string inpath, std::string outpath);
 	//
+	/*
+	predictGenomewideFASTA
+		Applies the classifier to a genome FASTA file and writes scores to output GFF- and Wig-files.
+	*/
+	bool predictGenomewideFASTA(std::string inFASTAPath,std::string outGFFPath,std::string outWigPath);
+	//
 	virtual bool trainWindow(char*buf,long long pos,int bufs,seqClass*cls) = 0;
 	virtual bool trainFinish() = 0;
 	virtual double do_applyWindow(char*buf,long long pos,int bufs) = 0;

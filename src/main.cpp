@@ -1273,6 +1273,54 @@ cmdArg argumentTypes[] = {
 			return true;
 		}
 	},
+	{
+		// Argument
+		"-genome:FASTA",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-genome:FASTA PATH",
+		{ "Sets a genome FASTA file, for genome-wide prediction." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->genomeFASTAPath = params[0];
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-predict:GFF",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-predict:GFF PATH",
+		{ "Sets an output GFF file, for genome-wide prediction." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->predictGFFPath = params[0];
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-predict:Wig",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-predict:Wig PATH",
+		{ "Sets an output Wiggle file, for genome-wide prediction." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+			cfg->predictWigPath = params[0];
+			return true;
+		}
+	},
 };
 
 /*
@@ -1519,6 +1567,10 @@ bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqLis
 		if(cfg->CAnalysisExportPath.length() > 0){
 			cmdSection("Classifier analysis export");
 			cls.ptr->exportAnalysisData(cfg->CAnalysisExportPath);
+		}
+		if(cfg->genomeFASTAPath.length() && (cfg->predictGFFPath.length() || cfg->predictWigPath.length())){
+			cmdSection("Genome-wide prediction");
+			cls.ptr->predictGenomewideFASTA(cfg->genomeFASTAPath, cfg->predictGFFPath, cfg->predictWigPath);
 		}
 	}
 	cout << sepline;
