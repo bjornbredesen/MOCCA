@@ -120,7 +120,6 @@ bool seqStreamRandom::train(seqStream*input){
 	rA = double(nNT[0])/double(bptotal);
 	rC1 = double(nNT[1])/double(bptotal);
 	rC2 = double(nNT[2])/double(bptotal);
-	//P_T=rT=double(nNT[3])/double(bptotal);
 	return true;
 }
 
