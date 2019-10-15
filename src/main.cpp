@@ -1298,7 +1298,9 @@ cmdArg argumentTypes[] = {
 		1,
 		// Documentation
 		"-predict:GFF PATH",
-		{ "Sets an output GFF file, for genome-wide prediction." },
+		{ "Sets an output GFF file, for genome-wide predictions.",
+		  "Windows with a score above the set threshold are predicted,",
+		  "and overlapping predictions are merged." },
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
 			cfg->predictGFFPath = params[0];
@@ -1314,7 +1316,8 @@ cmdArg argumentTypes[] = {
 		1,
 		// Documentation
 		"-predict:Wig PATH",
-		{ "Sets an output Wiggle file, for genome-wide prediction." },
+		{ "Sets an output Wiggle file, for genome-wide prediction",
+		  "scores." },
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
 			cfg->predictWigPath = params[0];

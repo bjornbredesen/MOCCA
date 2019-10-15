@@ -641,6 +641,33 @@ manpage.1: manpage.sgml
         </listitem>
       </varlistentry>
       
+      <varlistentry>
+        <term>
+          	<option>-genome:FASTA</option>
+        </term>
+        <listitem>
+          <para>Sets a genome FASTA file, for genome-wide prediction.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-predict:GFF</option>
+        </term>
+        <listitem>
+          <para>Sets an output GFF file, for genome-wide predictions. Windows with a score above the set threshold are predicted, and overlapping predictions are merged.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-predict:Wig PATH</option>
+        </term>
+        <listitem>
+          <para>Sets an output Wiggle file, for genome-wide prediction scores.</para>
+        </listitem>
+      </varlistentry>
+      
     </variablelist>
   </refsect1>
   <refsect1>
