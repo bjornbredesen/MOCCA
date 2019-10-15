@@ -1219,6 +1219,23 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-calibrate:precision",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-calibrate:precision P",
+		{ "Calibrates the precision to approximate a value of P,",
+		  "for the specified calibration sequences." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->wantPrecision=strtod(params[0].c_str(),0);
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-validate:no",
 		// Pass
 		1,
@@ -1553,7 +1570,7 @@ sequenceClassifier*constructClassifier(motifList*motifs,featureSet*features,seqL
 runPipeline
 	Runs the main application pipeline.
 */
-bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqList*valseq){
+bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqList*calseq,seqList*valseq){
 	cout << sepline;
 	
 	autodelete<sequenceClassifier>cls((sequenceClassifier*)0);
@@ -1568,6 +1585,12 @@ bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqLis
 			features->printInfo();
 		cmdSection("Classifier");
 		cls.ptr->printInfo();
+		
+		if(cfg->wantPrecision > 0. && calseq->nseq){
+			cmdSection("Threshold calibration");
+			cls.ptr->calibrateThresholdGenomewidePrecision(calseq, cfg->wantPrecision);
+		}
+		
 		cmdSection("Validation");
 		if(cfg->validate){
 			autofree<validationPair>vp((validationPair*)0);
@@ -1576,6 +1599,7 @@ bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqLis
 			cout << t_indent << "Training set\n";
 			printValidationMeasures(vp,nvp,cls.ptr->threshold);
 		}
+		
 		if(valseq->nseq){
 			autofree<validationPair>vp((validationPair*)0);
 			int nvp=0;
@@ -1596,6 +1620,7 @@ bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqLis
 			cmdSection("Classifier analysis export");
 			cls.ptr->exportAnalysisData(cfg->CAnalysisExportPath);
 		}
+		
 		if(cfg->genomeFASTAPath.length() && (cfg->predictGFFPath.length() || cfg->predictWigPath.length())){
 			cmdSection("Genome-wide prediction");
 			cls.ptr->predictGenomewideFASTA(cfg->genomeFASTAPath, cfg->predictGFFPath, cfg->predictWigPath);
@@ -1660,7 +1685,7 @@ int main(int argc,char**argv){
 	}
 	
 	// Run pipeline
-	if(!err)if(!runPipeline(motifs,features,trainseq,valseq))err=true;
+	if(!err)if(!runPipeline(motifs,features,trainseq,calseq,valseq))err=true;
 	
 	// Free memory
 	if(motifs)delete motifs;

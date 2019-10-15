@@ -94,6 +94,25 @@ seqStreamRandom::seqStreamRandom(double da,double dc,double dg){ // dt = 1-da-dc
 }
 
 bool seqStreamRandom::train(seqStream*input){
+	cmdTask task((char*)"Training i.i.d. background model");
+	#define FGCSBUFSIZE 256
+	autofree<char> buf((char*)malloc(FGCSBUFSIZE));
+	int nNT[5]={0,0,0,0,0};
+	long nti=0;
+	for(long wind=0;;wind++){
+		int nread=input->read(FGCSBUFSIZE,buf.ptr);
+		if(!nread)break;
+		char*c=buf.ptr;
+		for(int y=0;y<nread;y++,c++){
+			if(*c=='A')nNT[0]++;
+			else if(*c=='C')nNT[1]++;
+			else if(*c=='G')nNT[2]++;
+			else if(*c=='T')nNT[3]++;
+			else nNT[4]++;
+		}
+		nti+=nread;
+		if(!(wind%100))task.setLongT(nti,(char*)"nt");
+	}
 	return true;
 }
 

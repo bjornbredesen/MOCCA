@@ -178,14 +178,7 @@ bool sequenceClassifier::applyFASTA(std::string inpath, std::string outpath){
 	return true;
 }
 
-/*
-typedef struct {
-	int start, end;
-}predictionRegion;
-*/
-
 bool sequenceClassifier::predictGenomewideFASTA(std::string inFASTAPath, std::string outGFFPath, std::string outWigPath){
-	FILE*fout=0;
 	if(!inFASTAPath.length())return false;
 	timer mainTimer((char*)"Genome-wide prediction");
 	cmdTask task((char*)"Genome-wide prediction");
@@ -329,6 +322,54 @@ bool sequenceClassifier::predictCoreSequence(std::string inpath, std::string out
 		cout << " - " << sname << ": " << mwA << ".." << mwB << " (" << (mwB-mwA) << " / " << bufs << " bp) - Score: " << mwScore << "\n";
 	}
 	fclose(fout);
+	return true;
+}
+
+bool sequenceClassifier::calibrateThresholdGenomewidePrecision(seqList*calpos,double wantPrecision){
+	threshold=0.;
+	int nvp=0;
+	autofree<validationPair> vp((validationPair*)0);
+	timer mainTimer((char*)"Threshold calibration");
+	cmdTask task((char*)"Calibrating threshold");
+	{
+		cmdTask taskp((char*)"Scoring sequences");
+		if(!sequenceClassifier::getValidationTable(calpos,vp.ptr,nvp))
+			return false;
+	}
+	cmdTask taskp((char*)"Handling scores");
+	vector<validationPair> svp;
+	int nP = 0, nN = 0;
+	for(int x=0;x<nvp;x++){
+		svp.push_back(vp[x]);
+		if(vp[x].cls->flag) nP++;
+		else nN++;
+	}
+	sort(svp.begin(),svp.end(),
+	[](const validationPair a,const validationPair b){
+		return a.score < b.score;
+	});
+	int TP = nP, FP = nN;
+	double aPrec = -1., bPrec = -1.;
+	double aThr = 0., bThr = 0.;
+	for(auto& cvp: svp){
+		aPrec = bPrec;
+		bPrec = (double)(TP) / (double)(TP+FP);
+		aThr = bThr;
+		bThr = cvp.score;
+		if(bPrec>=wantPrecision)
+			break;
+		if(cvp.cls->flag){
+			TP--;
+		}else{
+			FP--;
+		}
+	}
+	threshold=aThr;
+	if(aPrec!=bPrec)
+		threshold = aThr + (wantPrecision-aPrec)*((bThr-aThr)/(bPrec-aPrec));
+	cmdTask::wipe();
+	cout << "Precision: " << wantPrecision << "\n";
+	cout << "Calibrated threshold: " << threshold << "\n";
 	return true;
 }
 

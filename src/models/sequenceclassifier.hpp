@@ -30,7 +30,11 @@ public:
 	*/
 	bool applyFASTA(std::string inpath,std::string outpath);
 	bool predictCoreSequence(std::string inpath, std::string outpath);
-	//
+	/*
+	calibrateThresholdGenomewidePrecision
+		Calibrates the classifier threshold for a desired genome-wide precision.
+	*/
+	bool calibrateThresholdGenomewidePrecision(seqList*calpos,double wantPrecision);
 	/*
 	predictGenomewideFASTA
 		Applies the classifier to a genome FASTA file and writes scores to output GFF- and Wig-files.

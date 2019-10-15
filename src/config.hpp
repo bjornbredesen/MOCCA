@@ -66,6 +66,7 @@ public:
 	std::string genomeFASTAPath;
 	std::string predictGFFPath;
 	std::string predictWigPath;
+	double wantPrecision;
 	/*
 	printInfo
 		Prints out information

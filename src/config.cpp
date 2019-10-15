@@ -48,6 +48,7 @@ config _config = config {
 	"","","",
 	"",
 	"","","",
+	-1.
 };
 
 config*getConfiguration(){
