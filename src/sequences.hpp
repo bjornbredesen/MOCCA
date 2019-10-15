@@ -81,7 +81,8 @@ class seqStreamRandom:public seqStream{
 private:
 	double rA,rC1,rC2;
 public:
-	seqStreamRandom(double da,double dc,double dg); // dt = 1-da-dc-dg.
+	seqStreamRandom(double da=0.25,double dc=0.25,double dg=0.25); // dt = 1-da-dc-dg.
+	bool train(seqStream*input);
 	int read(int len,char*dest);
 	bool setpos(long pos);
 };

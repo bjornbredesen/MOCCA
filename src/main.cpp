@@ -79,7 +79,7 @@ struct cmdArg{
 	int nParam;
 	std::string example;
 	std::vector<std::string> helpLines;
-	std::function<bool (std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq)> apply;
+	std::function<bool (std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq)> apply;
 };
 
 cmdArg argumentTypes[] = {
@@ -96,7 +96,7 @@ cmdArg argumentTypes[] = {
 		"-h",
 		{ "Prints help text." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			print_help();
 			return false;
 		}
@@ -112,7 +112,7 @@ cmdArg argumentTypes[] = {
 		"--help",
 		{ "Prints help text." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			print_help();
 			return false;
 		}
@@ -128,7 +128,7 @@ cmdArg argumentTypes[] = {
 		"-license",
 		{ "Prints license information." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			print_licenses();
 			return false;
 		}
@@ -144,7 +144,7 @@ cmdArg argumentTypes[] = {
 		"-seed VALUE",
 		{ "Sets the random seed to VALUE." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->randSeed = (int) strtol(params[0].c_str(), 0, 10);
 			srand(cfg->randSeed);
 			return true;
@@ -164,7 +164,7 @@ cmdArg argumentTypes[] = {
 		{ "Registers a sequence class with name NAME, value/ID VALUE,",
 		  "and flag FLAG (\"+\" for positive, or \"-\" for negative)." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			bool cls;
 			if(params[2][0] == '+' && !params[2][1]) cls=true;
 			else if(params[2][0] == '-' && !params[2][1]) cls=false;
@@ -192,7 +192,7 @@ cmdArg argumentTypes[] = {
 		{ "Adds an IUPAC-motif with the name NAME, and sequence MOTIF,",
 		  "with MISMATCHES mismatches allowed." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!ml->addIUPACMotif((char*)params[0].c_str(), (char*)params[1].c_str(), (int)strtol(params[2].c_str(), 0, 10))){
 				return false;
 			}
@@ -210,7 +210,7 @@ cmdArg argumentTypes[] = {
 		"-motif:XML PATH",
 		{ "Adds motifs specified in an XML-file PATH." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!ml->addMotifsFromXML(params[0])){
 				return false;
 			}
@@ -231,7 +231,7 @@ cmdArg argumentTypes[] = {
 		"-motif:kmer k",
 		{ "Adds all k-mers." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!ml->addKMers((int)strtol(params[0].c_str(), 0, 10))){
 				return false;
 			}
@@ -249,7 +249,7 @@ cmdArg argumentTypes[] = {
 		"-motif:Random N LEN",
 		{ "Adds N random sequences of length LEN." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!ml->addRandom((int)strtol(params[0].c_str(), 0, 10), (int)strtol(params[1].c_str(), 0, 10))){
 				return false;
 			}
@@ -267,7 +267,7 @@ cmdArg argumentTypes[] = {
 		"-motif:FSM",
 		{ "Enable Finite State Machine for motif occurrence parsing." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->useFSM=true;
 			return true;
 		}
@@ -283,7 +283,7 @@ cmdArg argumentTypes[] = {
 		"-motif:No-FSM",
 		{ "Disable Finite State Machine for motif occurrence parsing." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->useFSM=false;
 			return true;
 		}
@@ -299,7 +299,7 @@ cmdArg argumentTypes[] = {
 		"-motif:d:centers",
 		{ "Sets the distance mode to centered." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->distanceMode=dmCenters;
 			return true;
 		}
@@ -315,7 +315,7 @@ cmdArg argumentTypes[] = {
 		"-motif:d:between",
 		{ "Sets the distance mode to between." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->distanceMode=dmBetween;
 			return true;
 		}
@@ -331,7 +331,7 @@ cmdArg argumentTypes[] = {
 		"-motif:d:noOverlap",
 		{ "Disallows motif pairs to overlap when counting." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->motifPairsCanOverlap=false;
 			return true;
 		}
@@ -347,7 +347,7 @@ cmdArg argumentTypes[] = {
 		"-motif:d:overlap",
 		{ "Allows motif pairs to overlap when counting." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->motifPairsCanOverlap=true;
 			return true;
 		}
@@ -363,7 +363,7 @@ cmdArg argumentTypes[] = {
 		"-no-homo-pairing",
 		{ "Disables pairing of the same motifs for CPREdictor." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->allowHomoPairing = false;
 			return true;
 		}
@@ -379,7 +379,7 @@ cmdArg argumentTypes[] = {
 		"-no-hetero-pairing",
 		{ "Disables pairing of different motifs for CPREdictor." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->allowHeteroPairing = false;
 			return true;
 		}
@@ -397,7 +397,7 @@ cmdArg argumentTypes[] = {
 		"-f:nOcc",
 		{ "Adds motif occurrence frequency features." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_nOcc, featureMotif_All, 0, 0, 0, 0, 1, 0)){
 				return false;
 			}
@@ -416,7 +416,7 @@ cmdArg argumentTypes[] = {
 		{ "Adds motif pair occurrence frequency features, with distance",
 		  "cutoff D." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_nPair, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0),0, 1, 0)){
 				return false;
 			}
@@ -435,7 +435,7 @@ cmdArg argumentTypes[] = {
 		{ "Adds motif occurrence pair occurrence frequency features, with",
 		  "distance cutoff D." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_nOccPair, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0), 0, 1, 0)){
 				return false;
 			}
@@ -453,7 +453,7 @@ cmdArg argumentTypes[] = {
 		"-f:MDPA",
 		{ "Adds Mean Distance Proximal All features." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_MDPA, featureMotif_All, 0, 0, 0, 0, 1, 0)){
 				return false;
 			}
@@ -471,7 +471,7 @@ cmdArg argumentTypes[] = {
 		"-f:MDP",
 		{ "Adds Mean Distance Proximal features." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_MDP, featureMotif_All, featureMotif_All, 0, 0, 0, 1, 0)){
 				return false;
 			}
@@ -489,7 +489,7 @@ cmdArg argumentTypes[] = {
 		"-f:MDM",
 		{ "Adds Mean Distance Mean features." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_MDM, featureMotif_All, featureMotif_All, 0, 0, 0, 1, 0)){
 				return false;
 			}
@@ -507,7 +507,7 @@ cmdArg argumentTypes[] = {
 		"-f:MDDA",
 		{ "Adds Mean Distance Distal All features." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_MDDA, featureMotif_All, 0, 0, 0, 0, 1, 0)){
 				return false;
 			}
@@ -525,7 +525,7 @@ cmdArg argumentTypes[] = {
 		"-f:MDD",
 		{ "Adds Mean Distance Distal features." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_MDD, featureMotif_All, 0, 0, 0, 0, 1, 0)){
 				return false;
 			}
@@ -543,7 +543,7 @@ cmdArg argumentTypes[] = {
 		"-f:GC",
 		{ "Adds GC-content feature." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_GC, 0, 0, 0, 0, 0, 1, 0)){
 				return false;
 			}
@@ -564,7 +564,7 @@ cmdArg argumentTypes[] = {
 		  "and cosine of the distance separately, with the periodicity",
 		  "scaled to F." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_nPair2D, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0), strtod(params[1].c_str(), 0), 1, 0)){
 				return false;
 			}
@@ -588,7 +588,7 @@ cmdArg argumentTypes[] = {
 		  "of the distance, with the periodicity scaled to F, and phase",
 		  "shifted by P." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_PEDI, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[2].c_str(), 0), strtod(params[1].c_str(), 0), 1, strtod(params[0].c_str(), 0))){
 				return false;
 			}
@@ -610,7 +610,7 @@ cmdArg argumentTypes[] = {
 		  "curve shifted by 5.25 base pairs for occurrences on opposite",
 		  "strands." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!features->addFeature(featureType_nPairDH, featureMotif_All, featureMotif_All, featureMotif_All, strtod(params[0].c_str(), 0), 0, 1, 0)){
 				return false;
 			}
@@ -630,7 +630,7 @@ cmdArg argumentTypes[] = {
 		"-f:MOCCA:nOcc",
 		{ "Adds motif occurrence frequency features to SVM-MOCCA." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->MOCCA_nOcc=true;
 			return true;
 		}
@@ -646,7 +646,7 @@ cmdArg argumentTypes[] = {
 		"-f:MOCCA:DNT",
 		{ "Adds dinucleotide features to SVM-MOCCA." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->MOCCA_DNT=true;
 			return true;
 		}
@@ -662,7 +662,7 @@ cmdArg argumentTypes[] = {
 		"-f:MOCCA:GC",
 		{ "Adds GC content feature to SVM-MOCCA." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->MOCCA_GC=true;
 			return true;
 		}
@@ -680,7 +680,7 @@ cmdArg argumentTypes[] = {
 		"-C:CPREdictor",
 		{ "Sets the classifier to the CPREdictor." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cCPREdictor;
 			return true;
 		}
@@ -696,7 +696,7 @@ cmdArg argumentTypes[] = {
 		"-C:DummyPREdictor",
 		{ "Sets the classifier to the DummyPREdictor." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cDummyPREdictor;
 			return true;
 		}
@@ -713,7 +713,7 @@ cmdArg argumentTypes[] = {
 		{ "Sets the classifier to log-odds, using separately specified",
 		  "feature spaces." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cSEQLO;
 			return true;
 		}
@@ -730,7 +730,7 @@ cmdArg argumentTypes[] = {
 		{ "Sets the classifier to dummy (un-weighted sum), using separately",
 		  "specified, feature spaces." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cSEQDummy;
 			return true;
 		}
@@ -747,7 +747,7 @@ cmdArg argumentTypes[] = {
 		{ "Sets the classifier to SVM, using separately specified",
 		  "feature spaces." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cSEQSVM;
 			cfg->svmtype=C_SVC;
 			return true;
@@ -764,7 +764,7 @@ cmdArg argumentTypes[] = {
 		"-C:SVM-MOCCA",
 		{ "Sets the classifier to SVM-MOCCA." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cSVMMOCCA;
 			cfg->svmtype=C_SVC;
 			return true;
@@ -781,7 +781,7 @@ cmdArg argumentTypes[] = {
 		"-C:SVM-MOCCA:C-SVC",
 		{ "Sets the classifier to SVM-MOCCA, using the C-SVC formulation." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cSVMMOCCA;
 			cfg->svmtype=C_SVC;
 			return true;
@@ -798,7 +798,7 @@ cmdArg argumentTypes[] = {
 		"-C:SVM-MOCCA:nu-SVC",
 		{ "Sets the classifier to SVM-MOCCA, using the nu-SVC formulation." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cSVMMOCCA;
 			cfg->svmtype=NU_SVC;
 			return true;
@@ -817,7 +817,7 @@ cmdArg argumentTypes[] = {
 		"-C:analysis:export PATH",
 		{ "Exports model analysis to file." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->CAnalysisExportPath = params[0];
 			return true;
 		}
@@ -835,7 +835,7 @@ cmdArg argumentTypes[] = {
 		  "When either a positive or negative class summed feature is zero,",
 		  "a pseudocount of 1 is added for both the positives and negatives." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->wmMode=wmPREdictor;
 			return true;
 		}
@@ -853,7 +853,7 @@ cmdArg argumentTypes[] = {
 		  "When either a positive or negative class summed feature is zero,",
 		  "the weight is set to zero." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->wmMode=wmZero;
 			return true;
 		}
@@ -871,7 +871,7 @@ cmdArg argumentTypes[] = {
 		  "A constant pseudocount is added to summed positive and negative",
 		  "features, so that they are never zero." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->loBeta=strtod(params[0].c_str(),0);
 			cfg->wmMode=wmConstant;
 			return true;
@@ -890,7 +890,7 @@ cmdArg argumentTypes[] = {
 		  "Instead of log-odds, the Positive Predictive Value is calculated",
 		  "based on motif occurrences in positives (TP) versus negatives (FP)." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->wmMode=wmPPV;
 			return true;
 		}
@@ -910,7 +910,7 @@ cmdArg argumentTypes[] = {
 		  "BiPPV is the difference between PPV for the positives, and PPV",
 		  "for switched labels (False Discovery Rate)." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->wmMode=wmBiPPV;
 			return true;
 		}
@@ -926,7 +926,7 @@ cmdArg argumentTypes[] = {
 		"-k:linear",
 		{ "Sets the SVM kernel to linear." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->kernel=kLinear;
 			return true;
 		}
@@ -942,7 +942,7 @@ cmdArg argumentTypes[] = {
 		"-k:quadratic",
 		{ "Sets the SVM kernel to quadratic (poly. degree 2)." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->kernel=kQuadratic;
 			return true;
 		}
@@ -958,7 +958,7 @@ cmdArg argumentTypes[] = {
 		"-k:cubic",
 		{ "Sets the SVM kernel to cubic (poly. degree 3)." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->kernel=kCubic;
 			return true;
 		}
@@ -974,7 +974,7 @@ cmdArg argumentTypes[] = {
 		"-k:RBF",
 		{ "Sets the SVM kernel to Radial Basis Function." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->kernel=kRBF;
 			return true;
 		}
@@ -990,7 +990,7 @@ cmdArg argumentTypes[] = {
 		"-SVM:C VALUE",
 		{ "Sets the SVM metaparameter C." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->SVM_C=strtod(params[0].c_str(), 0);
 			return true;
 		}
@@ -1006,7 +1006,7 @@ cmdArg argumentTypes[] = {
 		"-SVM:nu VALUE",
 		{ "Sets the SVM metaparameter nu." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->SVM_nu=strtod(params[0].c_str(), 0);
 			return true;
 		}
@@ -1022,7 +1022,7 @@ cmdArg argumentTypes[] = {
 		"-SVM:p VALUE",
 		{ "Sets the SVM metaparameter p." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->SVM_p=strtod(params[0].c_str(), 0);
 			return true;
 		}
@@ -1038,7 +1038,7 @@ cmdArg argumentTypes[] = {
 		"-SVM:gamma VALUE",
 		{ "Sets the SVM kernel parameter gamma." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->SVM_gamma=strtod(params[0].c_str(), 0);
 			return true;
 		}
@@ -1054,7 +1054,7 @@ cmdArg argumentTypes[] = {
 		"-SVM:c0 VALUE",
 		{ "Sets the SVM kernel parameter c0." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->SVM_c0=strtod(params[0].c_str(), 0);
 			return true;
 		}
@@ -1070,7 +1070,7 @@ cmdArg argumentTypes[] = {
 		"-threshold VALUE",
 		{ "Sets the classifier threshold." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->threshold=strtod(params[0].c_str(), 0);
 			return true;
 		}
@@ -1086,7 +1086,7 @@ cmdArg argumentTypes[] = {
 		"-wSize VALUE",
 		{ "Sets the classifier window size." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->windowSize = (int)strtol(params[0].c_str(), 0, 10);
 			if(cfg->windowSize <= 0){
 				argSyntaxError();
@@ -1106,7 +1106,7 @@ cmdArg argumentTypes[] = {
 		"-wStep VALUE",
 		{ "Sets the classifier window step size." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->windowStep = (int)strtol(params[0].c_str(), 0, 10);
 			if(cfg->windowStep <= 0){
 				argSyntaxError();
@@ -1128,7 +1128,7 @@ cmdArg argumentTypes[] = {
 		  "When training with sequence windows, this can be set in order to",
 		  "control model complexity growth." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->windowStepTrain = (int)strtol(params[0].c_str(), 0, 10);
 			if(cfg->windowStepTrain <= 0){
 				argSyntaxError();
@@ -1157,7 +1157,7 @@ cmdArg argumentTypes[] = {
 		  "each training sequence file, or \"full\", for training with",
 		  "the full sequences." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!trainseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[1]), getTrainModeByName((char*)params[2].c_str()))){
 				return false;
 			}
@@ -1182,11 +1182,36 @@ cmdArg argumentTypes[] = {
 		  "pre-specified binary classes: \"+\" for positive or \"-\"",
 		  "for negative." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			if(!valseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[1]), train_Full)){
 				return false;
 			}
 			if(!registerFile("Validation sequences",params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-calibrate:FASTA",
+		// Pass
+		1,
+		// Parameters
+		2,
+		// Documentation
+		"-calibrate:FASTA PATH CLASS",
+		{ "Adds a calibration sequence file.",
+		  "PATH: Path to FASTA file.",
+		  "CLASS: A class ID, defined with \"-class\", or one of the",
+		  "pre-specified binary classes: \"+\" for positive or \"-\"",
+		  "for negative." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			if(!calseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[1]), train_Full)){
+				return false;
+			}
+			if(!registerFile("Calibration sequences",params[0])){
 				return false;
 			}
 			return true;
@@ -1203,7 +1228,7 @@ cmdArg argumentTypes[] = {
 		"-validate:no",
 		{ "Disables validation." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->validate = false;
 			return true;
 		}
@@ -1219,7 +1244,7 @@ cmdArg argumentTypes[] = {
 		"-validate:outSCTable PATH",
 		{ "Outputs validation set score and class table to file." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->outSCVal = params[0];
 			return true;
 		}
@@ -1235,7 +1260,7 @@ cmdArg argumentTypes[] = {
 		"-in:FASTA PATH",
 		{ "Sets an input FASTA file to be scored." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->inFASTA = params[0];
 			return true;
 		}
@@ -1251,7 +1276,7 @@ cmdArg argumentTypes[] = {
 		"-out:Wig PATH",
 		{ "Sets an output Wiggle file for scored sequences." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->outWig = params[0];
 			return true;
 		}
@@ -1268,7 +1293,7 @@ cmdArg argumentTypes[] = {
 		{ "Sets an output FASTA file for predicted core sequences",
 		  "from input FASTA file." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->outCoreSequence = params[0];
 			return true;
 		}
@@ -1284,7 +1309,7 @@ cmdArg argumentTypes[] = {
 		"-genome:FASTA PATH",
 		{ "Sets a genome FASTA file, for genome-wide prediction." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->genomeFASTAPath = params[0];
 			return true;
 		}
@@ -1302,7 +1327,7 @@ cmdArg argumentTypes[] = {
 		  "Windows with a score above the set threshold are predicted,",
 		  "and overlapping predictions are merged." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->predictGFFPath = params[0];
 			return true;
 		}
@@ -1319,7 +1344,7 @@ cmdArg argumentTypes[] = {
 		{ "Sets an output Wiggle file, for genome-wide prediction",
 		  "scores." },
 		// Code
-		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*valseq) -> bool {
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->predictWigPath = params[0];
 			return true;
 		}
@@ -1435,8 +1460,8 @@ parse_arg
 	Parses application arguments.
 	Also fills in motif list, feature set and training set.
 */
-bool parse_arg(int _argc,char**argv,motifList*ml,featureSet*features,seqList*trainseq,seqList*valseq){
-	if(!ml||!trainseq||!valseq)return false;
+bool parse_arg(int _argc,char**argv,motifList*ml,featureSet*features,seqList*trainseq,seqList*calseq,seqList*valseq){
+	if(!ml||!trainseq||!calseq||!valseq)return false;
 	config*cfg=getConfiguration();
 	std::unordered_map<std::string, cmdArg> argumentMap;
 	for(auto argType: argumentTypes) {
@@ -1469,7 +1494,7 @@ bool parse_arg(int _argc,char**argv,motifList*ml,featureSet*features,seqList*tra
 			}
 			if (cArgType.pass == pass) {
 				// Call argument processor
-				if(!cArgType.apply(params, cfg, ml, features, trainseq, valseq))
+				if(!cArgType.apply(params, cfg, ml, features, trainseq, calseq, valseq))
 					return false;
 				// Remove argument (null-arguments are skipped above)
 				ccargv = cargv;
@@ -1616,9 +1641,10 @@ int main(int argc,char**argv){
 	motifList*motifs=motifList::create();
 	seqList*trainseq=seqList::create();
 	seqList*valseq=seqList::create();
+	seqList*calseq=seqList::create();
 	featureSet*features=featureSet::create();
 	
-	if(!parse_arg(argc-1,argv+1,motifs,features,trainseq,valseq)){
+	if(!parse_arg(argc-1,argv+1,motifs,features,trainseq,calseq,valseq)){
 		err=true;
 	}
 	
@@ -1640,6 +1666,7 @@ int main(int argc,char**argv){
 	if(motifs)delete motifs;
 	if(trainseq)delete trainseq;
 	if(valseq)delete valseq;
+	if(calseq)delete calseq;
 	return err?-1:0;
 }
 

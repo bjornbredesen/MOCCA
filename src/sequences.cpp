@@ -92,6 +92,11 @@ seqStreamRandom::seqStreamRandom(double da,double dc,double dg){ // dt = 1-da-dc
 	rC1=da+dc;
 	rC2=rC1+dg;
 }
+
+bool seqStreamRandom::train(seqStream*input){
+	return true;
+}
+
 int seqStreamRandom::read(int len,char*dest){
 	double frv;
 	char*d=dest;
@@ -104,6 +109,7 @@ int seqStreamRandom::read(int len,char*dest){
 	}
 	return len;
 }
+
 bool seqStreamRandom::setpos(long pos){
 	return false;
 }
