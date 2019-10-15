@@ -162,6 +162,47 @@ bool seqList::loadFastaBatch(char*path,seqClass*cls,e_trainMode tm){
 	return true;
 }
 
+bool seqList::addRandomIid(char*tpath,int nadd,int len,seqClass*cls,e_trainMode tm){
+	if(!cls||tm==train_Invalid)return false;
+	if(len<=0){
+		cmdError("Invalid random sequence length requested.");
+		return false;
+	}else if(nadd<=0){
+		cmdError("Invalid number of random sequences requested.");
+		return false;
+	}
+	// Train generative model
+	autodelete<seqStreamRandom> rss(new seqStreamRandom());
+	if(!rss.ptr){
+		outOfMemory();
+		return false;
+	}
+	autodelete<seqStreamFastaBatch> ssfb(seqStreamFastaBatch::load(tpath));
+	if(!ssfb.ptr){
+		return false;
+	}
+	for(seqStreamFastaBatchBlock*ssfbblk;(ssfbblk=ssfb.ptr->getBlock());){
+		rss.ptr->train(ssfbblk);
+	}
+	// Generate and add random sequences
+	for(int l=0;l<nadd;l++){
+		autofree<char> buf((char*)malloc(len));
+		if(!buf.ptr){
+			outOfMemory();
+			return false;
+		}
+		rss.ptr->read(len,buf.ptr);
+		ostringstream oss;
+		int seed=rand();
+		srand(seed);
+		oss << "Random " << nseq << "(seed=" << seed << ")";
+		if(!addSeq(cloneString((char*)oss.str().c_str()),buf.disown(),len,cls,tm)){
+			return false;
+		}
+	}
+	return true;
+}
+
 void seqList::printInfo(char*title){
 	cmdSection(title);
 	seqListSeq*s=seq;

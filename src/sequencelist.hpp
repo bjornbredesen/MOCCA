@@ -104,6 +104,11 @@ public:
 	*/
 	bool loadFastaBatch(char*path,seqClass*cls,e_trainMode tm);
 	/*
+	addRandom
+		Adds N random sequences of length L with class 'cls'.
+	*/
+	bool addRandomIid(char*tpath,int nadd,int len, seqClass*cls, e_trainMode tm);
+	/*
 	printInfo
 		Prints out information
 	*/

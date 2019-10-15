@@ -1169,6 +1169,35 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-train:iid",
+		// Pass
+		1,
+		// Parameters
+		5,
+		// Documentation
+		"-train:iid PATH N L CLASS MODE",
+		{ "Trains an i.i.d. sequence model on sequences in the FASTA",
+		  "file PATH, generates N sequences, each of length L, and adds"
+		  "the sequences to training class CLASS.",
+		  "CLASS: A class ID, defined with \"-class\", or one of the",
+		  "pre-specified binary classes: \"+\" for positive or \"-\"",
+		  "for negative." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			if(!trainseq->addRandomIid((char*)params[0].c_str(), (int)strtol(params[1].c_str(), 0, 10), (int)strtol(params[2].c_str(), 0, 10), getSeqClassByName(params[3]), getTrainModeByName((char*)params[4].c_str()))){
+				return false;
+			}
+			/*if(!calseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[3]), train_Full)){
+				return false;
+			}*/
+			if(!registerFile("I.i.d. training sequences (training)",params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-validate:FASTA",
 		// Pass
 		1,
@@ -1194,6 +1223,35 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-validate:iid",
+		// Pass
+		1,
+		// Parameters
+		4,
+		// Documentation
+		"-validate:iid PATH N L CLASS",
+		{ "Trains an i.i.d. sequence model on sequences in the FASTA",
+		  "file PATH, generates N sequences, each of length L, and adds"
+		  "the sequences to validation class CLASS.",
+		  "CLASS: A class ID, defined with \"-class\", or one of the",
+		  "pre-specified binary classes: \"+\" for positive or \"-\"",
+		  "for negative." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			if(!valseq->addRandomIid((char*)params[0].c_str(), (int)strtol(params[1].c_str(), 0, 10), (int)strtol(params[2].c_str(), 0, 10), getSeqClassByName(params[3]), train_Full)){
+				return false;
+			}
+			/*if(!calseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[3]), train_Full)){
+				return false;
+			}*/
+			if(!registerFile("I.i.d. training sequences (validation)",params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-calibrate:FASTA",
 		// Pass
 		1,
@@ -1212,6 +1270,35 @@ cmdArg argumentTypes[] = {
 				return false;
 			}
 			if(!registerFile("Calibration sequences",params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-calibrate:iid",
+		// Pass
+		1,
+		// Parameters
+		4,
+		// Documentation
+		"-calibrate:iid PATH N L CLASS",
+		{ "Trains an i.i.d. sequence model on sequences in the FASTA",
+		  "file PATH, generates N sequences, each of length L, and adds"
+		  "the sequences to calibration class CLASS.",
+		  "CLASS: A class ID, defined with \"-class\", or one of the",
+		  "pre-specified binary classes: \"+\" for positive or \"-\"",
+		  "for negative." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			if(!calseq->addRandomIid((char*)params[0].c_str(), (int)strtol(params[1].c_str(), 0, 10), (int)strtol(params[2].c_str(), 0, 10), getSeqClassByName(params[3]), train_Full)){
+				return false;
+			}
+			/*if(!calseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[3]), train_Full)){
+				return false;
+			}*/
+			if(!registerFile("I.i.d. training sequences (calibration)",params[0])){
 				return false;
 			}
 			return true;
