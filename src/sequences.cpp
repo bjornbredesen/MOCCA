@@ -118,8 +118,8 @@ bool seqStreamRandom::train(seqStream*input){
 	int bptotal = nNT[0]+nNT[1]+nNT[2]+nNT[3];
 	int bpinvalid = nNT[4];
 	rA = double(nNT[0])/double(bptotal);
-	rC1 = double(nNT[1])/double(bptotal);
-	rC2 = double(nNT[2])/double(bptotal);
+	rC1 = rA + (double(nNT[1])/double(bptotal));
+	rC2 = rC1 + (double(nNT[2])/double(bptotal));
 	return true;
 }
 
