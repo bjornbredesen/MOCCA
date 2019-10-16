@@ -87,56 +87,59 @@ bool seqStreamBuffer::setpos(long pos){
 ////////////////////////////////////////////////////////////////////////////////////
 // seqStreamRandom
 
-seqStreamRandom::seqStreamRandom(double da,double dc,double dg){ // dt = 1-da-dc-dg.
-	rA = da;
-	rC1 = da+dc;
-	rC2 = rC1+dg;
+seqStreamRandomIid::seqStreamRandomIid(){ // dt = 1-da-dc-dg.
+	nA = 0;
+	nT = 0;
+	nG = 0;
+	nC = 0;
+	nU = 0;
+	rA = 0.25;
+	rT = 0.5;
+	rG = 0.75;
 }
 
-bool seqStreamRandom::train(seqStream*input){
+bool seqStreamRandomIid::train(seqStream*input){
 	cmdTask task((char*)"Training i.i.d. background model");
 	#define FGCSBUFSIZE 256
 	autofree<char> buf((char*)malloc(FGCSBUFSIZE));
 	// Extract occurrence frequencies per nucleotide
-	int nNT[5]={0,0,0,0,0};
 	long nti=0;
 	for(long wind=0;;wind++){
 		int nread=input->read(FGCSBUFSIZE,buf.ptr);
 		if(!nread)break;
 		char*c=buf.ptr;
 		for(int y=0;y<nread;y++,c++){
-			if(*c=='A')nNT[0]++;
-			else if(*c=='C')nNT[1]++;
-			else if(*c=='G')nNT[2]++;
-			else if(*c=='T')nNT[3]++;
-			else nNT[4]++;
+			if(*c=='A')nA++;
+			else if(*c=='T')nT++;
+			else if(*c=='G')nG++;
+			else if(*c=='C')nC++;
+			else nU++;
 		}
 		nti+=nread;
 		if(!(wind%100))task.setLongT(nti,(char*)"nt");
 	}
 	// Calculate weights
-	int bptotal = nNT[0]+nNT[1]+nNT[2]+nNT[3];
-	int bpinvalid = nNT[4];
-	rA = double(nNT[0])/double(bptotal);
-	rC1 = rA + (double(nNT[1])/double(bptotal));
-	rC2 = rC1 + (double(nNT[2])/double(bptotal));
+	int bptotal = nA + nT + nG + nC;
+	rA = double(nA) / double(bptotal);
+	rT = rA + (double(nT) / double(bptotal));
+	rG = rT + (double(nG) / double(bptotal));
 	return true;
 }
 
-int seqStreamRandom::read(int len,char*dest){
+int seqStreamRandomIid::read(int len,char*dest){
 	double frv;
 	char*d=dest;
 	for(int x=0;x<len;x++,d++){
 		frv=double(rand())/double(RAND_MAX);
 		if(frv<rA)(*d)='A';
-		else if(frv<rC1)(*d)='C';
-		else if(frv<rC2)(*d)='G';
-		else (*d)='T';
+		else if(frv<rT)(*d)='T';
+		else if(frv<rG)(*d)='G';
+		else (*d)='C';
 	}
 	return len;
 }
 
-bool seqStreamRandom::setpos(long pos){
+bool seqStreamRandomIid::setpos(long pos){
 	return false;
 }
 

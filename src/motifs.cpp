@@ -11,6 +11,9 @@ using namespace rapidxml;
 #include "config.hpp"
 #include "aux.hpp"
 #include "motifs.hpp"
+#include <unordered_map>
+#include <iostream>
+#include <iomanip>
 
 ////////////////////////////////////////////////////////////////////////////////////
 // Motif list
@@ -31,6 +34,10 @@ motifList::~motifList(){
 					case motifType_IUPAC:{
 						IUPACMotif*d=(IUPACMotif*)m->data;
 						if(d->seq)free(d->seq);
+						break;}
+					case motifType_PWM:{
+						PWMMotif*d=(PWMMotif*)m->data;
+						if(d->tbl)free(d->tbl);
 						break;}
 					default:
 						cmdWarning("Invalid motif.");
@@ -227,6 +234,106 @@ bool motifList::addRandom(int n,int len){
 	return true;
 }
 
+bool motifList::addMotifsFromPWMTable(char*path){
+	if(!path){
+		cmdError("loadPWMMotif: Null-pointer arguments.");
+		return false;
+	}
+	// Buffer file to memory
+	std::ifstream ifs(path);
+	std::string buf;
+	ifs.seekg(0, std::ios::end);
+	buf.reserve(ifs.tellg());
+	ifs.seekg(0, std::ios::beg);
+	buf.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+	char*lines[4]={0};
+	// Parse motifs
+	std::stringstream ss(buf);
+	std::string line;
+	while(true){
+		if(!std::getline(ss, line, '\n'))break;
+		if(!line.length())continue;
+		if(line[0] == '>'){
+			std::string motifName = line.substr(1);
+			std::unordered_map<std::string, std::vector<double>> ntMap;
+			for(int i=0; i<4; i++){
+				if(!std::getline(ss, line, '\n')){
+					cmdError("PWM syntax error: Nucleotides missing for PWM.");
+					break;
+				}
+				if(!line.length())continue;
+				std::string nt;
+				std::istringstream ss2(line);
+				if(!std::getline(ss2, nt, '|')){
+					cmdError("PWM syntax error: Nucleotide specification missing.");
+					break;
+				}
+				if(!nt.length()){
+					cmdError("PWM syntax error: Nucleotide specification missing.");
+					break;
+				}
+				std::vector<double> wl;
+				while(true){
+					std::string wt;
+					if(!std::getline(ss2, wt, '\t'))break;
+					if(!wt.length())continue;
+					wl.push_back(strtod(wt.c_str(), 0));
+				}
+				ntMap[nt.substr(0,1)] = wl;
+			}
+			
+			int width = -1;
+			for(const auto& n : ntMap){
+				if(width == -1) width=n.second.size();
+				else if(n.second.size() != width){
+					cmdError("PWM syntax error: Different nucleotide sequence lengths.");
+					return false;
+				}
+			}
+			//
+			autofree<double> pwm((double*)malloc(sizeof(double)*width*4));
+			int cmask = 0;
+			for(const auto&n:ntMap){
+				int ind = -1;
+				if(!n.first.compare("A")) ind = PWM_iA;
+				if(!n.first.compare("C")) ind = PWM_iC;
+				if(!n.first.compare("G")) ind = PWM_iG;
+				if(!n.first.compare("T")) ind = PWM_iT;
+				if(ind == -1){
+					cmdError("PWM syntax error: Invalid nucleotide.");
+					return false;
+				}
+				cmask |= 1<<ind;
+				int nti = 0;
+				for(const auto&w:n.second){
+					pwm.ptr[nti + (ind*width)] = w;
+					nti++;
+				}
+			}
+			if(cmask!=15){
+				cmdError("PWM syntax error: Missing nucleotide.");
+				return false;
+			}
+			autofree<PWMMotif> d((PWMMotif*)malloc(sizeof(PWMMotif)));
+			if(!d.ptr){
+				outOfMemory();
+				return false;
+			}
+			memset(d.ptr,0,sizeof(PWMMotif));
+			d.ptr->tbl=pwm.ptr;
+			d.ptr->width=width;
+			d.ptr->threshold=0.0;
+			motifListMotif*r=addMotif(cloneString((char*)motifName.c_str()),motifType_PWM,d.ptr,width);
+			if(r){
+				d.disown();
+				pwm.disown();
+			}
+		}
+	}
+	//
+	return true;
+}
+
 void motifList::printInfo(){
 	motifListMotif*m=motifs;
 	cmdSection("Motifs");
@@ -243,6 +350,35 @@ void motifList::printInfo(){
 					cout << t_indent << t_indent << "# mismatches: " << d->nmis << "\n";
 				}
 				break;
+			case motifType_PWM:
+				cout << " (PWM)\n";
+				if(!m->data){
+					cout << t_indent << t_indent << "Corrupted\n";
+				}else{
+					PWMMotif*d=(PWMMotif*)m->data;
+					
+					ostringstream ss;
+					
+					cout << t_indent << t_indent << "A: ";
+					for(int l=0; l<d->width; l++)ss << std::fixed << std::setprecision(2) << std::setw(8) << d->tbl[l + (d->width*PWM_iA)];
+					cout << ss.str() << "\n";
+					ss.str("");
+					
+					cout << t_indent << t_indent << "C: ";
+					for(int l=0; l<d->width; l++)ss << std::fixed << std::setprecision(2) << std::setw(8) << d->tbl[l + (d->width*PWM_iC)];
+					cout << ss.str() << "\n";
+					ss.str("");
+					
+					cout << t_indent << t_indent << "G: ";
+					for(int l=0; l<d->width; l++)ss << std::fixed << std::setprecision(2) << std::setw(8) << d->tbl[l + (d->width*PWM_iG)];
+					cout << ss.str() << "\n";
+					ss.str("");
+					
+					cout << t_indent << t_indent << "T: ";
+					for(int l=0; l<d->width; l++)ss << std::fixed << std::setprecision(2) << std::setw(8) << d->tbl[l + (d->width*PWM_iT)];
+					cout << ss.str() << "\n";
+					cout << t_indent << t_indent << "Threshold: " << d->threshold << "\n";
+				}
 			default:
 				cout << " (Invalid)\n";
 		}
@@ -342,7 +478,7 @@ motifOccContainer*motifOccContainer::create(int basesize,motifList*ml){
 	return r;
 }
 
-motifOcc*motifOccContainer::createMotifOcc(long long start,motifListMotif*m,bool strand){
+motifOcc*motifOccContainer::createMotifOcc(long long start,motifListMotif*m,bool strand,double score){
 	if(!m)return 0;
 	if(iFree==-1){
 		if(!growTable(tblSize)){
@@ -379,6 +515,7 @@ motifOcc*motifOccContainer::createMotifOcc(long long start,motifListMotif*m,bool
 	ret->strand=strand;
 	ret->skip=false;
 	ret->extra_buffer=0;
+	ret->score=score;
 	return ret;
 }
 
@@ -640,7 +777,7 @@ public:
 		motifFSMNodeMotif*m=mot;
 		while(m){
 			if(m->readpos==m->mot->len-1){
-				oc->createMotifOcc(pos-m->mot->len+1,m->mot,m->com);
+				oc->createMotifOcc(pos-m->mot->len+1,m->mot,m->com,1.);
 			}
 			m=m->next;
 		}
@@ -822,12 +959,15 @@ bool motifWindow::initialize(){
 	if(!occContainer){
 		return false;
 	}
-	int nIUPAC=0;
+	int nIUPAC=0, nPWM=0;
 	motifListMotif*m=motifs->motifs;
 	for(int l=0;l<motifs->nmotifs;l++,m++){
 		switch(m->type){
 			case motifType_IUPAC:
 				nIUPAC++;
+				break;
+			case motifType_PWM:
+				nPWM++;
 				break;
 			default:
 				cmdError("Invalid motif");
@@ -876,6 +1016,73 @@ bool motifWindow::motifMatchIUPAC(char*seq,int seqlen,motifListMotif*mot,bool co
 		}
 	}
 	return (nmatch+iumot->nmis>=mot->len);
+}
+
+autofree<int> charToPWMIndex;
+autofree<int> charToPWMIndexI;
+
+/*
+motifMatchPWM
+	PWM motif matching
+*/
+bool motifWindow::motifMatchPWM(char*seq,int seqlen,motifListMotif*mot,bool com,double&mscore){
+	// Initialize helper data structures for parsing
+	if(!charToPWMIndex.ptr){
+		charToPWMIndex.resize(256);
+		charToPWMIndex.fill(256, 0xFF);
+		charToPWMIndex.ptr['A'] = PWM_iA;
+		charToPWMIndex.ptr['C'] = PWM_iC;
+		charToPWMIndex.ptr['G'] = PWM_iG;
+		charToPWMIndex.ptr['T'] = PWM_iT;
+	}
+	if(!charToPWMIndexI.ptr){
+		charToPWMIndexI.resize(256);
+		charToPWMIndexI.fill(256, 0xFF);
+		charToPWMIndexI.ptr['A'] = PWM_iT;
+		charToPWMIndexI.ptr['C'] = PWM_iG;
+		charToPWMIndexI.ptr['G'] = PWM_iC;
+		charToPWMIndexI.ptr['T'] = PWM_iA;
+	}
+	
+	PWMMotif*pwm=(PWMMotif*)mot->data;
+	double*tbl=pwm->tbl;
+	int width=pwm->width;
+	double threshold=pwm->threshold;
+	
+	char s;
+	if(com){
+		double score=0;
+		int moti=width-1;
+		int nti=0;
+		for(int l=0;l<min(width,seqlen);l++,seq++){
+			nti = charToPWMIndexI.ptr[*seq];
+			/*if(nti>3){
+				cout << "ERROR\n";
+				return false;
+			}*/
+			if(nti>=0)
+				score+=tbl[moti + (nti*width)];
+			moti--;
+		}
+		mscore=score;
+		return (score>=threshold);
+	} else{
+		double score=0;
+		int moti=0;
+		int nti=0;
+		for(int l=0;l<min(width,seqlen);l++,seq++){
+			nti = charToPWMIndex.ptr[*seq];
+			/*if(nti>3){
+				cout << "ERROR\n";
+				return false;
+			}*/
+			if(nti>=0)
+				score+=tbl[moti + (nti*width)];
+			moti++;
+		}
+		mscore=score;
+		return (score>=threshold);
+	}
 }
 
 motifWindow::~motifWindow(){
@@ -938,6 +1145,7 @@ bool motifWindow::readWindow(char*wseq,long long wpos,int wlen){
 	int wstartbase=int(wPos+(long long)wLen-wpos); // Start at the end of the previous window, localized to the new one.
 	wPos=wpos;
 	wLen=wlen;
+	// Parse IUPAC motif occurrences
 	if(mFSM){
 		// Parse IUPAC with FSM
 		int wstart=0;
@@ -971,13 +1179,13 @@ bool motifWindow::readWindow(char*wseq,long long wpos,int wlen){
 				// Check if there is a match, either forward, or in reverse complementary.
 				//int match=0;
 				if(motifMatchIUPAC(b,wlen-rcoord,m,false)){
-					motifOcc*o=occContainer->createMotifOcc(wpos+rcoord,m,false);
+					motifOcc*o=occContainer->createMotifOcc(wpos+rcoord,m,false,1.);
 					if(!o){
 						return false;
 					}
 				}
 				if(motifMatchIUPAC(b,wlen-rcoord,m,true)){
-					motifOcc*o=occContainer->createMotifOcc(wpos+rcoord,m,true);
+					motifOcc*o=occContainer->createMotifOcc(wpos+rcoord,m,true,1.);
 					if(!o){
 						return false;
 					}
@@ -985,6 +1193,34 @@ bool motifWindow::readWindow(char*wseq,long long wpos,int wlen){
 			}
 		}
 	}
+	// Parse PWM motif occurrences
+	{
+		motifListMotif*m=motifs->motifs;
+		for(int mtype=0;mtype<motifs->nmotifs;mtype++,m++){
+			if(m->skip||m->type!=motifType_PWM||!m->data)continue;
+			int wstart=0;
+			if(wskip){
+				wstart=wstartbase-m->len+1;
+				if(wstart<0)wstart=0;
+			}
+			// Run through the sequence.
+			char*b=wseq+wstart;
+			// The sequence should be scanned until (and including): rcoord=wlen-m->slen,
+			// since at that point it will read the final, full motif occurrence for this window.
+			// I.e., it will parse up until (and including): c=wlen-1
+			for(unsigned int rcoord=wstart;int(rcoord)<=int(wlen)-int(m->len);b++,rcoord++){
+				int match=0;
+				double mscore=0;
+				if(motifMatchPWM(b,wlen-rcoord,m,false,mscore))
+					if(!occContainer->createMotifOcc(wpos+rcoord,m,false,mscore))
+						return false;
+				if(motifMatchPWM(b,wlen-rcoord,m,true,mscore))
+					if(!occContainer->createMotifOcc(wpos+rcoord,m,true,mscore))
+						return false;
+			}
+		}
+	}
+	//
 	return true;
 }
 

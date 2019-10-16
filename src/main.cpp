@@ -258,6 +258,49 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-motif:PWM",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-motif:PWM PATH",
+		{ "Adds Position Weight Matrix-motifs loaded from PATH." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			if(!ml->addMotifsFromPWMTable((char*)params[0].c_str())){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:PWM:threshold",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-motif:PWM:threshold T",
+		{ "Sets all Position Weight Matrix thresholds to T." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			double thr = strtod((char*)params[0].c_str(), 0);
+			motifListMotif*m=ml->motifs;
+			for(int l=0;l<ml->nmotifs;l++,m++){
+				if(m->type!=motifType_PWM)continue;
+				PWMMotif*d=(PWMMotif*)m->data;
+				d->threshold = thr;
+			}
+			/*if(!ml->addMotifsFromPWMTable((char*)params[0].c_str())){
+				return false;
+			}*/
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-motif:FSM",
 		// Pass
 		1,

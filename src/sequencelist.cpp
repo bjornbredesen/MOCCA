@@ -172,7 +172,7 @@ bool seqList::addRandomIid(char*tpath,int nadd,int len,seqClass*cls,e_trainMode 
 		return false;
 	}
 	// Train generative model
-	autodelete<seqStreamRandom> rss(new seqStreamRandom());
+	autodelete<seqStreamRandomIid> rss(new seqStreamRandomIid());
 	if(!rss.ptr){
 		outOfMemory();
 		return false;

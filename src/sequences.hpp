@@ -71,17 +71,18 @@ public:
 };
 
 /*
-seqStreamRandom
+seqStreamRandomIid
 	A sequence stream class for randomly generated sequences.
 	
 	This sequence stream has no end, and buffer()
 	should never be called.
 */
-class seqStreamRandom:public seqStream{
+class seqStreamRandomIid:public seqStream{
 private:
-	double rA,rC1,rC2;
+	double rA, rT, rG;
+	int nA, nT, nG, nC, nU;
 public:
-	seqStreamRandom(double da=0.25,double dc=0.25,double dg=0.25); // dt = 1-da-dc-dg.
+	seqStreamRandomIid();
 	bool train(seqStream*input);
 	int read(int len,char*dest);
 	bool setpos(long pos);

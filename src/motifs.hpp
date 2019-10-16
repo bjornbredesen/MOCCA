@@ -13,6 +13,7 @@
 enum motifType{
 	motifType_Invalid,
 	motifType_IUPAC,
+	motifType_PWM,
 };
 
 /*
@@ -32,6 +33,16 @@ typedef struct{
 	char*seq;
 	int nmis;
 }IUPACMotif;
+
+#define PWM_iA 0
+#define PWM_iC 1
+#define PWM_iG 2
+#define PWM_iT 3
+typedef struct{
+	double*tbl;			// Format: A-C-G-T-....-A-C-G-T.
+	int width;			// Same as motif length.
+	double threshold;	// Threshold for positive occurrence prediction.
+}PWMMotif;
 
 /*
 motifList
@@ -80,6 +91,11 @@ public:
 	*/
 	bool addRandom(int n,int len);
 	/*
+	addMotifsFromPWMTable
+		Loads one or more PWM motifs from a table file
+	*/
+	bool addMotifsFromPWMTable(char*path);
+	/*
 	printInfo
 		Prints out information
 	*/
@@ -103,11 +119,12 @@ typedef struct motifOcc{
 	motifListMotif*mot;	// Pointer to the motif specification. Should never be 0 for active occurrences.
 	//-----------------------------------------------------------------------
 	int iANext,iAPrev;	// Index of next/previous active motif. -1 for none.
-	int iANextT,iAPrevT;	// Index of next/previous active motif of same type. -1 for none.
+	int iANextT,iAPrevT;// Index of next/previous active motif of same type. -1 for none.
 	int iFNext;			// Index of next free motif. -1 for none.
-	bool active;			// True if active, or false if free.
-	bool strand;			// True if reverse complement.
+	bool active;		// True if active, or false if free.
+	bool strand;		// True if reverse complement.
 	bool skip;			// True if this occurrence should be skipped.
+	double score;		// Score for occurrence.
 	//-----------------------------------------------------------------------
 	void*extra_buffer;		// Will be freed with the occurrence using free().
 }motifOcc;
@@ -149,7 +166,7 @@ public:
 		Creates a motif occurrence.
 		It also expands the table if it has to.
 	*/
-	motifOcc*createMotifOcc(long long start,motifListMotif*m,bool strand);
+	motifOcc*createMotifOcc(long long start,motifListMotif*m,bool strand,double score);
 	/*
 	freeMotifOcc
 		Frees the motif occurrence.
@@ -198,6 +215,11 @@ private:
 		IUPAC motif matching for naive parsing
 	*/
 	bool motifMatchIUPAC(char*seq,int seqlen,motifListMotif*mot,bool com);
+	/*
+	motifMatchPWM
+		PWM motif matching
+	*/
+	bool motifMatchPWM(char*seq,int seqlen,motifListMotif*mot,bool com,double&mscore);
 public:
 	long long wPos;
 	int wLen;
