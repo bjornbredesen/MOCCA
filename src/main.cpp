@@ -293,9 +293,6 @@ cmdArg argumentTypes[] = {
 				PWMMotif*d=(PWMMotif*)m->data;
 				d->threshold = thr;
 			}
-			/*if(!ml->addMotifsFromPWMTable((char*)params[0].c_str())){
-				return false;
-			}*/
 			return true;
 		}
 	},
