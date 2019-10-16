@@ -106,13 +106,26 @@ bool sequenceClassifier::getValidationTable(seqList*sl,validationPair*&vp,int&nv
 		outOfMemory();
 		return false;
 	}
+	int bptotal=0;
+	for(int l=0;l<sl->nseq;l++,sls++)
+		bptotal+=sls->bufs;
+	sls = sl->seq;
+	cmdTask task((char*)"Sequence scoring");
+	int cbp = 0;
+	int nextbp = 0;
 	for(int l=0;l<sl->nseq;l++,sls++){
 		double maxScore=getSequenceScore(sls);
+		cbp+=sls->bufs;
+		if(cbp>=nextbp){
+			task.setPercent((double(cbp)/double(bptotal))*100.0);
+			nextbp+=10000;
+		}
 		vPairs.ptr[l].score=maxScore+threshold; // Store max. score without threshold
 		vPairs.ptr[l].cls=sls->cls;
 	}
 	vp=vPairs.disown();
 	nvp=sl->nseq;
+	cmdTask::wipe()
 	return true;
 }
 
