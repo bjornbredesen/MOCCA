@@ -109,6 +109,11 @@ public:
 	*/
 	bool addRandomIid(char*tpath,int nadd,int len, seqClass*cls, e_trainMode tm);
 	/*
+	addClone
+		Adds a clone of the given sequence to the set.
+	*/
+	bool addClone(seqListSeq*sls);
+	/*
 	printInfo
 		Prints out information
 	*/

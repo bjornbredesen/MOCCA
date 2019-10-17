@@ -32,7 +32,7 @@ config _config = config {
 	true,
 	true,
 	cSVMMOCCA,
-	500,10,250,
+	500,100,250,
 	true, true,
 	kLinear,
 	dmCenters,
@@ -80,7 +80,9 @@ void config::printInfo(){
 		case wmBiPPV:cout << "Bi-directional Positive Predictive Value weights";break;
 		default:{}
 	}
-	if(genomeFASTAPath.length() > 0) cout << t_indent << "Genome: " << genomeFASTAPath;
 	cout << "\n";
+	if(classifier == cSVMMOCCA || classifier == cSEQSVM)
+		cout << t_indent << "SVM kernel: " << getKernelName(kernel) << "\n";
+	if(genomeFASTAPath.length() > 0) cout << t_indent << "Genome: " << genomeFASTAPath << "\n";
 }
 

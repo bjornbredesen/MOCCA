@@ -11,6 +11,7 @@ using namespace rapidxml;
 #include "config.hpp"
 #include "aux.hpp"
 #include "motifs.hpp"
+#include "sequences.hpp"
 #include <unordered_map>
 #include <iostream>
 #include <iomanip>
@@ -1221,6 +1222,69 @@ bool motifWindow::readWindow(char*wseq,long long wpos,int wlen){
 		}
 	}
 	//
+	return true;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// PWM threshold calibration
+
+bool calibratePWMThresholdsIid(motifList*ml, std::string bgPath, double oFreq){
+	// Train generative model
+	autodelete<seqStreamRandomIid> rss(new seqStreamRandomIid());
+	if(!rss.ptr){
+		outOfMemory();
+		return false;
+	}
+	autodelete<seqStreamFastaBatch> ssfb(seqStreamFastaBatch::load((char*)bgPath.c_str()));
+	if(!ssfb.ptr){
+		return false;
+	}
+	for(seqStreamFastaBatchBlock*ssfbblk;(ssfbblk=ssfb.ptr->getBlock());){
+		rss.ptr->train(ssfbblk);
+	}
+	
+	// Generate calibration sequence
+	#define PWMCAL_SEQFRQ 1000
+	#define PWMCAL_UPSCALE 1000
+	#define PWMCAL_SEQSIZE (PWMCAL_UPSCALE*PWMCAL_SEQFRQ)
+	autofree<char> buf((char*)malloc(PWMCAL_SEQSIZE));
+	if(!buf.ptr){
+		outOfMemory();
+		return false;
+	}
+	rss.ptr->read(PWMCAL_SEQSIZE,buf.ptr);
+	
+	// Calibrate per PWM-motif
+	autodelete<motifWindow> mwin(motifWindow::create(ml));
+	motifListMotif*m=ml->motifs;
+	for(int l=0;l<ml->nmotifs;l++,m++){
+		if(m->type!=motifType_PWM)continue;
+		PWMMotif*pwm = (PWMMotif*)m->data;
+		
+		// Score sequence, and save scores
+		double score;
+		std::vector<double>mScores;
+		char*c=buf.ptr;
+		for(int i=0;i<PWMCAL_SEQSIZE;i++, c++){
+			mwin.ptr->motifMatchPWM(c,PWMCAL_SEQSIZE-i,m,false,score);
+			mScores.push_back(score);
+			mwin.ptr->motifMatchPWM(c,PWMCAL_SEQSIZE-i,m,true,score);
+			mScores.push_back(score);
+		}
+		
+		// Sort scores, and get threshold
+		sort(mScores.begin(),mScores.end(),
+		[](const double a,const double b){
+			return a > b;
+		});
+		pwm->threshold = mScores[int(oFreq * PWMCAL_UPSCALE)];
+		cout << m->name << " - calibrated threshold: " << pwm->threshold << "\n";
+		
+		// Output actual observed frequency, for reassurance
+		int nOcc = 0;
+		for(double s: mScores) if(s >= pwm->threshold) nOcc++;
+		cout << m->name << " -  - Frequency: " << (1000.*double(nOcc)/double(PWMCAL_SEQSIZE)) << " occ/kb\n";
+	}
 	return true;
 }
 

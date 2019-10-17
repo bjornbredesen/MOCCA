@@ -203,6 +203,19 @@ bool seqList::addRandomIid(char*tpath,int nadd,int len,seqClass*cls,e_trainMode 
 	return true;
 }
 
+bool seqList::addClone(seqListSeq*sls){
+	autofree<char> buf((char*)malloc(sls->bufs));
+	if(!buf.ptr){
+		outOfMemory();
+		return false;
+	}
+	memcpy(buf.ptr, sls->buf, sls->bufs);
+	if(!addSeq(cloneString((char*)sls->name),buf.disown(),sls->bufs,sls->cls,sls->trainMode)){
+		return false;
+	}
+	return true;
+}
+
 void seqList::printInfo(char*title){
 	cmdSection(title);
 	seqListSeq*s=seq;
