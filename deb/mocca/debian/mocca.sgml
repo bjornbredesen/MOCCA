@@ -115,7 +115,34 @@ manpage.1: manpage.sgml
           	<option>-motif:XML PATH</option>
         </term>
         <listitem>
-          <para>Adds motifs specified in an XML-file PATH..</para>
+          <para>Adds motifs specified in an XML-file PATH.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:PWM PATH T</option>
+        </term>
+        <listitem>
+          <para>Adds Position Weight Matrix-motifs loaded from PATH. The threshold is initialized to T.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:PWM:threshold T</option>
+        </term>
+        <listitem>
+          <para>Sets all Position Weight Matrix thresholds to T.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-motif:PWM:calibrate:iid PATH N</option>
+        </term>
+        <listitem>
+          <para>Calibrates each PWM-threshold for an expected N occurrences per kilobase, in an i.i.d.-generated background.</para>
         </listitem>
       </varlistentry>
       
@@ -589,10 +616,55 @@ manpage.1: manpage.sgml
       
       <varlistentry>
         <term>
+          	<option>-train:iid PATH N L CLASS MODE</option>
+        </term>
+        <listitem>
+          <para>Trains an i.i.d. sequence model on sequences in the FASTA file PATH, generates N sequences, each of length L, and adds the sequences to training class CLASS. CLASS: A class ID, defined with "-class", or one of the pre-specified binary classes: "+" for positive or "-" for negative.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
           	<option>-validate:FASTA PATH CLASS</option>
         </term>
         <listitem>
           <para>Adds a validation sequence file. PATH: Path to FASTA file. CLASS: A class ID, defined with "-class", or one of the pre-specified binary classes: "+" for positive or "-" for negative.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-validate:iid PATH N L CLASS</option>
+        </term>
+        <listitem>
+          <para>Trains an i.i.d. sequence model on sequences in the FASTA file PATH, generates N sequences, each of length L, and adds the sequences to validation class CLASS. CLASS: A class ID, defined with "-class", or one of the pre-specified binary classes: "+" for positive or "-" for negative.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-calibrate:FASTA PATH CLASS</option>
+        </term>
+        <listitem>
+          <para>Adds a calibration sequence file. PATH: Path to FASTA file. CLASS: A class ID, defined with "-class", or one of the pre-specified binary classes: "+" for positive or "-" for negative.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-calibrate:iid PATH N L CLASS</option>
+        </term>
+        <listitem>
+          <para>Trains an i.i.d. sequence model on sequences in the FASTA file PATH, generates N sequences, each of length L, and adds the sequences to calibration class CLASS. CLASS: A class ID, defined with "-class", or one of the pre-specified binary classes: "+" for positive or "-" for negative.</para>
+        </listitem>
+      </varlistentry>
+      
+      <varlistentry>
+        <term>
+          	<option>-calibrate:precision P</option>
+        </term>
+        <listitem>
+          <para>Calibrates the precision to approximate a value of P, for the specified calibration sequences.</para>
         </listitem>
       </varlistentry>
       

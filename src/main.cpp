@@ -1369,9 +1369,6 @@ cmdArg argumentTypes[] = {
 			if(!valseq->addRandomIid((char*)params[0].c_str(), (int)strtol(params[1].c_str(), 0, 10), (int)strtol(params[2].c_str(), 0, 10), getSeqClassByName(params[3]), train_Full)){
 				return false;
 			}
-			/*if(!calseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[3]), train_Full)){
-				return false;
-			}*/
 			if(!registerFile("I.i.d. training sequences (validation)",params[0])){
 				return false;
 			}
@@ -1423,9 +1420,6 @@ cmdArg argumentTypes[] = {
 			if(!calseq->addRandomIid((char*)params[0].c_str(), (int)strtol(params[1].c_str(), 0, 10), (int)strtol(params[2].c_str(), 0, 10), getSeqClassByName(params[3]), train_Full)){
 				return false;
 			}
-			/*if(!calseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[3]), train_Full)){
-				return false;
-			}*/
 			if(!registerFile("I.i.d. training sequences (calibration)",params[0])){
 				return false;
 			}
