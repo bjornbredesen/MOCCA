@@ -94,7 +94,7 @@ public:
 	addMotifsFromPWMTable
 		Loads one or more PWM motifs from a table file
 	*/
-	bool addMotifsFromPWMTable(char*path);
+	bool addMotifsFromPWMTable(char*path, double threshold=0.0);
 	/*
 	printInfo
 		Prints out information
@@ -210,6 +210,12 @@ private:
 	motifWindow(motifList*_motifs);
 	// Naive parsing
 	bool initialize();
+public:
+	long long wPos;
+	int wLen;
+	motifOccContainer*occContainer;
+	motifList*motifs;
+	
 	/*
 	motifMatchIUPAC
 		IUPAC motif matching for naive parsing
@@ -220,11 +226,6 @@ private:
 		PWM motif matching
 	*/
 	bool motifMatchPWM(char*seq,int seqlen,motifListMotif*mot,bool com,double&mscore);
-public:
-	long long wPos;
-	int wLen;
-	motifOccContainer*occContainer;
-	motifList*motifs;
 	
 	// Construction
 	~motifWindow();

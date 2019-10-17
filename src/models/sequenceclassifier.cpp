@@ -110,7 +110,7 @@ bool sequenceClassifier::getValidationTable(seqList*sl,validationPair*&vp,int&nv
 	for(int l=0;l<sl->nseq;l++,sls++)
 		bptotal+=sls->bufs;
 	sls = sl->seq;
-	cmdTask task((char*)"Sequence scoring");
+	cmdTask task((char*)"Scoring sequences");
 	int cbp = 0;
 	int nextbp = 0;
 	for(int l=0;l<sl->nseq;l++,sls++){
@@ -125,7 +125,7 @@ bool sequenceClassifier::getValidationTable(seqList*sl,validationPair*&vp,int&nv
 	}
 	vp=vPairs.disown();
 	nvp=sl->nseq;
-	cmdTask::wipe()
+	cmdTask::wipe();
 	return true;
 }
 
@@ -345,7 +345,6 @@ bool sequenceClassifier::calibrateThresholdGenomewidePrecision(seqList*calpos,do
 	timer mainTimer((char*)"Threshold calibration");
 	cmdTask task((char*)"Calibrating threshold");
 	{
-		cmdTask taskp((char*)"Scoring sequences");
 		if(!sequenceClassifier::getValidationTable(calpos,vp.ptr,nvp))
 			return false;
 	}

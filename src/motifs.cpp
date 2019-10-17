@@ -234,7 +234,7 @@ bool motifList::addRandom(int n,int len){
 	return true;
 }
 
-bool motifList::addMotifsFromPWMTable(char*path){
+bool motifList::addMotifsFromPWMTable(char*path, double threshold){
 	if(!path){
 		cmdError("loadPWMMotif: Null-pointer arguments.");
 		return false;
@@ -322,7 +322,7 @@ bool motifList::addMotifsFromPWMTable(char*path){
 			memset(d.ptr,0,sizeof(PWMMotif));
 			d.ptr->tbl=pwm.ptr;
 			d.ptr->width=width;
-			d.ptr->threshold=0.0;
+			d.ptr->threshold=threshold;
 			motifListMotif*r=addMotif(cloneString((char*)motifName.c_str()),motifType_PWM,d.ptr,width);
 			if(r){
 				d.disown();

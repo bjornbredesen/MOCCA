@@ -68,7 +68,7 @@ void printRegisteredFiles(){
 
 #include <functional>
 #include <unordered_map>
-#define N_ARGUMENT_PASSES 2
+#define N_ARGUMENT_PASSES 3
 
 void print_help();
 void print_licenses();
@@ -262,13 +262,14 @@ cmdArg argumentTypes[] = {
 		// Pass
 		1,
 		// Parameters
-		1,
+		2,
 		// Documentation
-		"-motif:PWM PATH",
-		{ "Adds Position Weight Matrix-motifs loaded from PATH." },
+		"-motif:PWM PATH T",
+		{ "Adds Position Weight Matrix-motifs loaded from PATH.",
+		  "The threshold is initialized to T." },
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
-			if(!ml->addMotifsFromPWMTable((char*)params[0].c_str())){
+			if(!ml->addMotifsFromPWMTable((char*)params[0].c_str(), strtod((char*)params[1].c_str(), 0))){
 				return false;
 			}
 			return true;
@@ -278,7 +279,7 @@ cmdArg argumentTypes[] = {
 		// Argument
 		"-motif:PWM:threshold",
 		// Pass
-		1,
+		2,
 		// Parameters
 		1,
 		// Documentation
@@ -293,6 +294,91 @@ cmdArg argumentTypes[] = {
 				PWMMotif*d=(PWMMotif*)m->data;
 				d->threshold = thr;
 			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-motif:PWM:calibrate:iid",
+		// Pass
+		2,
+		// Parameters
+		2,
+		// Documentation
+		"-motif:PWM:calibrate:iid PATH N",
+		{ "Calibrates each PWM-threshold for an expected",
+		  "N occurrences per kilobase, in an i.i.d.-generated",
+		  "background." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			
+			std::string bgPath = params[0];
+			double oFreq = strtod((char*)params[1].c_str(), 0);
+			if(oFreq <= 0){
+				cout << m_error << "Desired motif occurrence frequency cannot be negative.\n";
+				return false;
+			}else if(oFreq >= 1000){
+				cout << m_error << "Desired motif occurrence frequency per kilobase cannot be greater than 1000.\n";
+				return false;
+			}
+			
+			// Train generative model
+			autodelete<seqStreamRandomIid> rss(new seqStreamRandomIid());
+			if(!rss.ptr){
+				outOfMemory();
+				return false;
+			}
+			autodelete<seqStreamFastaBatch> ssfb(seqStreamFastaBatch::load((char*)bgPath.c_str()));
+			if(!ssfb.ptr){
+				return false;
+			}
+			for(seqStreamFastaBatchBlock*ssfbblk;(ssfbblk=ssfb.ptr->getBlock());){
+				rss.ptr->train(ssfbblk);
+			}
+			
+			// Generate calibration sequence
+			#define PWMCAL_SEQFRQ 1000
+			#define PWMCAL_UPSCALE 1000
+			#define PWMCAL_SEQSIZE (PWMCAL_UPSCALE*PWMCAL_SEQFRQ)
+			autofree<char> buf((char*)malloc(PWMCAL_SEQSIZE));
+			if(!buf.ptr){
+				outOfMemory();
+				return false;
+			}
+			rss.ptr->read(PWMCAL_SEQSIZE,buf.ptr);
+			
+			// Calibrate per PWM-motif
+			autodelete<motifWindow> mwin(motifWindow::create(ml));
+			motifListMotif*m=ml->motifs;
+			for(int l=0;l<ml->nmotifs;l++,m++){
+				if(m->type!=motifType_PWM)continue;
+				PWMMotif*pwm = (PWMMotif*)m->data;
+				
+				// Score sequence, and save scores
+				double score;
+				std::vector<double>mScores;
+				char*c=buf.ptr;
+				for(int i=0;i<PWMCAL_SEQSIZE;i++, c++){
+					mwin.ptr->motifMatchPWM(c,PWMCAL_SEQSIZE-i,m,false,score);
+					mScores.push_back(score);
+					mwin.ptr->motifMatchPWM(c,PWMCAL_SEQSIZE-i,m,true,score);
+					mScores.push_back(score);
+				}
+				
+				// Sort scores, and get threshold
+				sort(mScores.begin(),mScores.end(),
+				[](const double a,const double b){
+					return a > b;
+				});
+				pwm->threshold = mScores[int(oFreq * PWMCAL_UPSCALE)];
+				cout << m->name << " - calibrated threshold: " << pwm->threshold << "\n";
+				
+				// Output actual observed frequency, for reassurance
+				int nOcc = 0;
+				for(double s: mScores) if(s >= pwm->threshold) nOcc++;
+				cout << m->name << " -  - Frequency: " << (1000.*double(nOcc)/double(PWMCAL_SEQSIZE)) << " occ/kb\n";
+			}
+			
 			return true;
 		}
 	},
@@ -927,8 +1013,9 @@ cmdArg argumentTypes[] = {
 		// Documentation
 		"-wm:PPV",
 		{ "Sets the log-odds weight mode to PPV.",
-		  "Instead of log-odds, the Positive Predictive Value is calculated",
-		  "based on motif occurrences in positives (TP) versus negatives (FP)." },
+		  "Instead of log-odds, the Positive Predictive Value is",
+		  "calculated based on motif occurrences in positives (TP)",
+		  "versus negatives (FP)." },
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->wmMode=wmPPV;
@@ -945,10 +1032,11 @@ cmdArg argumentTypes[] = {
 		// Documentation
 		"-wm:BiPPV",
 		{ "Sets the log-odds weight mode to BiPPV.",
-		  "Instead of log-odds, the Bi-Positive Predictive Value is calculated",
-		  "based on motif occurrences in positives (TP) versus negatives (FP).",
-		  "BiPPV is the difference between PPV for the positives, and PPV",
-		  "for switched labels (False Discovery Rate)." },
+		  "Instead of log-odds, the Bi-Positive Predictive Value is",
+		  "calculated based on motif occurrences in positives (TP)",
+		  "versus negatives (FP). BiPPV is the difference between",
+		  "PPV for the positives, and PPV for switched labels",
+		  "(False Discovery Rate)." },
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->wmMode=wmBiPPV;
@@ -1217,7 +1305,7 @@ cmdArg argumentTypes[] = {
 		// Documentation
 		"-train:iid PATH N L CLASS MODE",
 		{ "Trains an i.i.d. sequence model on sequences in the FASTA",
-		  "file PATH, generates N sequences, each of length L, and adds"
+		  "file PATH, generates N sequences, each of length L, and adds",
 		  "the sequences to training class CLASS.",
 		  "CLASS: A class ID, defined with \"-class\", or one of the",
 		  "pre-specified binary classes: \"+\" for positive or \"-\"",
@@ -1271,7 +1359,7 @@ cmdArg argumentTypes[] = {
 		// Documentation
 		"-validate:iid PATH N L CLASS",
 		{ "Trains an i.i.d. sequence model on sequences in the FASTA",
-		  "file PATH, generates N sequences, each of length L, and adds"
+		  "file PATH, generates N sequences, each of length L, and adds",
 		  "the sequences to validation class CLASS.",
 		  "CLASS: A class ID, defined with \"-class\", or one of the",
 		  "pre-specified binary classes: \"+\" for positive or \"-\"",
@@ -1325,7 +1413,7 @@ cmdArg argumentTypes[] = {
 		// Documentation
 		"-calibrate:iid PATH N L CLASS",
 		{ "Trains an i.i.d. sequence model on sequences in the FASTA",
-		  "file PATH, generates N sequences, each of length L, and adds"
+		  "file PATH, generates N sequences, each of length L, and adds",
 		  "the sequences to calibration class CLASS.",
 		  "CLASS: A class ID, defined with \"-class\", or one of the",
 		  "pre-specified binary classes: \"+\" for positive or \"-\"",
