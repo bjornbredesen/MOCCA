@@ -24,6 +24,9 @@ After building, MOCCA can be installed by running
 Similarly, MOCCA can be uninstalled by running
 `sudo make uninstall`
 
+To build a Debian-package, run
+`debuild -b`
+
 -------------------------------------------------
 
 ## License
