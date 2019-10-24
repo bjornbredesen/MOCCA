@@ -10,6 +10,15 @@ configure
 depcomp
 install-sh
 missing
+debian/mocca.1
+debian/mocca.debhelper.log
+debian/files
+debian/mocca
+debian/autoreconf.before
+debian/autoreconf.after
+debian/debhelper-build-stamp
+debian/mocca.substvars
+src/mocca
 src/.deps/
 src/Makefile
 src/Makefile.in
