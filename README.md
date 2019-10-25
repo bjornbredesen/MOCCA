@@ -16,16 +16,20 @@ Several types of motif-based models are included within MOCCA: a reimplementatio
 ## Installing
 
 To build, run
-`autoreconf --install && ./configure && make`
+`autoreconf --install && ./configure && make`.
 
 After building, MOCCA can be installed by running
-`sudo make install`
+`sudo make install`.
 
 Similarly, MOCCA can be uninstalled by running
-`sudo make uninstall`
+`sudo make uninstall`.
 
 To build a Debian-package, run
-`debuild -b`
+`debuild -b`.
+
+... or
+`gbp buildpackage`.
+This requires the installation of git-buildpackage. For the first build, adding the `--git-force-create` is necessary.
 
 -------------------------------------------------
 
