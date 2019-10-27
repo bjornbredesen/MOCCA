@@ -36,6 +36,18 @@ This requires the installation of git-buildpackage. For the first build, adding 
 
 -------------------------------------------------
 
+## Using
+
+Example:
+```
+mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:XML motifs2019.xml -predict:GFF predictions.gff -predict:Wig predictions.wig
+```
+
+See the `tutorial/` folder and `mocca --help` for more information.
+
+
+-------------------------------------------------
+
 ## License
 
 MIT License
@@ -145,7 +157,4 @@ IN THE SOFTWARE.
      * Validation with FASTA sequence files
      * Saving sequence scores to table
      * Scoring of sequence files to Wiggle curves
-
-### Example usage
-`./bin/mocca -motif:XML ./data/motifs.2003.xml -motif:IUPAC Combgap GTGT 0 -f:MOCCA:nOcc -f:MOCCA:DNT -train:FASTA ./data/T2003_PRE.fasta + full -train:FASTA ./data/T2003_NonPRE.fasta - full`
 
