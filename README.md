@@ -14,9 +14,15 @@ Several types of motif-based models are included within MOCCA: a reimplementatio
  * Bredesen *et al.* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
  * Ringrose *et al.* 2003: https://www.sciencedirect.com/science/article/pii/S153458070300337X
 
+#### Citing
+If you use MOCCA in published research, MOCCA must be cited. An article for MOCCA is in the process of being submitted for peer review. Please check back for proper citation policy.
+
 -------------------------------------------------
 
 ## Installing
+
+On Debian-based systems, the easiest way to install MOCCA is using `apt-get`. MOCCA is available via a PPA on launchpad. Run
+```sudo add-apt-repository ppa:bjornbredesen/mocca && sudo apt-get update && sudo apt-get install mocca```
 
 To build, run
 `autoreconf --install && ./configure && make`.
@@ -44,6 +50,34 @@ mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -moti
 ```
 
 See the `tutorial/` folder and `mocca --help` for more information.
+
+
+-------------------------------------------------
+
+## Features
+ - Models
+     * Dummy PREdictor
+     * CPREdictor
+     * SVM-MOCCA (the Support Vector Machine Motif Occurrence Combinatorics Classification Algorithm)
+     * Log-odds models with motif-based feature spaces
+     * Support Vector Machines with motif-based feature spaces
+ - Motif handling
+     * Command-line specification of IUPAC motifs
+     * Loading of IUPAC motifs from XML
+     * Generation of random IUPAC motifs.
+     * Full *k*-mer sets.
+     * IUPAC motif occurrence parsing Finite State Machine
+ - Feature spaces
+     * Motif occurrence frequency spectrum
+     * Motif pair occurrence frequency spectrum, with distance cutoff, and multiple distancing and overlap modes
+     * Motif distancing kernels
+     * Periodic motif occurrence kernels
+     * Motif pairing kernels that incorporate positional information
+ - Core usage features
+     * Training with FASTA sequence files
+     * Validation with FASTA sequence files
+     * Saving sequence scores to table
+     * Scoring of sequence files to Wiggle curves
 
 
 -------------------------------------------------
@@ -130,31 +164,4 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS 
 IN THE SOFTWARE.
-
--------------------------------------------------
-
-## Features
- - Models
-     * Dummy PREdictor
-     * CPREdictor
-     * SVM-MOCCA (the Support Vector Machine Motif Occurrence Combinatorics Classification Algorithm)
-     * Log-odds models with motif-based feature spaces
-     * Support Vector Machines with motif-based feature spaces
- - Motif handling
-     * Command-line specification of IUPAC motifs
-     * Loading of IUPAC motifs from XML
-     * Generation of random IUPAC motifs.
-     * Full *k*-mer sets.
-     * IUPAC motif occurrence parsing Finite State Machine
- - Feature spaces
-     * Motif occurrence frequency spectrum
-     * Motif pair occurrence frequency spectrum, with distance cutoff, and multiple distancing and overlap modes
-     * Motif distancing kernels
-     * Periodic motif occurrence kernels
-     * Motif pairing kernels that incorporate positional information
- - Core usage features
-     * Training with FASTA sequence files
-     * Validation with FASTA sequence files
-     * Saving sequence scores to table
-     * Scoring of sequence files to Wiggle curves
 
