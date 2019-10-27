@@ -1,4 +1,6 @@
 
+![alt text](../markdown/mocca.png "")
+
 # MOCCA
 Copyright Bjørn Bredesen, 2011-2019
 
