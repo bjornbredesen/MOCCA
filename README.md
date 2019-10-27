@@ -4,6 +4,7 @@
 # MOCCA
 Copyright Bjørn Bredesen, 2011-2019
 
+
 -------------------------------------------------
 
 ## About
@@ -14,8 +15,6 @@ Several types of motif-based models are included within MOCCA: a reimplementatio
  * Bredesen *et al.* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
  * Ringrose *et al.* 2003: https://www.sciencedirect.com/science/article/pii/S153458070300337X
 
-#### Citing
-If you use MOCCA in published research, MOCCA must be cited. An article for MOCCA is in the process of being submitted for peer review. Please check back for proper citation policy.
 
 -------------------------------------------------
 
@@ -39,6 +38,7 @@ To build a Debian-package, run
 ... or
 `gbp buildpackage`.
 This requires the installation of git-buildpackage. For the first build, adding the `--git-force-create` is necessary.
+
 
 -------------------------------------------------
 
@@ -80,6 +80,13 @@ See the `tutorial/` folder and `mocca --help` for more information.
      * Scoring of sequence files to Wiggle curves
 
 
+
+-------------------------------------------------
+
+## Citing
+If you use MOCCA in published research, MOCCA must be cited. An article for MOCCA is in the process of being submitted for peer review. Please check back for an updated citation policy.
+
+
 -------------------------------------------------
 
 ## License
@@ -105,6 +112,7 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
 
 -------------------------------------------------
 
