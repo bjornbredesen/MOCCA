@@ -9,7 +9,7 @@ Copyright Bjørn Bredesen, 2011-2019
 ## Tutorial
 
 ### Assisted training
-In this section, we will train SVM-MOCCA to predict Polycomb/Trithorax Response Elements (PREs) using Polycomb targets from the Kahn *et al.* (2014) experimental set. It is assumed that MOCCA has been installed. We extracted the Polycomb target regions determined by Kahn *et al.* (2014) from their Supplementary Table 3, we resized all regions to a length of 3kb each, and we extracted the underlying sequences from the *Drosophila melanogaster* genome release 5, using Cistem. The resulting sequences are supplied in the file `KahnPcG.fa`.
+In this section, we will train SVM-MOCCA to predict Polycomb/Trithorax Response Elements (PREs) using Polycomb targets from the Kahn *et al.* (2014) experimental set. It is assumed that MOCCA has been installed. We extracted the Polycomb target regions determined by Kahn *et al.* (2014) from their Supplementary Table 3, we resized all regions to a length of 3kb each, and we extracted the underlying sequences from the *Drosophila melanogaster* genome release 5, using Gnocis. The resulting sequences are supplied in the file `KahnPcG.fa`.
 
 Sequence models in MOCCA make use of sequence motifs in order to learn distinguishing features of the different sequence classes. Accordingly, the motifs to be used must be specified. The simplest way of supplying MOCCA with a set of known motifs is by specifying them in IUPAC nucleotide codes (https://www.bioinformatics.org/sms/iupac.html) in an XML-file. We have supplied a sample XML-file, with the motifs that we used previously for genome-wide prediction of PREs (Bredesen *et al* 2019). The motifs are given in the file `motifs2019.xml`.
 
@@ -80,7 +80,7 @@ mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -moti
 
  * Bredesen *et al.* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
  * Kahn *et al.* 2014: https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1004495
- * Cistem - Bredesen *et al.* 2020 (?): Article to be submitted to journal
+ * Gnocis - Bredesen *et al.* 2020 (?): Article to be submitted to journal
  * FlyBase - : https://academic.oup.com/nar/article/41/D1/D751/1051942
  * Ringrose *et al.* 2003: https://www.sciencedirect.com/science/article/pii/S153458070300337X
 
