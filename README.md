@@ -20,7 +20,7 @@ Several types of motif-based models are included within MOCCA: a reimplementatio
 
 ## Installing
 
-On Debian-based systems, the easiest way to install MOCCA is using `apt-get`. MOCCA is available via a PPA on launchpad. Run
+On Debian-based systems, the easiest way to install MOCCA is using `apt-get`. Ubuntu builds of MOCCA are available via a PPA on launchpad. Run
 ```sudo add-apt-repository ppa:bjornbredesen/mocca && sudo apt-get update && sudo apt-get install mocca```
 
 To build, run
