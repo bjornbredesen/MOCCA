@@ -26,6 +26,7 @@ using namespace rapidxml;
 #include "models/cpredictor.hpp"
 #include "models/dummypredictor.hpp"
 #include "models/seqsvm.hpp"
+#include "models/seqrf.hpp"
 #include "models/seqlo.hpp"
 #include "models/seqdummy.hpp"
 
@@ -821,6 +822,23 @@ cmdArg argumentTypes[] = {
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cSEQSVM;
 			cfg->svmtype=C_SVC;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-C:RF",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:RF",
+		{ "Sets the classifier to Random Forest, using separately specified",
+		  "feature spaces." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->classifier=cSEQRF;
 			return true;
 		}
 	},
@@ -1725,6 +1743,17 @@ LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\n\
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n\
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n";
 	cout << sepline;
+	cout << t_bold("Dependency license: Ranger") << "\n\
+MIT License\n\
+\n\
+Copyright (c) [2014-2018] [Marvin N. Wright]\n\
+\n\
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the \"Software\"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:\n\
+\n\
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\
+\n\
+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n";
+	cout << sepline;
 	cout << t_bold("Dependency license: RapidXML") << "\n\
 \n\
 Copyright (c) 2006, 2007 Marcin Kalicinski\n\
@@ -1746,6 +1775,7 @@ THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER \n\
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, \n\
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS \n\
 IN THE SOFTWARE.\n";
+
 	cout << sepline;
 }
 
@@ -1826,6 +1856,7 @@ sequenceClassifier*constructClassifier(motifList*motifs,featureSet*features,seqL
 		case cCPREdictor:cls=CPREdictor::create(motifs);break;
 		case cDummyPREdictor:cls=DummyPREdictor::create(motifs);break;
 		case cSEQSVM:cls=SEQSVM::create(motifs,features,cfg->svmtype);break;
+		case cSEQRF:cls=SEQRF::create(motifs,features);break;
 		case cSEQLO:cls=SEQLO::create(motifs,features);break;
 		case cSEQDummy:cls=SEQDummy::create(motifs,features);break;
 		default:cmdError("Invalid classifier.");return 0;

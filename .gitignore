@@ -23,6 +23,10 @@ src/.deps/
 src/Makefile
 src/Makefile.in
 src/*.o
+src/lib/ranger/src/*.o
+src/lib/ranger/src/.deps/
+src/lib/ranger/src/Forest/.deps/
+src/lib/ranger/src/Tree/.deps/
 src/models/*.o
 src/models/.deps/
 src/models/.dirstamp

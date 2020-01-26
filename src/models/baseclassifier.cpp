@@ -959,3 +959,44 @@ bool MultiClassSVM::exportAnalysisData(FILE*f, char*title, char*indent){
 	return true;
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+// Random Forest
+//	Trains RF with Ranger.
+
+RFClassifier::RFClassifier(int nf):baseClassifier(nf){
+	// TODO Initialize
+}
+
+RFClassifier*RFClassifier::create(int nf){
+	if(!nf){
+		cmdError("No features.");
+		return 0;
+	}
+	RFClassifier*r=new RFClassifier(nf);
+	if(!r){
+		outOfMemory();
+		return 0;
+	}
+	// TODO Initialize
+	return r;
+}
+
+bool RFClassifier::do_train(){
+	// TODO Implement training here
+	return true;
+}
+
+double RFClassifier::do_apply(double*vec){
+	// TODO Implement model application here
+	double r=0;
+	/*for(int i=0;i<nFeatures;i++){
+		r+=vec[i]*weights[i];
+	}*/
+	return r;
+}
+
+void RFClassifier::printInfo(char*header){
+	cout << t_indent << header << "\n";
+	// TODO Implement model information printout here
+}
+

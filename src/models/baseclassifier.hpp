@@ -133,3 +133,22 @@ public:
 	bool exportAnalysisData(FILE*f, char*title, char*indent);
 };
 
+////////////////////////////////////////////////////////////////////////////////////
+// Random Forest
+//	Trains RF with Ranger.
+
+class RFClassifier:public baseClassifier{
+private:
+	//int nP,nN;
+	//autofree<double> weights, cP, cN;
+	RFClassifier(int nf);
+public:
+	std::vector<std::string> featureNames;
+	virtual ~RFClassifier(){ };
+	static RFClassifier*create(int nf);
+	//double getWeight(int i);
+	bool do_train();
+	double do_apply(double*vec);
+	void printInfo(char*header);
+};
+

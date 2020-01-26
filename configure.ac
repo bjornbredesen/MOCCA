@@ -8,6 +8,7 @@ AC_LANG(C++)
 AC_PROG_CXX
 
 CXXFLAGS="-std=c++11 -fPIC"
+LDFLAGS="-pthread"
 
 AC_CONFIG_FILES([Makefile src/Makefile])
 AC_OUTPUT
