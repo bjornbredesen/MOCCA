@@ -978,11 +978,85 @@ RFClassifier*RFClassifier::create(int nf){
 		return 0;
 	}
 	// TODO Initialize
+	
+	r->rf.ptr = new ranger::ForestProbability();
+	
+	
+	
+	//autodelete<ranger::Data> data(new ranger::DataDouble);
+	
+	//std::unique_ptr<ranger::Data> data = ranger::make_unique<ranger::DataDouble>();
+	/*
+	*/
 	return r;
 }
 
+class RangerData: public ranger::DataDouble {
+public:
+	void setData(int nFeatures, std::vector<baseClassifierSmp*> dat) {
+		// Set header
+		for(int i=0;i<nFeatures;i++){
+			variable_names.push_back("f" + std::to_string(i+1));
+		}
+		num_cols = variable_names.size();
+		num_cols_no_snp = num_cols;
+		for(baseClassifierSmp*t: dat)
+			num_rows++;
+		/*cout << "num_rows: " << num_rows << "\n";
+		cout << "num_cols: " << num_cols << "\n";
+		cout << "num_cols_no_snp: " << num_cols_no_snp << "\n";*/
+		reserveMemory(1);
+		bool error = false;
+		// Set rows
+		int row = 0;
+		for(baseClassifierSmp*t: dat){
+			for(int i=0;i<nFeatures;i++)
+				set_x(i, row, t->vec[i], error);
+			set_y(nFeatures, row, t->cls->flag ? 1.0 : -1.0, error);
+			row++;
+		}
+	}
+};
+
 bool RFClassifier::do_train(){
-	// TODO Implement training here
+	// Fill in data values
+	std::unique_ptr<RangerData> data{};
+	data = ranger::make_unique<RangerData>(); //new ranger::DataDouble();
+	data->setData(nFeatures, trainingExamples.v);
+	
+	// Train model
+	std::vector<std::string> catvars;
+	std::vector<double> regfac;
+	std::vector<double> sample_fraction_vector = { ranger::DEFAULT_SAMPLE_FRACTION_REPLACE };
+	rf.ptr->init(
+		ranger::MemoryMode::MEM_DOUBLE,
+		std::move(data),
+		(ranger::uint)0, // uint mtry,
+		std::string(""), //std::string output_prefix,
+		(ranger::uint)0, //uint num_trees,
+		(ranger::uint)0, //uint seed,
+		(ranger::uint)1, //uint num_threads,
+		ranger::ImportanceMode::IMP_NONE, //ImportanceMode importance_mode,
+		(ranger::uint)0, //uint min_node_size,
+		false, //bool prediction_mode,
+		true, //bool sample_with_replacement,
+		catvars, //const std::vector<std::string>& unordered_variable_names,
+		false, //bool memory_saving_splitting,
+		ranger::SplitRule::LOGRANK,//SplitRule splitrule,
+		false, //bool predict_all,
+		sample_fraction_vector, //std::vector<double>& sample_fraction,
+		ranger::DEFAULT_ALPHA, //double alpha,
+		ranger::DEFAULT_MINPROP, //double minprop,
+		false, //bool holdout,
+		ranger::PredictionType::RESPONSE, //PredictionType prediction_type,
+		ranger::DEFAULT_NUM_RANDOM_SPLITS, //uint num_random_splits,
+		false, //bool order_snps,
+		ranger::DEFAULT_MAXDEPTH, //uint max_depth,
+		regfac,//const std::vector<double>& regularization_factor,
+		false); //bool regularization_usedepth);
+	
+	
+	
 	return true;
 }
 

@@ -86,7 +86,7 @@ double SEQRF::do_applyWindow(char*buf,long long pos,int bufs){
 
 bool SEQRF::printInfo(){
 	cout << t_indent << "SEQRF classifier\n";
-	classifier.ptr->printInfo((char*)"SVM");
+	classifier.ptr->printInfo((char*)"Random Forest");
 	return true;
 }
 

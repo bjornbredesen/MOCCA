@@ -137,11 +137,22 @@ public:
 // Random Forest
 //	Trains RF with Ranger.
 
+#include "../lib/ranger/src/globals.h"
+#include "../lib/ranger/src/ForestClassification.h"
+#include "../lib/ranger/src/ForestRegression.h"
+#include "../lib/ranger/src/ForestProbability.h"
+#include "../lib/ranger/src/utility.h"
+#include "../lib/ranger/src/Data.h"
+#include "../lib/ranger/src/DataDouble.h"
+
+//using namespace ranger;
+
 class RFClassifier:public baseClassifier{
 private:
 	//int nP,nN;
 	//autofree<double> weights, cP, cN;
 	RFClassifier(int nf);
+	autodelete<ranger::Forest> rf;
 public:
 	std::vector<std::string> featureNames;
 	virtual ~RFClassifier(){ };
