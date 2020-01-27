@@ -23,6 +23,7 @@ using namespace rapidxml;
 #include "models/baseclassifier.hpp"
 #include "models/sequenceclassifier.hpp"
 #include "models/svmmocca.hpp"
+#include "models/rfmocca.hpp"
 #include "models/cpredictor.hpp"
 #include "models/dummypredictor.hpp"
 #include "models/seqsvm.hpp"
@@ -893,6 +894,22 @@ cmdArg argumentTypes[] = {
 			return true;
 		}
 	},
+	{
+		// Argument
+		"-C:RF-MOCCA",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:RF-MOCCA",
+		{ "Sets the classifier to RF-MOCCA." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->classifier=cRFMOCCA;
+			return true;
+		}
+	},
 	//---------------------------
 	// Classifier configuration
 	{
@@ -1566,7 +1583,7 @@ cmdArg argumentTypes[] = {
 			}
 			getSeqClassByName((char*)"+")->name = "CRM";
 			getSeqClassByName((char*)"-")->name = "Dummy CRM";
-			if(cfg->classifier == cSVMMOCCA){
+			if(cfg->classifier == cSVMMOCCA || cfg->classifier == cRFMOCCA){
 				if(!registerSeqClass(-2,(char*)"Dummy genomic",false)){
 					return false;
 				}
@@ -1625,7 +1642,7 @@ cmdArg argumentTypes[] = {
 			}
 			cout << "Input genome: " << cfg->genomeFASTAPath << " (" << genomeSize << " bp)\n";
 			// For SVM-MOCCA classifier, if no features were specified, set to standard
-			if(cfg->classifier == cSVMMOCCA){
+			if(cfg->classifier == cSVMMOCCA || cfg->classifier == cRFMOCCA){
 				if(!( cfg->MOCCA_nOcc | cfg->MOCCA_DNT | cfg->MOCCA_GC )){
 					cfg->MOCCA_nOcc = cfg->MOCCA_DNT = true;
 					cfg->kernel=kQuadratic;
@@ -1853,6 +1870,7 @@ sequenceClassifier*constructClassifier(motifList*motifs,featureSet*features,seqL
 	config*cfg=getConfiguration();
 	switch(cfg->classifier){
 		case cSVMMOCCA:cls=SVMMOCCA::create(motifs,cfg->svmtype);break;
+		case cRFMOCCA:cls=RFMOCCA::create(motifs);break;
 		case cCPREdictor:cls=CPREdictor::create(motifs);break;
 		case cDummyPREdictor:cls=DummyPREdictor::create(motifs);break;
 		case cSEQSVM:cls=SEQSVM::create(motifs,features,cfg->svmtype);break;

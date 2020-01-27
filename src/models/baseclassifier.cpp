@@ -967,7 +967,7 @@ RFClassifier::RFClassifier(int nf):baseClassifier(nf){
 	// TODO Initialize
 }
 
-RFClassifier*RFClassifier::create(int nf){
+RFClassifier*RFClassifier::create(int nf, std::string name){
 	if(!nf){
 		cmdError("No features.");
 		return 0;
@@ -978,6 +978,7 @@ RFClassifier*RFClassifier::create(int nf){
 		return 0;
 	}
 	r->rf.ptr = new RangerRandomForest();
+	r->name = name;
 	return r;
 }
 

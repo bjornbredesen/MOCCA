@@ -37,6 +37,7 @@ enum classifierT{
 	cInvalid,
 	cCPREdictor,
 	cSVMMOCCA,
+	cRFMOCCA,
 	cDummyPREdictor,
 	cSEQSVM,
 	cSEQRF,

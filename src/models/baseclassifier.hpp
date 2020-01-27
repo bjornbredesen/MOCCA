@@ -218,10 +218,11 @@ private:
 	//autofree<double> weights, cP, cN;
 	RFClassifier(int nf);
 	autodelete<RangerRandomForest> rf;
+	std::string name;
 public:
 	std::vector<std::string> featureNames;
 	virtual ~RFClassifier(){ };
-	static RFClassifier*create(int nf);
+	static RFClassifier*create(int nf, std::string name);
 	//double getWeight(int i);
 	bool do_train();
 	double do_apply(double*vec);

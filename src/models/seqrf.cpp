@@ -51,7 +51,7 @@ SEQRF*SEQRF::create(motifList*motifs,featureSet*fs){
 	r.ptr->motifs=r.ptr->mwin.ptr->motifs;
 	r.ptr->features=fs;
 	cout << r.ptr->nFeatures;
-	r.ptr->classifier.ptr = RFClassifier::create(nfeatures);
+	r.ptr->classifier.ptr = RFClassifier::create(nfeatures, std::string("cls"));
 	if(!r.ptr->classifier.ptr){
 		return 0;
 	}
