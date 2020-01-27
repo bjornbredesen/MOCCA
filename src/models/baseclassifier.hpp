@@ -158,9 +158,6 @@ public:
 		num_cols_no_snp = num_cols;
 		for(baseClassifierSmp*t: dat)
 			num_rows++;
-		/*cout << "num_rows: " << num_rows << "\n";
-		cout << "num_cols: " << num_cols << "\n";
-		cout << "num_cols_no_snp: " << num_cols_no_snp << "\n";*/
 		reserveMemory(1);
 		bool error = false;
 		// Set rows
@@ -168,44 +165,20 @@ public:
 		for(baseClassifierSmp*t: dat){
 			for(int i=0;i<nFeatures;i++)
 				set_x(i, row, t->vec[i], error);
-			//set_y(nFeatures, row, t->cls->flag ? 1.0 : -1.0, error);
-			set_y(0, row, t->cls->flag ? 1. : 0., error);
+			set_y(0, row, t->cls->flag ? 1. : -1., error);
 			row++;
 		}
 	}
-/*	void setDataV(int nFeatures, double*vec) {
-		// Set header
-		for(int i=0;i<nFeatures;i++){
-			variable_names.push_back("f" + std::to_string(i+1));
-		}
-		num_cols = variable_names.size();
-		num_cols_no_snp = num_cols;
-		num_rows = 1;
-		//for(baseClassifierSmp*t: dat)
-		//	num_rows++;
-		/*cout << "num_rows: " << num_rows << "\n";
-		cout << "num_cols: " << num_cols << "\n";
-		cout << "num_cols_no_snp: " << num_cols_no_snp << "\n";*/
-/*		reserveMemory(1);
-		bool error = false;
-		// Set rows
-		int row = 0;
-		for(baseClassifierSmp*t: dat){
-			for(int i=0;i<nFeatures;i++)
-				set_x(i, row, t->vec[i], error);
-			set_y(nFeatures, row, t->cls->flag ? 1.0 : -1.0, error);
-			row++;
-		}
-	}*/
 	void setVector(double*vec, int ncol){
 		num_rows = 1;
 		num_cols = ncol;
 		num_cols_no_snp = num_cols;
-		reserveMemory(1);
+		//reserveMemory(1);
+		reserveMemory(0);
 		bool error = false;
 		for(int i=0;i<ncol;i++)
 			set_x(i, 0, vec[i], error);
-		set_y(0, 0, 0.0, error);
+		//set_y(0, 0, 0.0, error);
 	}
 };
 
@@ -217,13 +190,25 @@ public:
 		dependent_variable_names.push_back(std::string("target"));
 	}
 	double predictVec(double*vec){
+		//return double(rand()) / double(RAND_MAX);
 		RangerData*rd = (RangerData*)data.get();
 		int ncol = rd->getNumCols();
 		rd->setVector(vec, ncol);
 		num_samples = 1;
 		ranger::equalSplit(thread_ranges, 0, num_trees - 1, num_threads);
 		predict();
-		return predictions[0][0][0];
+		double ppos = 0.;
+		double pneg = 0.;
+		for(int icls = 0; icls < class_values.size(); icls++){
+			if (class_values[icls] == 1.0)
+				ppos = predictions[0][0][icls];
+			else if (class_values[icls] == -1.0)
+				pneg = predictions[0][0][icls];
+			//	return predictions[0][0][icls];
+		}
+		return ppos - pneg;
+		//return -100000000000000000000.0;
+		//return predictions[0][0][0];
 	}
 };
 
