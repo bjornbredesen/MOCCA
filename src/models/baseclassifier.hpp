@@ -147,12 +147,107 @@ public:
 
 //using namespace ranger;
 
+class RangerData: public ranger::DataDouble {
+public:
+	void setDataT(int nFeatures, std::vector<baseClassifierSmp*> dat) {
+		// Set header
+		for(int i=0;i<nFeatures;i++){
+			variable_names.push_back("f" + std::to_string(i+1));
+		}
+		num_cols = variable_names.size();
+		num_cols_no_snp = num_cols;
+		for(baseClassifierSmp*t: dat)
+			num_rows++;
+		/*cout << "num_rows: " << num_rows << "\n";
+		cout << "num_cols: " << num_cols << "\n";
+		cout << "num_cols_no_snp: " << num_cols_no_snp << "\n";*/
+		reserveMemory(1);
+		bool error = false;
+		// Set rows
+		int row = 0;
+		for(baseClassifierSmp*t: dat){
+			for(int i=0;i<nFeatures;i++)
+				set_x(i, row, t->vec[i], error);
+			//set_y(nFeatures, row, t->cls->flag ? 1.0 : -1.0, error);
+			set_y(0, row, t->cls->flag ? 1. : 0., error);
+			row++;
+		}
+	}
+/*	void setDataV(int nFeatures, double*vec) {
+		// Set header
+		for(int i=0;i<nFeatures;i++){
+			variable_names.push_back("f" + std::to_string(i+1));
+		}
+		num_cols = variable_names.size();
+		num_cols_no_snp = num_cols;
+		num_rows = 1;
+		//for(baseClassifierSmp*t: dat)
+		//	num_rows++;
+		/*cout << "num_rows: " << num_rows << "\n";
+		cout << "num_cols: " << num_cols << "\n";
+		cout << "num_cols_no_snp: " << num_cols_no_snp << "\n";*/
+/*		reserveMemory(1);
+		bool error = false;
+		// Set rows
+		int row = 0;
+		for(baseClassifierSmp*t: dat){
+			for(int i=0;i<nFeatures;i++)
+				set_x(i, row, t->vec[i], error);
+			set_y(nFeatures, row, t->cls->flag ? 1.0 : -1.0, error);
+			row++;
+		}
+	}*/
+	void setVector(double*vec, int ncol){
+		//int old_rows = num_rows;
+		num_rows = 1;
+		num_cols = ncol;
+		num_cols_no_snp = num_cols;
+		//if(old_rows != 1)
+		//	reserveMemory(1);
+		reserveMemory(1);
+		bool error = false;
+		for(int i=0;i<ncol;i++)
+			set_x(i, 0, vec[i], error);
+		set_y(0, 0, 0.0, error);
+	}
+};
+
+class RangerRandomForest: public ranger::ForestProbability {
+public:
+	void train(){
+		grow();
+		computePredictionError();
+		dependent_variable_names.push_back(std::string("target"));
+	}
+	double predictVec(double*vec){
+		RangerData*rd0 = (RangerData*)data.get();
+		int ncol = rd0->getNumCols();
+		data.reset();
+		cout << "ncol: " << ncol << "\n";
+		data = ranger::make_unique<RangerData>();
+		RangerData*rd = (RangerData*)data.get();
+		rd->setVector(vec, ncol);
+		cout << "setVector successful\n";
+		num_samples = 1;
+		ranger::equalSplit(thread_ranges, 0, num_trees - 1, num_threads);
+		cout << "ranger::equalSplit successful\n";
+		predict();
+		cout << "predict successful\n";
+		//cout << "predictions[0][0][0]: " << predictions[0][0][0] << "\n";
+		//cout << "predictions[0][0][1]: " << predictions[0][0][1] << "\n";
+		/*cout << "predictions.size(): " << predictions.size() << "\n";
+		cout << "predictions[0].size(): " << predictions[0].size() << "\n";
+		cout << "predictions[0][0].size(): " << predictions[0][0].size() << "\n";*/
+		return predictions[0][0][0];
+	}
+};
+
 class RFClassifier:public baseClassifier{
 private:
 	//int nP,nN;
 	//autofree<double> weights, cP, cN;
 	RFClassifier(int nf);
-	autodelete<ranger::Forest> rf;
+	autodelete<RangerRandomForest> rf;
 public:
 	std::vector<std::string> featureNames;
 	virtual ~RFClassifier(){ };

@@ -977,52 +977,15 @@ RFClassifier*RFClassifier::create(int nf){
 		outOfMemory();
 		return 0;
 	}
-	// TODO Initialize
-	
-	r->rf.ptr = new ranger::ForestProbability();
-	
-	
-	
-	//autodelete<ranger::Data> data(new ranger::DataDouble);
-	
-	//std::unique_ptr<ranger::Data> data = ranger::make_unique<ranger::DataDouble>();
-	/*
-	*/
+	r->rf.ptr = new RangerRandomForest();
 	return r;
 }
-
-class RangerData: public ranger::DataDouble {
-public:
-	void setData(int nFeatures, std::vector<baseClassifierSmp*> dat) {
-		// Set header
-		for(int i=0;i<nFeatures;i++){
-			variable_names.push_back("f" + std::to_string(i+1));
-		}
-		num_cols = variable_names.size();
-		num_cols_no_snp = num_cols;
-		for(baseClassifierSmp*t: dat)
-			num_rows++;
-		/*cout << "num_rows: " << num_rows << "\n";
-		cout << "num_cols: " << num_cols << "\n";
-		cout << "num_cols_no_snp: " << num_cols_no_snp << "\n";*/
-		reserveMemory(1);
-		bool error = false;
-		// Set rows
-		int row = 0;
-		for(baseClassifierSmp*t: dat){
-			for(int i=0;i<nFeatures;i++)
-				set_x(i, row, t->vec[i], error);
-			set_y(nFeatures, row, t->cls->flag ? 1.0 : -1.0, error);
-			row++;
-		}
-	}
-};
 
 bool RFClassifier::do_train(){
 	// Fill in data values
 	std::unique_ptr<RangerData> data{};
 	data = ranger::make_unique<RangerData>(); //new ranger::DataDouble();
-	data->setData(nFeatures, trainingExamples.v);
+	data->setDataT(nFeatures, trainingExamples.v);
 	
 	// Train model
 	std::vector<std::string> catvars;
@@ -1033,7 +996,7 @@ bool RFClassifier::do_train(){
 		std::move(data),
 		(ranger::uint)0, // uint mtry,
 		std::string(""), //std::string output_prefix,
-		(ranger::uint)0, //uint num_trees,
+		ranger::DEFAULT_NUM_TREE, //uint num_trees,
 		(ranger::uint)0, //uint seed,
 		(ranger::uint)1, //uint num_threads,
 		ranger::ImportanceMode::IMP_NONE, //ImportanceMode importance_mode,
@@ -1053,8 +1016,9 @@ bool RFClassifier::do_train(){
 		false, //bool order_snps,
 		ranger::DEFAULT_MAXDEPTH, //uint max_depth,
 		regfac,//const std::vector<double>& regularization_factor,
-		false); //bool regularization_usedepth);
-	
+		false //bool regularization_usedepth
+	);
+	rf.ptr->train();
 	
 	
 	return true;
@@ -1066,6 +1030,13 @@ double RFClassifier::do_apply(double*vec){
 	/*for(int i=0;i<nFeatures;i++){
 		r+=vec[i]*weights[i];
 	}*/
+	//std::unique_ptr<RangerData> data{};
+	//data = ranger::make_unique<RangerData>(); //new ranger::DataDouble();
+	//data->setDataV(nFeatures, vec);
+	//rf.ptr->setData(std::move(data));
+	cout << "Q\n";
+	r = rf.ptr->predictVec(vec);
+	cout << "T\n";
 	return r;
 }
 
