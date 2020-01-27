@@ -1034,9 +1034,7 @@ double RFClassifier::do_apply(double*vec){
 	//data = ranger::make_unique<RangerData>(); //new ranger::DataDouble();
 	//data->setDataV(nFeatures, vec);
 	//rf.ptr->setData(std::move(data));
-	cout << "Q\n";
 	r = rf.ptr->predictVec(vec);
-	cout << "T\n";
 	return r;
 }
 

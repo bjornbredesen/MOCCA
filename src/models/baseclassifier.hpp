@@ -198,12 +198,9 @@ public:
 		}
 	}*/
 	void setVector(double*vec, int ncol){
-		//int old_rows = num_rows;
 		num_rows = 1;
 		num_cols = ncol;
 		num_cols_no_snp = num_cols;
-		//if(old_rows != 1)
-		//	reserveMemory(1);
 		reserveMemory(1);
 		bool error = false;
 		for(int i=0;i<ncol;i++)
@@ -220,24 +217,12 @@ public:
 		dependent_variable_names.push_back(std::string("target"));
 	}
 	double predictVec(double*vec){
-		RangerData*rd0 = (RangerData*)data.get();
-		int ncol = rd0->getNumCols();
-		data.reset();
-		cout << "ncol: " << ncol << "\n";
-		data = ranger::make_unique<RangerData>();
 		RangerData*rd = (RangerData*)data.get();
+		int ncol = rd->getNumCols();
 		rd->setVector(vec, ncol);
-		cout << "setVector successful\n";
 		num_samples = 1;
 		ranger::equalSplit(thread_ranges, 0, num_trees - 1, num_threads);
-		cout << "ranger::equalSplit successful\n";
 		predict();
-		cout << "predict successful\n";
-		//cout << "predictions[0][0][0]: " << predictions[0][0][0] << "\n";
-		//cout << "predictions[0][0][1]: " << predictions[0][0][1] << "\n";
-		/*cout << "predictions.size(): " << predictions.size() << "\n";
-		cout << "predictions[0].size(): " << predictions[0].size() << "\n";
-		cout << "predictions[0][0].size(): " << predictions[0][0].size() << "\n";*/
 		return predictions[0][0][0];
 	}
 };
