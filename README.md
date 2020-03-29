@@ -62,6 +62,7 @@ See the `tutorial/` folder and `mocca --help` for more information.
      * RF-MOCCA (the Random Forest Motif Occurrence Combinatorics Classification Algorithm)
      * Log-odds models with motif-based feature spaces
      * Support Vector Machines with motif-based feature spaces
+     * Random Forests with motif-based feature spaces
  - Motif handling
      * Command-line specification of IUPAC motifs
      * Loading of IUPAC motifs from XML
