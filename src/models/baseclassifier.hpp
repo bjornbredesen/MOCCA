@@ -145,8 +145,6 @@ public:
 #include "../lib/ranger/src/Data.h"
 #include "../lib/ranger/src/DataDouble.h"
 
-//using namespace ranger;
-
 class RangerData: public ranger::DataDouble {
 public:
 	void setDataT(int nFeatures, std::vector<baseClassifierSmp*> dat) {
@@ -173,12 +171,10 @@ public:
 		num_rows = 1;
 		num_cols = ncol;
 		num_cols_no_snp = num_cols;
-		//reserveMemory(1);
 		reserveMemory(0);
 		bool error = false;
 		for(int i=0;i<ncol;i++)
 			set_x(i, 0, vec[i], error);
-		//set_y(0, 0, 0.0, error);
 	}
 };
 
@@ -190,7 +186,6 @@ public:
 		dependent_variable_names.push_back(std::string("target"));
 	}
 	double predictVec(double*vec){
-		//return double(rand()) / double(RAND_MAX);
 		RangerData*rd = (RangerData*)data.get();
 		int ncol = rd->getNumCols();
 		rd->setVector(vec, ncol);
@@ -204,18 +199,13 @@ public:
 				ppos = predictions[0][0][icls];
 			else if (class_values[icls] == -1.0)
 				pneg = predictions[0][0][icls];
-			//	return predictions[0][0][icls];
 		}
 		return ppos - pneg;
-		//return -100000000000000000000.0;
-		//return predictions[0][0][0];
 	}
 };
 
 class RFClassifier:public baseClassifier{
 private:
-	//int nP,nN;
-	//autofree<double> weights, cP, cN;
 	RFClassifier(int nf);
 	autodelete<RangerRandomForest> rf;
 	std::string name;
@@ -223,7 +213,6 @@ public:
 	std::vector<std::string> featureNames;
 	virtual ~RFClassifier(){ };
 	static RFClassifier*create(int nf, std::string name);
-	//double getWeight(int i);
 	bool do_train();
 	double do_apply(double*vec);
 	void printInfo(char*header);

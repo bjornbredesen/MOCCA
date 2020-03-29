@@ -91,20 +91,6 @@ bool SEQRF::printInfo(){
 }
 
 bool SEQRF::exportAnalysisData(string path){
-	/*
-	FILE*f=fopen(path.c_str(),"wb");
-	int i=0;
-	fprintf(f,"Motif pair\tWeight\n");
-	for(int ia=0;ia<motifs->nmotifs;ia++){
-		for(int ib=ia;ib<motifs->nmotifs;ib++){
-			double w = classifier.ptr->getWeight(i);
-			//fvec[i]=double(getNPair(ia,ib)*1000)/double(bufs);
-			fprintf(f,"%s:%s\t\%f\n",motifs->motifs[ia].name,motifs->motifs[ib].name,w);
-			i++;
-		}
-	}
-	fclose(f);
-	cout << "Saved classifier analysis data to \"" << path << "\"\n";*/
 	cout << "Model analysis export not yet supported for SEQRF";
 	return false;
 }

@@ -90,9 +90,6 @@ double RFMotifOccClassifier::applyOcc(motifOcc*o,motifOccContainer*moc,long long
 		return false;
 	}
 	return classifier.ptr->apply(features.ptr,nfeatures);
-	//seqClass*r=classifier.ptr->apply(features.ptr,nfeatures);
-	//if(!r)return 0;
-	//return r->flag?1.0:-1.0;
 }
 
 void RFMotifOccClassifier::printInfo(){
@@ -107,7 +104,6 @@ bool RFMotifOccClassifier::exportAnalysisData(FILE*f){
 // RF-MOCCA
 
 RFMOCCA::RFMOCCA(int nf):sequenceClassifier(nf){
-	// TODO Initialize
 }
 
 RFMOCCA*RFMOCCA::create(motifList*motifs){

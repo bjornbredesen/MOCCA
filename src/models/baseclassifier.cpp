@@ -964,7 +964,6 @@ bool MultiClassSVM::exportAnalysisData(FILE*f, char*title, char*indent){
 //	Trains RF with Ranger.
 
 RFClassifier::RFClassifier(int nf):baseClassifier(nf){
-	// TODO Initialize
 }
 
 RFClassifier*RFClassifier::create(int nf, std::string name){
@@ -997,9 +996,9 @@ bool RFClassifier::do_train(){
 		std::move(data),
 		(ranger::uint)0, // uint mtry,
 		std::string(""), //std::string output_prefix,
-		ranger::DEFAULT_NUM_TREE, //uint num_trees,
+		getConfiguration()->RF_nTrees, //uint num_trees,
 		(ranger::uint)0, //uint seed,
-		(ranger::uint)1, //uint num_threads,
+		(ranger::uint)getConfiguration()->nThreads, //uint num_threads,
 		//ranger::ImportanceMode::IMP_NONE, //ImportanceMode importance_mode,
 		ranger::ImportanceMode::IMP_PERM_CASEWISE, //ImportanceMode importance_mode,
 		(ranger::uint)0, //uint min_node_size,
@@ -1028,21 +1027,10 @@ bool RFClassifier::do_train(){
 }
 
 double RFClassifier::do_apply(double*vec){
-	// TODO Implement model application here
-	double r=0;
-	/*for(int i=0;i<nFeatures;i++){
-		r+=vec[i]*weights[i];
-	}*/
-	//std::unique_ptr<RangerData> data{};
-	//data = ranger::make_unique<RangerData>(); //new ranger::DataDouble();
-	//data->setDataV(nFeatures, vec);
-	//rf.ptr->setData(std::move(data));
-	r = rf.ptr->predictVec(vec);
-	return r;
+	return rf.ptr->predictVec(vec);
 }
 
 void RFClassifier::printInfo(char*header){
 	cout << t_indent << header << "\n";
-	// TODO Implement model information printout here
 }
 

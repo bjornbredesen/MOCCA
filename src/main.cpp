@@ -1169,6 +1169,22 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-RF:trees",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-RF:trees VALUE",
+		{ "Sets the number of trees for random forests." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->RF_nTrees=strtod(params[0].c_str(), 0);
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-threshold",
 		// Pass
 		1,
@@ -1239,6 +1255,27 @@ cmdArg argumentTypes[] = {
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->windowStepTrain = (int)strtol(params[0].c_str(), 0, 10);
 			if(cfg->windowStepTrain <= 0){
+				argSyntaxError();
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-threads",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-threads VALUE",
+		{ "Sets the number of threads to use (currently only supported by",
+		  "RF-based models)." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->nThreads = (int)strtol(params[0].c_str(), 0, 10);
+			if(cfg->windowSize <= 0){
 				argSyntaxError();
 				return false;
 			}
