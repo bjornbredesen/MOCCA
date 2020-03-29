@@ -66,9 +66,10 @@ See the `tutorial/` folder and `mocca --help` for more information.
  - Motif handling
      * Command-line specification of IUPAC motifs
      * Loading of IUPAC motifs from XML
-     * Generation of random IUPAC motifs.
-     * Full *k*-mer sets.
+     * Generation of random IUPAC motifs
+     * Full *k*-mer sets
      * IUPAC motif occurrence parsing Finite State Machine
+     * Position Weight Matrix motifs
  - Feature spaces
      * Motif occurrence frequency spectrum
      * Motif pair occurrence frequency spectrum, with distance cutoff, and multiple distancing and overlap modes
