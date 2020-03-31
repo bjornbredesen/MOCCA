@@ -37,8 +37,9 @@ MOCCA will then do the following:
  * *Note*: This may take some time to execute.
 
 We usually also want to save the predictions. In order to do so, at least one additional argument must be specified. In order to output genome-wide predictions as non-overlapping regions in the General Feature Format (https://www.ensembl.org/info/website/upload/gff.html), add `-predict:GFF predictions.gff`. To output all genome-wide window scores, add `-predict:Wig predictions.wig`.
+
 ```
-mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:XML motifs2019.xml -predict:GFF predictions.gff -predict:Wig predictions.wig
+mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:PWM UmassPGFE_PSSM_pho_SOLEXA_5_20200302.pssm 0 -predict:GFF predictions.gff -predict:Wig predictions.wig
 ```
 
 After running this, MOCCA should have generated the files `predictions.gff` and `predictions.wig` in the same folder.
@@ -71,7 +72,7 @@ MOCCA supports training log-odds or Support Vector Machine (SVM) models with a v
 
 A Support Vector Machine with motif pair occurrence frequencies as features can be trained using the following command:
 ```
-mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:XML motifs2019.xml -predict:GFF predictions.gff -predict:Wig predictions.wig -C:SVM -f:nPair 220
+mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:XML motifs2019expho.xml -predict:GFF predictions.gff -predict:Wig predictions.wig -C:SVM -f:nPair 220
 ```
 
 
