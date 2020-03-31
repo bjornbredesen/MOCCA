@@ -11,16 +11,16 @@ Copyright Bjørn Bredesen, 2011-2019
 ### Assisted training
 In this section, we will train SVM-MOCCA to predict Polycomb/Trithorax Response Elements (PREs) using Polycomb targets from the Kahn *et al.* (2014) experimental set. It is assumed that MOCCA has been installed. We extracted the Polycomb target regions determined by Kahn *et al.* (2014) from their Supplementary Table 3, we resized all regions to a length of 3kb each, and we extracted the underlying sequences from the *Drosophila melanogaster* genome release 5, using Gnocis. The resulting sequences are supplied in the file `KahnPcG.fa`.
 
-Sequence models in MOCCA make use of sequence motifs in order to learn distinguishing features of the different sequence classes. Accordingly, the motifs to be used must be specified. The simplest way of supplying MOCCA with a set of known motifs is by specifying them in IUPAC nucleotide codes (https://www.bioinformatics.org/sms/iupac.html) in an XML-file. We have supplied a sample XML-file, with the motifs that we used previously for genome-wide prediction of PREs (Bredesen *et al* 2019). The motifs are given in the file `motifs2019.xml`.
+Sequence models in MOCCA make use of sequence motifs in order to learn distinguishing features of the different sequence classes. Accordingly, the motifs to be used must be specified. The simplest way of supplying MOCCA with a set of known motifs is by specifying them in IUPAC nucleotide codes (https://www.bioinformatics.org/sms/iupac.html) in an XML-file. We have supplied a sample XML-file, with the motifs that we used previously for genome-wide prediction of PREs (Bredesen *et al* 2019), with the motifs for the DNA-binding factor pho removed. The motifs are given in the file `motifs2019expho.xml`. In addition, we will use a Position Weight Matrix (PWM) motif for the DNA-binding factor pho, acquired from the Fly Factor Survey.
 
-MOCCA uses binary or multi-class machine learning, and thus requires training data of at least two different classes. However, MOCCA supplies a mode that automatically constructs negative training data based on an input genome, given in FASTA format. We will train our first model using this mode. We will download the *Drosophila melanogaster* genome from FlyBase.
+MOCCA uses binary or multi-class machine learning, and thus requires training data of at least two different classes. However, MOCCA supplies a mode that automatically constructs negative training data based on an input genome, given in FASTA format. We will here train a model using this mode. First, we will download the *Drosophila melanogaster* genome from FlyBase.
 
  * **Either**: Download and unpack the genome sequence to the folder with the tutorial data: ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r5.57_FB2014_03/fasta/dmel-all-chromosome-r5.57.fasta.gz
  * **Or**: In a Linux terminal, navigate to the folder with the tutorial data, and execute the following command: `wget ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r5.57_FB2014_03/fasta/dmel-all-chromosome-r5.57.fasta.gz && gunzip dmel-all-chromosome-r5.57.fasta.gz`
 
 With this set up, we are ready to train SVM-MOCCA. In a terminal, navigate to the tutorial folder, and run:
 ```
-mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:XML motifs2019.xml 
+mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:XML motifs2019expho.xml -motif:PWM UmassPGFE_PSSM_pho_SOLEXA_5_20200302.pssm 0 
 ```
 
 MOCCA will then do the following:
@@ -30,6 +30,7 @@ MOCCA will then do the following:
     - The negative test data is 100 times larger than the positive test data, in order to reflect the expected imbalance in the genome.
  * Generate threshold calibration data.
     - This is the size of the genome.
+ * Calibrate the PWM-threshold for an expected
  * Train an SVM-MOCCA model, with three classes (CRM, dummy CRM and dummy genomic).
  * Calibrate the threshold for an expected genome-wide precision of 80% (can be changed).
  * Print out validation statistics.
@@ -80,7 +81,8 @@ mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -moti
 
  * Bredesen *et al.* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
  * Kahn *et al.* 2014: https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1004495
- * Gnocis - Bredesen *et al.* 2020 (?): Article to be submitted to journal
+ * Gnocis - Bredesen *et al.* 2020 (?): Manuscript in preparation
  * FlyBase - : https://academic.oup.com/nar/article/41/D1/D751/1051942
  * Ringrose *et al.* 2003: https://www.sciencedirect.com/science/article/pii/S153458070300337X
+ * Fly Factor Survey - https://academic.oup.com/nar/article/39/suppl_1/D111/2508103
 
