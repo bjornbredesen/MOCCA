@@ -35,6 +35,15 @@ seqClass*getSeqClassByName(std::string name){
 	return 0;
 }
 
+seqClass*getSeqClassByValue(double cls){
+	for(auto& c: seqClasses)
+		if(c.cls == cls)
+			return &c;
+	cmdError("Class not found.");
+	cout << t_indent << "Requested class: " << cls << "\n";
+	return 0;
+}
+
 void printSeqClasses(){
 	cmdSection("Classes");
 	for(auto& c: seqClasses)

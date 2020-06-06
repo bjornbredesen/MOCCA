@@ -7,6 +7,20 @@
 
 #pragma once
 
+struct prediction{
+	int start, end, center;
+	double score;
+	int mstart, mend;
+	prediction(int _start, int _end, double _score, int _mstart = -1, int _mend = -1){
+		start = _start;
+		end = _end;
+		center = (start + end) / 2;
+		score = _score;
+		mstart = _mstart;
+		mend = _mend;
+	}
+};
+
 ////////////////////////////////////////////////////////////////////////////////////
 // Sequence classifiers
 
@@ -47,6 +61,7 @@ public:
 	virtual bool flush() = 0;
 	virtual bool printInfo() = 0;
 	virtual bool exportAnalysisData(string path) = 0;
+	virtual vector<prediction> predictWindow(char*buf,long long pos,int bufs, corePredictionModeT cpm);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////

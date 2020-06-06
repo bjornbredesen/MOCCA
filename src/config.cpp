@@ -49,7 +49,9 @@ config _config = config {
 	"","","",
 	"",
 	"","","",
-	-1.
+	-1.,
+	cpmNone,
+	false
 };
 
 config*getConfiguration(){
@@ -72,6 +74,15 @@ void config::printInfo(){
 	}
 	if(motifPairsCanOverlap)cout << " (can overlap)\n";
 	else cout << " (can not overlap)\n";
+	cout << t_indent << "Core prediction: ";
+	switch(corePredictionMode){
+		case cpmNone:cout << "Disabled";break;
+		case cpmContinuous:cout << "Continuous";break;
+		case cpmMotifs:cout << "Motifs";break;
+		case cpmMotifsStrong:cout << "Motifs (strong)";break;
+	}
+	if(corePredictionMax) cout << " - maximum";
+	cout << "\n";
 	cout << t_indent << "Log-odds mode: ";
 	switch(wmMode){
 		case wmPREdictor:cout << "PREdictor";break;

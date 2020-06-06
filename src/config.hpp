@@ -45,6 +45,13 @@ enum classifierT{
 	cSEQDummy,
 };
 
+enum corePredictionModeT{
+	cpmNone,
+	cpmContinuous,
+	cpmMotifs,
+	cpmMotifsStrong,
+};
+
 class config{
 public:
 	int randSeed;
@@ -70,6 +77,8 @@ public:
 	std::string predictGFFPath;
 	std::string predictWigPath;
 	double wantPrecision;
+	corePredictionModeT corePredictionMode;
+	bool corePredictionMax;
 	/*
 	printInfo
 		Prints out information

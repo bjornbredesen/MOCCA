@@ -240,3 +240,108 @@ bool RFMOCCA::exportAnalysisData(string path){
 	return true;
 }
 
+vector<prediction> RFMOCCA::predictWindow(char*buf,long long pos,int bufs, corePredictionModeT cpm){
+	vector<prediction> ret = vector<prediction>();
+	if(!mwin.ptr->readWindow(buf,pos,bufs)){
+		return ret;
+	}
+	vector<prediction> motpos = vector<prediction>();
+	for(int x=0;x<motifs->nmotifs;x++){
+		RFMotifOccClassifier*c=subcls[x];
+		motifOcc*o=moc->getFirst(x);
+		int nc=0;
+		while(o){
+			if( c->applyOcc(o,moc,pos,buf,bufs)>0 ){
+				nc++;
+				if(cpm != cpmNone){
+					int center = (o->start + o->start + motifs->motifs[x].len) / 2;
+					double mscore = classifier.ptr->getWeight(x);
+					motpos.push_back(prediction(center - 250, center + 250, mscore,
+						o->start,
+						o->start + motifs->motifs[x].len));
+				}
+			}
+			o=moc->getNextSame(o);
+		}
+		fvec[x]=double(nc*1000)/double(bufs);
+	}
+	double cvalue = classifier.ptr->apply(fvec.ptr,nFeatures);
+	if(cpm != cpmNone){
+		if(cvalue >= threshold){
+			// Motif prediction--based core prediction algorithm
+			if(cpm == cpmMotifs || cpm == cpmMotifsStrong){
+				// Try to limit to central occurrences with cumulative scores above threshold
+				vector<prediction> cmotpos = vector<prediction>();
+				for(auto&oA: motpos){
+					double cumscore = 0.;
+					for(auto&oB: motpos){
+						if(oB.mstart < oA.start || oB.mend > oA.end) continue;
+						cumscore += oB.score;
+					}
+					if(cumscore >= threshold)
+						cmotpos.push_back(prediction(
+							max(oA.start, 0),
+							min(oA.end, (int)pos + bufs),
+							cumscore));
+				}
+				if(cpm == cpmMotifsStrong) return cmotpos;
+				if(cmotpos.size() > 0) motpos = cmotpos;
+				// Flatten
+				for(auto&occ: motpos){
+					//if(ret.size() > 0 && occ.start < ret.back().end+500){
+					if(ret.size() > 0 && occ.start < ret.back().end){
+						ret.back().end = max(ret.back().end, occ.end);
+						ret.back().score = max(ret.back().score, occ.score);
+					}else{
+						ret.push_back(prediction(occ.start, occ.end, occ.score));
+					}
+				}
+				// If there are predictions scoring above the threshold, predict those.
+				// Otherwise, there must be many low-scoring predictions, so predict
+				// all of them.
+				// Thus: Get predictions with scores above threshold.
+				vector<prediction> pred = vector<prediction>();
+				for(auto&p: ret)
+					if(p.score >= threshold)
+						pred.push_back(p);
+				// If any, return that list
+				if(pred.size() > 0)
+					return pred;
+				// If none, return the regular list of predictions
+			// Continuous core prediction algorithm
+			}else if(cpm == cpmContinuous){
+				// For continuous predictions, we want to predict a core delimited
+				// by motif occurrences that spans potentially a larger region, and
+				// has a high score per basepair.
+				vector<prediction> mwnd = vector<prediction>();
+				for(auto&oA: motpos){
+					for(auto&oB: motpos){
+						if(oB.center < oA.center || oB.end > oA.start + cfg->windowSize)
+							continue;
+						int wA = max(oA.start, 0);
+						int wB = min(oB.end, (int)pos + bufs);
+						if(wB-wA < oA.end-oA.start) continue;
+						double cumscore = 0.;
+						for(auto&oC: motpos){
+							if(oC.mstart < wA || oC.mend > wB) continue;
+							cumscore += oC.score;
+						}
+						mwnd.push_back(prediction(wA, wB, cumscore));
+					}
+				}
+				if(mwnd.size() == 0) return mwnd;
+				sort(mwnd.begin(),mwnd.end(),
+				[](const prediction a,const prediction b){
+					double sA = a.score / max(double(a.end - a.start), 1.);
+					double sB = b.score / max(double(b.end - b.start), 1.);
+					return sA > sB;
+				});
+				ret.push_back(prediction(mwnd[0].start, mwnd[0].end, mwnd[0].score));
+			}
+		}
+	}else{
+		ret.push_back(prediction(pos, pos+bufs, cvalue));
+	}
+	return ret;
+}
+

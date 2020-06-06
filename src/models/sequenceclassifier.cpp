@@ -238,40 +238,64 @@ bool sequenceClassifier::predictGenomewideFASTA(std::string inFASTAPath, std::st
 		int rbn;
 		long nextSi=0;
 		double cvalue;
+		vector<prediction> pred;
 		flush();
+		int lastPredWndEnd = -1;
 		for(long i=0;(rbn=ssw->get(rb));i+=cfg->windowStep){
 			cit += rbn - (cfg->windowSize-cfg->windowStep);
 			if(cit>=nextSi){
 				nextSi+=50000;
 				task.setPercent((double(cit)/double(bptotal))*100.0);
 			}
-			cvalue=applyWindow(rb,i,rbn);
+			vector<prediction> wpred = predictWindow(rb, i, rbn, cfg->corePredictionMode);
+			cvalue = wpred.size() > 0 ? wpred.back().score : -9999999999.;
 			if(ofWig.is_open())
 				ofWig << (cvalue+threshold) << "\n";
 			if(cvalue>=0.){
-				if(pEnd==-1){
-					pStart=i;
-					pScore=cvalue+threshold;
+				if(cfg->corePredictionMax){
+					// For maximum core prediction mode, find the maximally scoring
+					// core prediction, and add/replace last depending on whether
+					// the last predicted window is non-overlapping or overlapping,
+					// respectively.
+					prediction pmax = prediction(-1, -1, -999999999.);
+					if(lastPredWndEnd >= i) pmax = pred.back();
+					for(auto&p: wpred)
+						if(p.score > pmax.score)
+							pmax = p;
+					if(lastPredWndEnd >= i) pred.back() = pmax;
+					else pred.push_back(pmax);
 				}else{
-					pScore=max(cvalue+threshold,pScore);
+					// For the normal mode, just add all.
+					for(auto&p: wpred)
+						pred.push_back(p);
 				}
-				pEnd=i+rbn;
-			}else if(pEnd != -1 && i > pEnd){
-				cmdTask::wipe();
-				cout << t_indent << "Predicted: " << chromName << ":" << pStart << ".." << pEnd << " - score: " << pScore << "\n";
-				cmdTask::refresh();
-				if(ofGFF.is_open())
-					ofGFF << chromName << "\tMOCCA\tPrediction\t" << pStart << "\t" << pEnd << "\t" << pScore << "\t.\t.\t1\n";
-				pEnd = -1;
-				nPredictions++;
+				lastPredWndEnd = i + rbn;
 			}
 		}
 		if(pEnd != -1){
 			cmdTask::wipe();
-			cout << t_indent << "Predicted: " << chromName << ":" << pStart << ".." << pEnd << " - score: " << pScore << "\n";
+		}
+		// Flatten predictions
+		sort(pred.begin(),pred.end(),
+		[](const prediction a,const prediction b){
+			return a.start < b.start;
+		});
+		vector<prediction> fpred = vector<prediction>();
+		for(auto&p: pred){
+			if(fpred.size() > 0 && p.start < fpred.back().end){
+				fpred.back().end = max(fpred.back().end, p.end);
+				fpred.back().score = max(fpred.back().score, p.score);
+			}else{
+				fpred.push_back(prediction(p.start, p.end, p.score));
+			}
+		}
+		// Save predictions
+		for(auto&p: fpred){
+			cmdTask::wipe();
+			cout << t_indent << "Predicted: " << chromName << ":" << p.start << ".." << p.end << " (" << (p.end-p.start) << " bp) - score: " << p.score << "\n";
 			cmdTask::refresh();
 			if(ofGFF.is_open())
-				ofGFF << chromName << "\tMOCCA\tPrediction\t" << pStart << "\t" << pEnd << "\t" << pScore << "\t.\t.\t1\n";
+				ofGFF << chromName << "\tMOCCA\tPrediction\t" << p.start << "\t" << p.end << "\t" << p.score << "\t.\t.\t1\n";
 			nPredictions++;
 		}
 		delete ssw;
@@ -336,6 +360,14 @@ bool sequenceClassifier::predictCoreSequence(std::string inpath, std::string out
 	}
 	fclose(fout);
 	return true;
+}
+
+vector<prediction> sequenceClassifier::predictWindow(char*buf,long long pos,int bufs, corePredictionModeT cpm){
+	double cvalue = applyWindow(buf, pos, bufs) + threshold;
+	vector<prediction> ret = vector<prediction>();
+	if(cvalue >= threshold)
+		ret.push_back(prediction(pos, pos+bufs, cvalue));
+	return ret;
 }
 
 bool sequenceClassifier::calibrateThresholdGenomewidePrecision(seqList*calpos,double wantPrecision){

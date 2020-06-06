@@ -21,6 +21,7 @@ typedef struct{
 }seqClass;
 
 seqClass*getSeqClassByName(std::string name);
+seqClass*getSeqClassByValue(double cls);
 
 /*
 printSeqClasses

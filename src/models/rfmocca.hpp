@@ -53,5 +53,6 @@ public:
 	bool flush();
 	bool printInfo();
 	bool exportAnalysisData(string path);
+	virtual vector<prediction> predictWindow(char*buf,long long pos,int bufs, corePredictionModeT cpm);
 };
 

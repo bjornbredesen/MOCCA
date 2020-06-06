@@ -1577,6 +1577,88 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-predict:core",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-predict:core",
+		{ "Sets prediction mode to core prediction.",
+		  "Default mode: maximally scoring of continuous cores." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->corePredictionMode = cpmContinuous;
+			cfg->corePredictionMax = true;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-predict:core:motifs",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-predict:core:motifs",
+		{ "Sets prediction mode to core prediction with predicted motifs." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->corePredictionMode = cpmMotifs;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-predict:core:motifs:strong",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-predict:core:motifs:strong",
+		{ "Sets prediction mode to core prediction with strongly predicted motifs." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->corePredictionMode = cpmMotifsStrong;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-predict:core:continuous",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-predict:core:motifs:continuous",
+		{ "Sets prediction mode to continuous core prediction." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->corePredictionMode = cpmContinuous;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-predict:core:max",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-predict:core:max",
+		{ "Sets prediction mode to predict maximally scoring of core predictions." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->corePredictionMax = true;
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-predict:Wig",
 		// Pass
 		1,
