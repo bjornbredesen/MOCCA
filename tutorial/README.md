@@ -30,7 +30,7 @@ MOCCA will then do the following:
     - The negative test data is 100 times larger than the positive test data, in order to reflect the expected imbalance in the genome.
  * Generate threshold calibration data.
     - This is the size of the genome.
- * Calibrate the PWM-threshold for an expected
+ * Calibrate the PWM-threshold for one occurrence expected per kilobase.
  * Train an SVM-MOCCA model, with three classes (CRM, dummy CRM and dummy genomic).
  * Calibrate the threshold for an expected genome-wide precision of 80% (can be changed).
  * Print out validation statistics.
