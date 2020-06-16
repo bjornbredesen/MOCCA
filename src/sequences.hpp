@@ -72,7 +72,7 @@ public:
 
 /*
 seqStreamRandomIid
-	A sequence stream class for randomly generated sequences.
+	A sequence stream class for i.i.d. randomly generated sequences.
 	
 	This sequence stream has no end, and buffer()
 	should never be called.
@@ -83,6 +83,32 @@ private:
 	int nA, nT, nG, nC, nU;
 public:
 	seqStreamRandomIid();
+	bool train(seqStream*input);
+	int read(int len,char*dest);
+	bool setpos(long pos);
+};
+
+typedef struct{
+	int nA, nT, nG, nC, nU;
+	double rA, rT, rG;
+}MCProbability;
+
+/*
+seqStreamRandomMarkov
+	A sequence stream class for randomly generated sequences by a Markov chain.
+	
+	This sequence stream has no end, and buffer()
+	should never be called.
+*/
+class seqStreamRandomMC:public seqStream{
+private:
+	int order;
+	int nprobs;
+	int pseudo;
+	bool addRC;
+	autofree<MCProbability> probs;
+public:
+	seqStreamRandomMC(int _order, int _pseudo = 1, bool _addRC = true);
 	bool train(seqStream*input);
 	int read(int len,char*dest);
 	bool setpos(long pos);

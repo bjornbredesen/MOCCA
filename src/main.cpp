@@ -1343,6 +1343,35 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-train:MC",
+		// Pass
+		1,
+		// Parameters
+		6,
+		// Documentation
+		"-train:MC PATH N L CLASS MODE ORDER",
+		{ "Trains an ORDER-th order Markov chain on sequences in the FASTA",
+		  "file PATH, generates N sequences, each of length L, and adds",
+		  "the sequences to training class CLASS.",
+		  "CLASS: A class ID, defined with \"-class\", or one of the",
+		  "pre-specified binary classes: \"+\" for positive or \"-\"",
+		  "for negative." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			if(!trainseq->addRandomMC((char*)params[0].c_str(), (int)strtol(params[1].c_str(), 0, 10), (int)strtol(params[2].c_str(), 0, 10), getSeqClassByName(params[3]), getTrainModeByName((char*)params[4].c_str()), (int)strtol(params[5].c_str(), 0, 10))){
+				return false;
+			}
+			/*if(!calseq->loadFastaBatch((char*)params[0].c_str(), getSeqClassByName(params[3]), train_Full)){
+				return false;
+			}*/
+			if(!registerFile("Markov chain training sequences (training)",params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-validate:FASTA",
 		// Pass
 		1,
@@ -1394,6 +1423,32 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-validate:MC",
+		// Pass
+		1,
+		// Parameters
+		5,
+		// Documentation
+		"-validate:MC PATH N L CLASS ORDER",
+		{ "Trains an ORDER-th order Markov chain on sequences in the FASTA",
+		  "file PATH, generates N sequences, each of length L, and adds",
+		  "the sequences to validation class CLASS.",
+		  "CLASS: A class ID, defined with \"-class\", or one of the",
+		  "pre-specified binary classes: \"+\" for positive or \"-\"",
+		  "for negative." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			if(!valseq->addRandomMC((char*)params[0].c_str(), (int)strtol(params[1].c_str(), 0, 10), (int)strtol(params[2].c_str(), 0, 10), getSeqClassByName(params[3]), train_Full, (int)strtol(params[4].c_str(), 0, 10))){
+				return false;
+			}
+			if(!registerFile("Markov chain training sequences (validation)",params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-calibrate:FASTA",
 		// Pass
 		1,
@@ -1438,6 +1493,32 @@ cmdArg argumentTypes[] = {
 				return false;
 			}
 			if(!registerFile("I.i.d. training sequences (calibration)",params[0])){
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-calibrate:MC",
+		// Pass
+		1,
+		// Parameters
+		5,
+		// Documentation
+		"-calibrate:MC PATH N L CLASS ORDER",
+		{ "Trains an ORDER-th order Markov chain on sequences in the FASTA",
+		  "file PATH, generates N sequences, each of length L, and adds",
+		  "the sequences to calibration class CLASS.",
+		  "CLASS: A class ID, defined with \"-class\", or one of the",
+		  "pre-specified binary classes: \"+\" for positive or \"-\"",
+		  "for negative." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			if(!calseq->addRandomMC((char*)params[0].c_str(), (int)strtol(params[1].c_str(), 0, 10), (int)strtol(params[2].c_str(), 0, 10), getSeqClassByName(params[3]), train_Full, (int)strtol(params[4].c_str(), 0, 10))){
+				return false;
+			}
+			if(!registerFile("Markov chain training sequences (calibration)",params[0])){
 				return false;
 			}
 			return true;
@@ -1676,6 +1757,27 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-auto:order",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-auto:order ORDER",
+		{ "Order of complexity to use for background model.",
+		  "I.i.d. when ORDER is zero, or Markov chain ortherwise." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->bgOrder = (int)strtol(params[0].c_str(), 0, 10);
+			if(cfg->windowSize < 0){
+				argSyntaxError();
+				return false;
+			}
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-auto:FASTA",
 		// Pass
 		2,
@@ -1761,25 +1863,44 @@ cmdArg argumentTypes[] = {
 			}
 			cout << "Input genome: " << cfg->genomeFASTAPath << " (" << genomeSize << " bp)\n";
 			// For SVM-MOCCA classifier, if no features were specified, set to standard
+			cout << "Background model order: " << cfg->bgOrder << "\n";
 			if(cfg->classifier == cSVMMOCCA || cfg->classifier == cRFMOCCA){
 				if(!( cfg->MOCCA_nOcc | cfg->MOCCA_DNT | cfg->MOCCA_GC )){
 					cfg->MOCCA_nOcc = cfg->MOCCA_DNT = true;
 					cfg->kernel=kQuadratic;
 				}
 				// We can also add a dummy genomic class, as a second negative class
-				if(!trainseq->addRandomIid((char*)cfg->genomeFASTAPath.c_str(), nTrain, meanLen, getSeqClassByName((char*)"--"), getTrainModeByName((char*)"full"))){
-					return false;
+				if(cfg->bgOrder > 0){
+					if(!trainseq->addRandomMC((char*)cfg->genomeFASTAPath.c_str(), nTrain, meanLen, getSeqClassByName((char*)"--"), getTrainModeByName((char*)"full"), cfg->bgOrder)){
+						return false;
+					}
+				}else{
+					if(!trainseq->addRandomIid((char*)cfg->genomeFASTAPath.c_str(), nTrain, meanLen, getSeqClassByName((char*)"--"), getTrainModeByName((char*)"full"))){
+						return false;
+					}
 				}
 			}
 			//
-			if(!trainseq->addRandomIid((char*)params[0].c_str(), nTrain, meanLen, getSeqClassByName((char*)"-"), getTrainModeByName((char*)"full"))){
-				return false;
-			}
-			if(!valseq->addRandomIid((char*)params[0].c_str(), nTrain*100, meanLen, getSeqClassByName((char*)"-"), getTrainModeByName((char*)"full"))){
-				return false;
-			}
-			if(!calseq->addRandomIid((char*)cfg->genomeFASTAPath.c_str(), genomeSize/meanLen, meanLen, getSeqClassByName((char*)"-"), getTrainModeByName((char*)"full"))){
-				return false;
+			if(cfg->bgOrder > 0){
+				if(!trainseq->addRandomMC((char*)params[0].c_str(), nTrain, meanLen, getSeqClassByName((char*)"-"), getTrainModeByName((char*)"full"), cfg->bgOrder)){
+					return false;
+				}
+				if(!valseq->addRandomMC((char*)params[0].c_str(), nTrain*100, meanLen, getSeqClassByName((char*)"-"), getTrainModeByName((char*)"full"), cfg->bgOrder)){
+					return false;
+				}
+				if(!calseq->addRandomMC((char*)cfg->genomeFASTAPath.c_str(), genomeSize/meanLen, meanLen, getSeqClassByName((char*)"-"), getTrainModeByName((char*)"full"), cfg->bgOrder)){
+					return false;
+				}
+			}else{
+				if(!trainseq->addRandomIid((char*)params[0].c_str(), nTrain, meanLen, getSeqClassByName((char*)"-"), getTrainModeByName((char*)"full"))){
+					return false;
+				}
+				if(!valseq->addRandomIid((char*)params[0].c_str(), nTrain*100, meanLen, getSeqClassByName((char*)"-"), getTrainModeByName((char*)"full"))){
+					return false;
+				}
+				if(!calseq->addRandomIid((char*)cfg->genomeFASTAPath.c_str(), genomeSize/meanLen, meanLen, getSeqClassByName((char*)"-"), getTrainModeByName((char*)"full"))){
+					return false;
+				}
 			}
 			cout << "Training sequences: " << trainseq->nseq << "\n";
 			cout << "Validation sequences: " << valseq->nseq << "\n";

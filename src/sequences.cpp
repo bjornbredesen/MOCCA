@@ -85,7 +85,7 @@ bool seqStreamBuffer::setpos(long pos){
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
-// seqStreamRandom
+// seqStreamRandomIid
 
 seqStreamRandomIid::seqStreamRandomIid(){ // dt = 1-da-dc-dg.
 	nA = 0;
@@ -140,6 +140,102 @@ int seqStreamRandomIid::read(int len,char*dest){
 }
 
 bool seqStreamRandomIid::setpos(long pos){
+	return false;
+}
+
+////////////////////////////////////////////////////////////////////////////////////
+// seqStreamRandomMarkov
+
+seqStreamRandomMC::seqStreamRandomMC(int _order, int _pseudo, bool _addRC){
+	order = _order;
+	pseudo = _pseudo;
+	addRC = _addRC;
+}
+
+bool seqStreamRandomMC::train(seqStream*input){
+	cmdTask task((char*)"Training Markov chain background model");
+	#define FGCSBUFSIZE 256
+	autofree<char> buf((char*)malloc(FGCSBUFSIZE));
+	// Extract occurrence frequencies per nucleotide
+	nprobs = 4 << ((order - 1) << 1);
+	probs.resize((size_t)nprobs);
+	probs.fill((size_t)nprobs, 0);
+	unsigned int state = 0;
+	unsigned int stateRC = 0;
+	int ivalid = 0;
+	long nti=0;
+	for(long wind=0;;wind++){
+		int nread=input->read(FGCSBUFSIZE,buf.ptr);
+		if(!nread)break;
+		char*c=buf.ptr;
+		for(int y=0;y<nread;y++,c++){
+			if(nti + y > ivalid + order){
+				// Forward
+				MCProbability*p = &probs.ptr[state];
+				if(*c=='A')p->nA++;
+				else if(*c=='T')p->nT++;
+				else if(*c=='G')p->nG++;
+				else if(*c=='C')p->nC++;
+				// Reverse complement
+				if(addRC){
+					p = &probs.ptr[stateRC];
+					if(*c=='A')p->nT++;
+					else if(*c=='T')p->nA++;
+					else if(*c=='G')p->nC++;
+					else if(*c=='C')p->nG++;
+				}
+			}
+			int ntc = 0;
+			if(*c == 'A') ntc = 0;
+			else if(*c == 'T') ntc = 1;
+			else if(*c == 'G') ntc = 2;
+			else if(*c == 'C') ntc = 3;
+			else ivalid = nti + y + 1;
+			state = ((state << 2) | ntc) & (nprobs - 1);
+			stateRC = ((stateRC >> 2) | ((ntc^1) << ((order-1) << 1))) & (nprobs - 1);
+		}
+		nti+=nread;
+		if(!(wind%100))task.setLongT(nti,(char*)"nt");
+	}
+	// Add pseudocounts
+	if(pseudo > 0){
+		MCProbability*p = probs.ptr;
+		for(int i = 0; i < nprobs; i++, p++){
+			p->nA += pseudo;
+			p->nT += pseudo;
+			p->nG += pseudo;
+			p->nC += pseudo;
+		}
+	}
+	// Calculate weights
+	MCProbability*p = probs.ptr;
+	for(int i = 0; i < nprobs; i++, p++){
+		int bptotal = p->nA + p->nT + p->nG + p->nC;
+		p->rA = double(p->nA) / double(bptotal);
+		p->rT = p->rA + (double(p->nT) / double(bptotal));
+		p->rG = p->rT + (double(p->nG) / double(bptotal));
+	}
+	return true;
+}
+
+int seqStreamRandomMC::read(int len,char*dest){
+	double frv;
+	char*d=dest;
+	unsigned int state = rand() & (nprobs-1);
+	int ntc;
+	for(int x=0;x<len;x++,d++){
+		frv = double(rand())/double(RAND_MAX);
+		MCProbability*p = &probs.ptr[state];
+		if(frv < p->rA) ntc = 0, (*d) = 'A';
+		else if(frv < p->rT) ntc = 1, (*d) = 'T';
+		else if(frv < p->rG) ntc = 2, (*d) = 'G';
+		else ntc = 3, (*d) = 'C';
+		state = ((state << 2) | ntc) & (nprobs - 1);
+	}
+	return len;
+}
+
+bool seqStreamRandomMC::setpos(long pos){
 	return false;
 }
 

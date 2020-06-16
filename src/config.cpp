@@ -50,6 +50,7 @@ config _config = config {
 	"",
 	"","","",
 	-1.,
+	4, // Background model order
 	cpmNone,
 	false
 };

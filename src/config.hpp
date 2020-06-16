@@ -77,6 +77,7 @@ public:
 	std::string predictGFFPath;
 	std::string predictWigPath;
 	double wantPrecision;
+	int bgOrder;
 	corePredictionModeT corePredictionMode;
 	bool corePredictionMax;
 	/*
