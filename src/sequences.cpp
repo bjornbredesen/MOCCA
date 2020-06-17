@@ -180,7 +180,6 @@ bool seqStreamRandomMC::train(seqStream*input){
 			else ivalid = nti + y + 1;
 			state = ((state << 2) | ntc) & (nspectrum - 1);
 			stateRC = (stateRC >> 2) | ((ntc^1) << (order << 1));
-			cout << "K-mer: " << state << " / " << stateRC << "\n";
 			if(nti + y > ivalid + order){
 				spectrum[state]++;
 				if(addRC) spectrum[stateRC]++;
