@@ -204,7 +204,7 @@ bool seqList::addRandomIid(char*tpath,int nadd,int len,seqClass*cls,e_trainMode 
 		ostringstream oss;
 		int seed=rand();
 		srand(seed);
-		oss << "Random " << nseq << "(seed=" << seed << ")";
+		oss << "Random (i.i.d.) " << nseq << "(seed=" << seed << ")";
 		if(!addSeq(cloneString((char*)oss.str().c_str()),buf.disown(),len,cls,tm)){
 			return false;
 		}
@@ -235,6 +235,8 @@ bool seqList::addRandomMC(char*tpath,int nadd,int len,seqClass*cls,e_trainMode t
 		rss.ptr->train(ssfbblk);
 	}
 	// Generate and add random sequences
+	ofstream ofFASTA;
+	ofFASTA.open("./testMOCCAMC.fa");
 	for(int l=0;l<nadd;l++){
 		autofree<char> buf((char*)malloc(len));
 		if(!buf.ptr){
@@ -245,7 +247,11 @@ bool seqList::addRandomMC(char*tpath,int nadd,int len,seqClass*cls,e_trainMode t
 		ostringstream oss;
 		int seed=rand();
 		srand(seed);
-		oss << "Random " << nseq << "(seed=" << seed << ")";
+		oss << "Random (MC order " << order << ") " << nseq << "(seed=" << seed << ")";
+		ofFASTA << ">MOCCA Random (MC order " << order << ") " << nseq << "(seed=" << seed << ")\n";
+		std::string myString;
+		myString.assign(buf.ptr, len);
+		ofFASTA << myString << "\n";
 		if(!addSeq(cloneString((char*)oss.str().c_str()),buf.disown(),len,cls,tm)){
 			return false;
 		}

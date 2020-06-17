@@ -89,7 +89,7 @@ public:
 };
 
 typedef struct{
-	int nA, nT, nG, nC, nU;
+	unsigned int nA, nT, nG, nC, nU, total;
 	double rA, rT, rG;
 }MCProbability;
 
@@ -103,10 +103,13 @@ seqStreamRandomMarkov
 class seqStreamRandomMC:public seqStream{
 private:
 	int order;
-	int nprobs;
 	int pseudo;
 	bool addRC;
+	int nprobs;
+	int unsigned genstate;
 	autofree<MCProbability> probs;
+	int nspectrum;
+	autofree<int> spectrum;
 public:
 	seqStreamRandomMC(int _order, int _pseudo = 1, bool _addRC = true);
 	bool train(seqStream*input);
