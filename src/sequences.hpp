@@ -110,6 +110,8 @@ private:
 	autofree<MCProbability> probs;
 	int nspectrum;
 	autofree<int> spectrum;
+	void postprocess();
+	bool prepared;
 public:
 	seqStreamRandomMC(int _order, int _pseudo = 1, bool _addRC = true);
 	bool train(seqStream*input);

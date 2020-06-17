@@ -150,16 +150,19 @@ seqStreamRandomMC::seqStreamRandomMC(int _order, int _pseudo, bool _addRC){
 	order = _order;
 	pseudo = _pseudo;
 	addRC = _addRC;
+	nspectrum = 4 << (order << 1);
+	spectrum.resize((size_t)nspectrum);
+	spectrum.fill((size_t)nspectrum, 0);
+	nprobs = 4 << ((order - 1) << 1);
+	probs.resize((size_t)nprobs);
+	probs.fill((size_t)nprobs, 0);
+	prepared = false;
 }
 
 bool seqStreamRandomMC::train(seqStream*input){
 	cmdTask task((char*)"Training Markov chain background model");
 	#define FGCSBUFSIZE 256
 	autofree<char> buf((char*)malloc(FGCSBUFSIZE));
-	// Extract occurrence frequencies per nucleotide
-	nspectrum = 4 << (order << 1);
-	spectrum.resize((size_t)nspectrum);
-	spectrum.fill((size_t)nspectrum, 0);
 	unsigned int state = 0;
 	unsigned int stateRC = 0;
 	int ivalid = 0;
@@ -186,6 +189,10 @@ bool seqStreamRandomMC::train(seqStream*input){
 		nti+=nread;
 		if(!(wind%100))task.setLongT(nti,(char*)"nt");
 	}
+	return true;
+}
+
+void seqStreamRandomMC::postprocess(){
 	// Add pseudocounts
 	if(pseudo > 0){
 		int*s = spectrum.ptr;
@@ -193,9 +200,6 @@ bool seqStreamRandomMC::train(seqStream*input){
 			(*s) += pseudo;
 	}
 	// Calculate weights
-	nprobs = 4 << ((order - 1) << 1);
-	probs.resize((size_t)nprobs);
-	probs.fill((size_t)nprobs, 0);
 	MCProbability*p = probs.ptr;
 	unsigned int ntot = 0;
 	for(int i = 0; i < nprobs; i++, p++){
@@ -212,7 +216,7 @@ bool seqStreamRandomMC::train(seqStream*input){
 	}
 	// Get random start state
 	genstate = 0;
-	unsigned int irv = (unsigned int)( double(ntot) * double(rand()) / double(RAND_MAX) );
+	unsigned int irv = (rand() ^ (rand() << 12)) % ntot;
 	p = probs.ptr;
 	for(int i = 0; i < nprobs; i++, p++){
 		if(irv <= p->total){
@@ -221,20 +225,22 @@ bool seqStreamRandomMC::train(seqStream*input){
 		}
 		irv -= p->total;
 	}
-	//
-	return true;
 }
 
 int seqStreamRandomMC::read(int len,char*dest){
-	double frv;
+	if(!prepared){
+		postprocess();
+		prepared = true;
+	}
+	unsigned int frv;
 	char*d=dest;
 	int ntc = 0;
 	for(int x=0;x<len;x++,d++){
 		MCProbability*p = &probs.ptr[genstate];
-		frv = double(rand())/double(RAND_MAX);
-		if(frv < p->rA) ntc = 0, (*d) = 'A';
-		else if(frv < p->rT) ntc = 1, (*d) = 'T';
-		else if(frv < p->rG) ntc = 2, (*d) = 'G';
+		frv = (rand() ^ (rand() << 12)) % p->total;
+		if(frv < p->nA) ntc = 0, (*d) = 'A';
+		else if(frv < p->nA + p->nT) ntc = 1, (*d) = 'T';
+		else if(frv < p->nA + p->nT + p->nG) ntc = 2, (*d) = 'G';
 		else ntc = 3, (*d) = 'C';
 		genstate = ((genstate << 2) | ntc) & (nprobs - 1);
 	}
