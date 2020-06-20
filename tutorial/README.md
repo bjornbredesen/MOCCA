@@ -113,7 +113,7 @@ mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -moti
 ```
 
 
-#### CPREdictor &ndash; Assisted training
+### CPREdictor &ndash; Assisted training
 --------------------------
 
 Similarly, changing to training the CPREdictor model is as simple as adding the following argument: `-C:CPREdictor`. The PREdictor (Ringrose *et al.* 2003) is a binary classifier. The `-auto:FASTA` pipeline accordingly changes the negative training set generation to use one generated class of negatives &ndash; dummy-CREs.
@@ -123,7 +123,7 @@ mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -moti
 ```
 
 
-#### Models with user-specified feature spaces &ndash; Assisted training
+### Models with user-specified feature spaces &ndash; Assisted training
 --------------------------
 
 MOCCA supports training log-odds, Support Vector Machine (SVM) and Random Forest (RF) models with a variety of motif-based feature sets. For a complete listing of feature sets implemented in MOCCA, see `mocca --help`.
@@ -139,7 +139,7 @@ mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -moti
 ```
 
 
-#### Abbreviations
+### Abbreviations
 --------------------------
  * CRE: *Cis*-regulatory element
  * PRE: Polycomb/Trithorax Response Element
@@ -150,7 +150,7 @@ mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -moti
 
 -------------------------------------------------
 
-#### References
+### References
 
  * Bredesen *et al.* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
  * Kahn *et al.* 2014: https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1004495
