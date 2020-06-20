@@ -96,7 +96,7 @@ In preceding sections, we have used assisted learning. The user can also manuall
 
 Data classes are specified using the argument `-class VALUE LABEL`, where `VALUE` is an integer that identifies the class and is used with the machine learning algorithm, and `LABEL` designates the class as positive (`+`) or negative (`-`). Training data can be specified with FASTA files using the argument `-train:FASTA PATH CLASS MODE`, where `PATH` is the path to a FASTA file, `CLASS` is a class value, and `MODE` is a training mode (`full` for the full sequences, or `windows` for training in windows). Training data can also be generated with `-train:MC PATH NUM LEN CLASS MODE ORDER`. See `mocca --help` for more information. Validation and calibration data is similarly specified with arguments with the `-train`-prefix replaced with `-validate` and `-calibrate` prefixes, and modes removed. We here use 11802 negative validation and calibrations sequences, which is the size of the genome divided by 3000 and scaled by the ratio of positives used for calibration to the full set (50/170).
 
-When training without assisted learning, we additionally require setting the features to use for SVM-MOCCA. We will use local dinucleotide frequencies (`-f:MOCCA:DNT`) and local motif occurrence frequencies (`-f:MOCCA:nOcc`).
+When training without assisted learning, we are also required to set the features to use for SVM-MOCCA. We will use local dinucleotide frequencies (`-f:MOCCA:DNT`) and local motif occurrence frequencies (`-f:MOCCA:nOcc`).
 
 See `mocca --help` for more details regarding all other arguments.
 
