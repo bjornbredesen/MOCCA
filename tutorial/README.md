@@ -11,8 +11,9 @@ Copyright Bjørn Bredesen, 2011-2020
 In this tutorial, we demonstrate how to train models implemented in the Motif Occurrence Combinatorics Classification Algorithms (MOCCA) suite.
 We previously presented the Support Vector Machine Motif Occurrence Combinatorics Classification Algorithm (SVM-MOCCA) (Bredesen *et al.* 2019), which we found to improve generalization to Polycomb/Trithorax Response Elements (PREs), a class of *cis*-regulatory elements (CREs) that maintains epigenetic memory.
 SVM-MOCCA is a hierarchical method based on Support Vector Machines (SVMs) and motifs, where one SVM is trained per motif to classify its occurrences, with the feature space consisting of local dinucleotide and motif occurrence frequencies. Positively classified motif occurrences are subsequently combined using a log-odds model for a final prediction score.
-A key novelty of the MOCCA suite is the inclusion of the first polished and configurable implementation of SVM-MOCCA. Additionally, MOCCA includes a derivative method based on Random Forests (RFs), called the Random Forest Motif Occurrence Combinatorics Classification Algorithm (RF-MOCCA). Given their importance, we will focus on the training of these models first.
+A key novelty of the MOCCA suite is the inclusion of the first polished and configurable implementation of SVM-MOCCA. Additionally, MOCCA includes a derivative method based on Random Forests (RFs), called the Random Forest Motif Occurrence Combinatorics Classification Algorithm (RF-MOCCA).
 SVM-MOCCA and RF-MOCCA distinguish themselves from classical use of SVM and RF with motifs, where SVMs or RFs are trained with motif occurrence frequencies or *k*-spectra.
+Given their importance, we will focus on the training of these models first.
 In addition, MOCCA supports the training of log-odds and classic SVM and RF models based on a variety of feature space formulations, which is treated in the final sections of the tutorial.
 
 
