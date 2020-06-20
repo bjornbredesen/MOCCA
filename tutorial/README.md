@@ -99,7 +99,7 @@ When training without assisted learning, we additionally require setting the fea
 See `mocca --help` for more details regarding all other arguments.
 
 ```
-mocca -motif:XML motifs2019.xml -wSize 3000 -wStep 1000 -C:SVM-MOCCA -f:MOCCA:DNT -f:MOCCA:nOcc -k:quadratic -class "PREs" 1 + -class "Dummy genomic" -1 - -class "Dummy PREs" -2 - -class "Coding sequences" -3 - -train:FASTA tPREsKahn2014.fa 1 full -train:MC dmel-all-chromosome-r5.57.fasta 110 3000 -1 full 4 -train:MC tPREsKahn2014.fa 110 3000 -2 full 4 -train:FASTA tCDS.fa -3 full -validate:FASTA vPREsKahn2014.fa + -validate:MC dmel-all-chromosome-r5.57.fasta 11000 3000 - 4 -calibrate:FASTA vPREsKahn2014.fa + -calibrate:MC dmel-all-chromosome-r5.57.fasta 11000 3000 - 4 -calibrate:precision 0.8
+mocca -motif:XML motifs2019.xml -wSize 3000 -wStep 1000 -C:SVM-MOCCA -f:MOCCA:DNT -f:MOCCA:nOcc -k:quadratic -class "PREs" 1 + -class "Dummy genomic" -1 - -class "Dummy PREs" -2 - -class "Coding sequences" -3 - -train:FASTA tPREsKahn2014.fa 1 full -train:MC dmel-all-chromosome-r5.57.fasta 110 3000 -1 full 4 -train:MC tPREsKahn2014.fa 110 3000 -2 full 4 -train:FASTA tCDS.fa -3 full -validate:FASTA vPREsKahn2014.fa + -validate:MC dmel-all-chromosome-r5.57.fasta 11000 3000 - 4 -calibrate:FASTA vPREsKahn2014.fa + -calibrate:MC dmel-all-chromosome-r5.57.fasta 11000 3000 - 4 -calibrate:precision 0.8 -genome:FASTA dmel-all-chromosome-r5.57.fasta -predict:GFF predictions.gff -predict:Wig predictions.wig -predict:core
 ```
 
 
