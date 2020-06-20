@@ -58,7 +58,7 @@ MOCCA will then execute the following steps:
  * Print out validation statistics.
  * *Note*: This may take some time to execute.
 
-We usually also want to save the predictions. In order to do so, at least one additional argument must be specified. In order to output genome-wide predictions as non-overlapping regions in the General Feature Format (https://www.ensembl.org/info/website/upload/gff.html), add `-predict:GFF predictions.gff`. To output all genome-wide window scores, add `-predict:Wig predictions.wig`.
+We usually also want to save the predictions. In order to do so, at least one additional argument must be specified. In order to output genome-wide predictions as non-overlapping regions in the General Feature Format (https://www.ensembl.org/info/website/upload/gff.html), add `-predict:GFF predictions.gff`. To output all genome-wide window scores in Wiggle format (https://www.ensembl.org/info/website/upload/wig.html), add `-predict:Wig predictions.wig`.
 
 ```
 mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:XML motifs2019expho.xml -motif:PWM UmassPGFE_PSSM_pho_SOLEXA_5_20200302.pssm 0 -predict:GFF predictions.gff -predict:Wig predictions.wig
