@@ -22,14 +22,14 @@ This tutorial assumes that MOCCA has been successfully installed. For directions
 
 Sequence models in MOCCA make use of sequence motifs in order to learn distinguishing features of the different sequence classes. Accordingly, the motifs to be used must be specified. The simplest way of supplying MOCCA with a set of known motifs is by specifying them in IUPAC nucleotide codes (https://www.bioinformatics.org/sms/iupac.html) in an XML-file. We have supplied a sample XML-file, with the motifs that we used previously for genome-wide prediction of PREs (Bredesen *et al* 2019). The motifs are given in the file `motifs2019.xml`. Alternatively, motifs can be specified individually with commandline arguments (see `mocca --help`). In addition, motifs can be specified using Position Weight Matrices (PWMs). In order to demonstrate the use of PWMs, we additionally supply the XML file `motifs2019expho.xml`, which has the motifs for the DNA-binding factor *pho* removed, and we include a PWM-motif for *pho* (in the file `UmassPGFE_PSSM_pho_SOLEXA_5_20200302.pssm`) acquired from the Fly Factor Survey.
 
-MOCCA uses binary or multi-class machine learning, and thus requires training data of at least two different classes. Classes and training data can be specified manually using commandline arguments. MOCCA also supplies a mode that automatically constructs negative training data based on a set of positives and an input genome, given in FASTA format -- here referred to as "assisted training".
+MOCCA uses binary or multi-class machine learning, and thus requires training data of at least two different classes. Classes and training data can be specified manually using commandline arguments. MOCCA also supplies a mode that automatically constructs negative training data based on a set of positives and an input genome, given in FASTA format &ndash; here referred to as "assisted training".
 
 In this tutorial, we will use the *D. melanogaster* genome assembly R5, which can be downloaded from FlyBase:
  * **Either**: Download and unpack the genome sequence to the folder with the tutorial data: ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r5.57_FB2014_03/fasta/dmel-all-chromosome-r5.57.fasta.gz
  * **Or**: In a Linux terminal, navigate to the folder with the tutorial data, and execute the following command: `wget ftp://ftp.flybase.net/genomes/Drosophila_melanogaster/dmel_r5.57_FB2014_03/fasta/dmel-all-chromosome-r5.57.fasta.gz && gunzip dmel-all-chromosome-r5.57.fasta.gz`
 
 
-### SVM-MOCCA -- Assisted training
+### SVM-MOCCA &ndash; Assisted training
 --------------------------
 
 In this section, we will train SVM-MOCCA to predict Polycomb/Trithorax Response Elements (PREs) using assisted training and genome-wide Polycomb target sites from the Kahn *et al.* (2014) experimental set. With assisted learning, MOCCA requires only a positive training set and a genome, and MOCCA generates negative data using generative models. We extracted the Polycomb target site regions determined by Kahn *et al.* (2014) from their Supplementary Table 3, we resized all regions to a length of 3kb each, and we extracted the underlying sequences from the *D. melanogaster* genome release 5, using Gnocis. The resulting sequences are supplied in the file `KahnPcG.fa`.
@@ -67,7 +67,7 @@ After running this, MOCCA should have generated the files `predictions.gff` and 
 Note: If prediction is to be performed on only a subset of the chromosomes specified in the input genome FASTA file, the FASTA file must be filtered in advance of prediction.
 
 
-### SVM-MOCCA -- Core-CRE prediction
+### SVM-MOCCA &ndash; Core-CRE prediction
 --------------------------
 
 The default window size is 500bp. Efficiency can be improved by using a larger window size and step size. Shorter core-CREs can then be predicted within larger predicted regions. Core-CRE prediction in MOCCA uses motif occurrence predictions in order to identify high-scoring motif occurrence clusters with precise positions. With the following command, SVM-MOCCA is applied genome-wide using a window size of 3kb and step size of 1kb, and core-CREs are predicted based on clusters of positively classified motif occurrences within the windows.
@@ -77,7 +77,7 @@ mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -moti
 ```
 
 
-### SVM-MOCCA -- Alternative kernels
+### SVM-MOCCA &ndash; Alternative kernels
 --------------------------
 
 The models we have trained so far are linear. Alternatively, SVMs support non-linear classification using kernel functions. Non-linear kernels can enable the modelling of combinatorial feature enrichment. A quadratic model can be trained by adding the `-k:quadratic` argument (see `mocca --help` for more information on SVM kernel functions).
@@ -87,7 +87,7 @@ mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -moti
 ```
 
 
-### SVM-MOCCA -- Custom data
+### SVM-MOCCA &ndash; Custom data
 --------------------------
 
 In preceding sections, we have used assisted learning. The user can also manually specify all training/validation/calibration data and classes to use. We will here train SVM-MOCCA using data of four classes: PREs, dummy PREs, dummy genomic and coding sequences. For PREs and coding sequences, we include files based on the Kahn *et al.* (2014) Polycomb target sites (`tPREsKahn2014.fa` and `vPREsKahn2014.fa` for independent training and validation sequences) and coding sequences from the FlyBase *D. melanogaster* genome annotation R5.57 (`tCDS.fa`).
@@ -103,27 +103,27 @@ mocca -motif:XML motifs2019.xml -wSize 3000 -wStep 1000 -C:SVM-MOCCA -f:MOCCA:DN
 ```
 
 
-### RF-MOCCA -- Assisted training
+### RF-MOCCA &ndash; Assisted training
 --------------------------
 
-In addition to including a polished implementation of SVM-MOCCA, MOCCA includes a derivative method based on Random Forests -- RF-MOCCA. Assisted training of RF-MOCCA is achieved almost identically to with SVM-MOCCA, except that we add the argument `-C:RF-MOCCA`. We can also set the number of trees to use per motif classifier with the argument `-RF:trees COUNT`, where `COUNT` is the number of trees.
+In addition to including a polished implementation of SVM-MOCCA, MOCCA includes a derivative method based on Random Forests &ndash; RF-MOCCA. Assisted training of RF-MOCCA is achieved almost identically to with SVM-MOCCA, except that we add the argument `-C:RF-MOCCA`. We can also set the number of trees to use per motif classifier with the argument `-RF:trees COUNT`, where `COUNT` is the number of trees.
 
 ```
 mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:XML motifs2019expho.xml -motif:PWM UmassPGFE_PSSM_pho_SOLEXA_5_20200302.pssm 0 -predict:GFF predictions.gff -predict:Wig predictions.wig -predict:core -wSize 3000 -wStep 1000 -C:RF-MOCCA -RF:trees 300
 ```
 
 
-#### CPREdictor -- Assisted training
+#### CPREdictor &ndash; Assisted training
 --------------------------
 
-Similarly, changing to training the CPREdictor model is as simple as adding the following argument: `-C:CPREdictor`. The PREdictor (Ringrose *et al.* 2003) is a binary classifier. The `-auto:FASTA` pipeline accordingly changes the negative training set generation to use one generated class of negatives -- dummy-CREs.
+Similarly, changing to training the CPREdictor model is as simple as adding the following argument: `-C:CPREdictor`. The PREdictor (Ringrose *et al.* 2003) is a binary classifier. The `-auto:FASTA` pipeline accordingly changes the negative training set generation to use one generated class of negatives &ndash; dummy-CREs.
 
 ```
 mocca -auto:FASTA KahnPcG.fa -genome:FASTA dmel-all-chromosome-r5.57.fasta -motif:XML motifs2019.xml -predict:GFF predictions.gff -predict:Wig predictions.wig -C:CPREdictor
 ```
 
 
-#### Models with user-specified feature spaces -- Assisted training
+#### Models with user-specified feature spaces &ndash; Assisted training
 --------------------------
 
 MOCCA supports training log-odds, Support Vector Machine (SVM) and Random Forest (RF) models with a variety of motif-based feature sets. For a complete listing of feature sets implemented in MOCCA, see `mocca --help`.
