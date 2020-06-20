@@ -8,8 +8,12 @@ Copyright Bjørn Bredesen, 2011-2019
 -------------------------------------------------
 
 ## About
-MOCCA (Motif Occurrence Combinatorics Classification Algorithms) is a suite for modelling DNA cis-regulatory element sequences.
-Several types of motif-based models are included within MOCCA: a reimplementation of the PREdictor (Ringrose *et al.* 2003), implementations of the Dummy PREdictor and SVM-MOCCA (Bredesen *et al.* 2019), as various motif-based kernel functions that can be combined with log-odds and Support Vector Machine models.
+MOCCA (Motif Occurrence Combinatorics Classification Algorithms) is a suite for modelling DNA *cis*-regulatory element (CRE) sequences.
+With MOCCA, we include the first polished, efficient and configurable implementation of the Support Vector Machine Motif Occurrence Combinatorics Classification Algorithm (SVM-MOCCA), a method that we previously presented and found to improve generalization to Polycomb/Trithorax Response Elements (PREs) (Bredesen *et al.* 2019), a class of *cis*-regulatory elements (CREs) that maintains epigenetic memory.
+SVM-MOCCA is a hierarchical method based on Support Vector Machines (SVMs) and motifs, where one SVM is trained per motif to classify its occurrences, with the feature space consisting of local dinucleotide and motif occurrence frequencies. Positively classified motif occurrences are subsequently combined using a log-odds model for a final prediction score.
+SVM-MOCCA distinguishes itself from classical use of SVMs with motifs for the modelling of CRE sequences, where SVMs are trained with motif occurrence frequencies or *k*-spectra, whereas the MOCCA methods train one model per motif and combine predictions.
+MOCCA also includes a derivative method based on Random Forests called the Random Forest Motif Occurrence Combinatorics Classification Algorithm (RF-MOCCA).
+In addition, MOCCA implements support for training log-odds models and classical SVM and RF models using a variety of feature space formulations.
 
 #### References
  * Bredesen *et al.* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
