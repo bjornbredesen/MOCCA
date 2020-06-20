@@ -14,7 +14,7 @@ SVM-MOCCA is a hierarchical method based on Support Vector Machines (SVMs) and m
 SVM-MOCCA distinguishes itself from classical use of SVMs with motifs for the modelling of CRE sequences, where SVMs are trained with motif occurrence frequencies or *k*-spectra, whereas the MOCCA methods train one model per motif and combine predictions.
 MOCCA also includes a derivative method based on Random Forests called the Random Forest Motif Occurrence Combinatorics Classification Algorithm (RF-MOCCA).
 In addition, MOCCA implements support for training log-odds models and classical SVM and RF models using a variety of feature space formulations.
-MOCCA includes functionality for the generation of negative data, threshold calibration and genome-wide prediction.
+MOCCA includes functionality for the generation of negative data, threshold calibration and genome-wide prediction, and also an automated mode that requires only that the user specifies positive sequences, motifs and a genome.
 
 #### References
  * Bredesen *et al.* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
@@ -84,8 +84,12 @@ See the `tutorial/` folder and `mocca --help` for more information.
  - Core usage features
      * Training with FASTA sequence files
      * Validation with FASTA sequence files
-     * Saving sequence scores to table
+     * Prediction threshold calibration for a desired precision
+     * Genome-wide prediction of candidate CREs to General Feature Format files
+     * Genome-wide prediction to Wiggle files
+     * Saving of sequence scores to table
      * Scoring of sequence files to Wiggle curves
+     * Automatic construction of negative training/test/calibration data
 
 
 
