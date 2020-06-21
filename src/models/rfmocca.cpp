@@ -272,10 +272,15 @@ vector<prediction> RFMOCCA::predictWindow(char*buf,long long pos,int bufs, coreP
 			if(cpm == cpmMotifs || cpm == cpmMotifsStrong){
 				// Try to limit to central occurrences with cumulative scores above threshold
 				vector<prediction> cmotpos = vector<prediction>();
+				sort(motpos.begin(),motpos.end(),
+				[](const prediction a,const prediction b){
+					return a.mstart < b.mstart;
+				});
 				for(auto&oA: motpos){
 					double cumscore = 0.;
 					for(auto&oB: motpos){
-						if(oB.mstart < oA.start || oB.mend > oA.end) continue;
+						if(oB.mstart < oA.start) continue;
+						if(oB.mend > oA.end) break;
 						cumscore += oB.score;
 					}
 					if(cumscore >= threshold)
@@ -313,11 +318,17 @@ vector<prediction> RFMOCCA::predictWindow(char*buf,long long pos,int bufs, coreP
 				// For continuous predictions, we want to predict a core delimited
 				// by motif occurrences that spans potentially a larger region, and
 				// has a high score per basepair.
+				sort(motpos.begin(),motpos.end(),
+				[](const prediction a,const prediction b){
+					return a.center < b.center;
+				});
 				vector<prediction> mwnd = vector<prediction>();
-				for(auto&oA: motpos){
-					for(auto&oB: motpos){
-						if(oB.center < oA.center || oB.end > oA.start + cfg->windowSize)
-							continue;
+				for(int iA = 0; iA < motpos.size() - 1; iA++){
+					auto&oA = motpos[iA];
+					for(int iB = iA; iB < motpos.size(); iB++){
+						auto&oB = motpos[iB];
+						if(oB.end > oA.start + cfg->windowSize)
+							break;
 						int wA = max(oA.start, 0);
 						int wB = min(oB.end, (int)pos + bufs);
 						if(wB-wA < oA.end-oA.start) continue;
