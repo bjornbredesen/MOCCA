@@ -322,6 +322,76 @@ vector<prediction> RFMOCCA::predictWindow(char*buf,long long pos,int bufs, coreP
 				[](const prediction a,const prediction b){
 					return a.center < b.center;
 				});
+				vector<prediction> cmotpos = vector<prediction>();
+				for(auto&m: motpos) cmotpos.push_back(m);
+				sort(cmotpos.begin(),cmotpos.end(),
+				[](const prediction a,const prediction b){
+					return a.mstart < b.mstart;
+				});
+				int maxWinStart = -1;
+				int maxWinEnd = -1;
+				double maxWinScore = -1.;
+				double maxWinCumScore = -1.;
+				int iCA = 0;
+				for(int iA = 0; iA < motpos.size() - 1; iA++){
+					auto&oA = motpos[iA];
+					int iCB = iCA;
+					double cumscoreA = 0.;
+					for(int iB = iA; iB < motpos.size(); iB++){
+						auto&oB = motpos[iB];
+						if(oB.end > oA.start + cfg->windowSize)
+							break;
+						int wA = max(oA.start, 0);
+						int wB = min(oB.end, (int)pos + bufs);
+						if(wB-wA < oA.end-oA.start) continue;
+						bool block = false;
+						double cumscore = cumscoreA;
+						for(int iC = iCB; iC < cmotpos.size(); iC++){
+							auto&oC = cmotpos[iC];
+							// Occurrences are sorted by motif start, so if they
+							// start before the window, we can safely skip.
+							if(oC.mstart < wA){
+								iCA++;
+								iCB++;
+								continue;
+							}
+							//if(oC.mstart > wB) continue;
+							// If the occurrence is past the window end, we can
+							// safely break.
+							if(oC.mstart > wB) break;
+							// If only the end is past, later shorter occurrences
+							// may still be inside, so just block updating of the
+							// bookmark position.
+							if(oC.mend > wB) {
+								block = true;
+								continue;
+							}
+							// The occurrence is inside the window, so add.
+							cumscore += oC.score;
+							// If an occurrence was past the end of the window,
+							// do not update bookmarks.
+							if(!block) {
+								iCB = iC + 1;
+								cumscoreA = cumscore;
+							}
+						}
+						double winScore = cumscore / max(double(wB - wA), 1.);
+						if(maxWinStart == -1 || winScore > maxWinScore){
+							maxWinStart = wA;
+							maxWinEnd = wB;
+							maxWinScore = winScore;
+							maxWinCumScore = cumscore;
+						}
+					}
+				}
+				if(maxWinStart == -1) return ret;
+				ret.push_back(prediction(maxWinStart, maxWinEnd, maxWinCumScore));
+				/*
+				// Unoptimized base algorithm
+				sort(motpos.begin(),motpos.end(),
+				[](const prediction a,const prediction b){
+					return a.center < b.center;
+				});
 				vector<prediction> mwnd = vector<prediction>();
 				for(int iA = 0; iA < motpos.size() - 1; iA++){
 					auto&oA = motpos[iA];
@@ -348,6 +418,7 @@ vector<prediction> RFMOCCA::predictWindow(char*buf,long long pos,int bufs, coreP
 					return sA > sB;
 				});
 				ret.push_back(prediction(mwnd[0].start, mwnd[0].end, mwnd[0].score));
+				*/
 			}
 		}
 	}else{
