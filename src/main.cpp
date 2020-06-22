@@ -1275,7 +1275,7 @@ cmdArg argumentTypes[] = {
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->nThreads = (int)strtol(params[0].c_str(), 0, 10);
-			if(cfg->windowSize <= 0){
+			if(cfg->nThreads <= 0){
 				argSyntaxError();
 				return false;
 			}
