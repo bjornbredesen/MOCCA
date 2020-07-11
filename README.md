@@ -31,6 +31,9 @@ On Debian-based systems, the easiest way to install MOCCA is using `apt-get`. Ub
 To build, run
 `autoreconf --install && ./configure && make`.
 
+MOCCA can optionally link with Shogun, for support for additional supervised learning methods. In order to link with Shogun (version => 16), run `./configure` with the additional directive `--use-shogun`.
+`autoreconf --install && ./configure --enable-shogun && make`.
+
 After building, MOCCA can be installed by running
 `sudo make install`.
 
