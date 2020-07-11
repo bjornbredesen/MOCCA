@@ -1,6 +1,15 @@
-AC_INIT(mocca, 1.0)
+AC_INIT(mocca, 1.1)
 
 AM_INIT_AUTOMAKE
+
+AC_ARG_ENABLE([shogun],
+[  --enable-shogun    Use Shogun machine learning library],
+[case "${enableval}" in
+  yes) shogun=true ;;
+  no)  shogun=false ;;
+  *) AC_MSG_ERROR([bad value ${enableval} for --enable-shogun]) ;;
+esac],[shogun=false])
+AM_CONDITIONAL([USE_SHOGUN], [test x$shogun = xtrue])
 
 AC_PROG_MAKE_SET
 
