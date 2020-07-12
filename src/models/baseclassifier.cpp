@@ -1089,7 +1089,7 @@ void LDAClassifier::printInfo(char*header){
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////
-// Linear Discriminant Analysis
+// Perceptron
 #ifdef USE_SHOGUN
 
 PerceptronClassifier::PerceptronClassifier(int nf):baseClassifier(nf){

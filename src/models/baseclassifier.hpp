@@ -245,11 +245,10 @@ public:
 	double do_apply(double*vec);
 	void printInfo(char*header);
 };
-
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////
-// Quadratic Discriminant Analysis
+// Perceptron
 
 #ifdef USE_SHOGUN
 #include <shogun/classifier/AveragedPerceptron.h>
@@ -267,6 +266,5 @@ public:
 	double do_apply(double*vec);
 	void printInfo(char*header);
 };
-
 #endif
 
