@@ -43,6 +43,7 @@ enum classifierT{
 	cSEQRF,
 	cSEQLO,
 	cSEQDummy,
+	cSEQLDA,
 };
 
 enum corePredictionModeT{

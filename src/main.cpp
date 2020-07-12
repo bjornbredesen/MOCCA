@@ -30,6 +30,9 @@ using namespace rapidxml;
 #include "models/seqrf.hpp"
 #include "models/seqlo.hpp"
 #include "models/seqdummy.hpp"
+#ifdef USE_SHOGUN
+#include "models/seqlda.hpp"
+#endif
 
 ////////////////////////////////////////////////////////////////////////////////////
 // File list
@@ -910,6 +913,25 @@ cmdArg argumentTypes[] = {
 			return true;
 		}
 	},
+	#ifdef USE_SHOGUN
+	{
+		// Argument
+		"-C:LDA",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:LDA",
+		{ "Sets the classifier to Linear Discriminant Analysis, using separately",
+		  "specified feature spaces." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->classifier=cSEQLDA;
+			return true;
+		}
+	},
+	#endif
 	//---------------------------
 	// Classifier configuration
 	{
@@ -2149,6 +2171,9 @@ sequenceClassifier*constructClassifier(motifList*motifs,featureSet*features,seqL
 		case cSEQRF:cls=SEQRF::create(motifs,features);break;
 		case cSEQLO:cls=SEQLO::create(motifs,features);break;
 		case cSEQDummy:cls=SEQDummy::create(motifs,features);break;
+		#ifdef USE_SHOGUN
+		case cSEQLDA:cls=SEQLDA::create(motifs,features);break;
+		#endif
 		default:cmdError("Invalid classifier.");return 0;
 	}
 	if(!cls)return 0;

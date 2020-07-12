@@ -1034,3 +1034,59 @@ void RFClassifier::printInfo(char*header){
 	cout << t_indent << header << "\n";
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+// Linear Discriminant Analysis
+#ifdef USE_SHOGUN
+
+LDAClassifier::LDAClassifier(int nf):baseClassifier(nf){
+}
+
+LDAClassifier*LDAClassifier::create(int nf, std::string name){
+	if(!nf){
+		cmdError("No features.");
+		return 0;
+	}
+	LDAClassifier*r=new LDAClassifier(nf);
+	if(!r){
+		outOfMemory();
+		return 0;
+	}
+	r->name = name;
+	return r;
+}
+
+bool LDAClassifier::do_train(){
+	shogun::init_shogun_with_defaults();
+	cout << "DBG - LDAClassifier::do_train\n";
+	int ntrain = trainingExamples.v.size();
+	shogun::SGVector<double> lvec(ntrain);
+	shogun::SGMatrix<double> fmat(nFeatures, ntrain);
+	cout << "DBG - Filling in training data\n";
+	int row = 0;
+	for(baseClassifierSmp*t: trainingExamples.v){
+		for(int i=0; i<nFeatures; i++)
+			fmat(i, row) = t->vec[i];
+		lvec[row] = t->cls->flag ? 1 : -1;
+		row++;
+	}
+	shogun::CBinaryLabels*lbl = new shogun::CBinaryLabels(lvec);
+	shogun::CDenseFeatures<double>*fv = new shogun::CDenseFeatures<double>(fmat);
+	LDA.ptr = new shogun::CLDA(0.0001, fv, lbl);
+	LDA.ptr->train();
+	return true;
+}
+
+double LDAClassifier::do_apply(double*vec){
+	shogun::SGMatrix<double> fmat(nFeatures, 1);
+	for(int i=0; i<nFeatures; i++)
+		fmat(i, 0) = vec[i];
+	shogun::CDenseFeatures<double>*fv = new shogun::CDenseFeatures<double>(fmat);
+	autodelete<shogun::CBinaryLabels> pred(LDA.ptr->apply_binary(fv));
+	return pred.ptr->get_value(0);
+}
+
+void LDAClassifier::printInfo(char*header){
+	cout << t_indent << header << "\n";
+}
+#endif
+
