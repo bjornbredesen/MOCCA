@@ -1,3 +1,10 @@
+mocca (1.1) stable; urgency=medium
+
+  * Improved ease of use functionality, and added optional integration
+    with the Shogun machine learning library
+
+ -- Bjørn Bredesen <bjorn@bjornbredesen.no>  Sun, 12 Jul 2020 17:51:20 +0200
+
 mocca (1.0-0ubuntu1) trusty; urgency=medium
 
   * Initial release
