@@ -218,3 +218,38 @@ public:
 	void printInfo(char*header);
 };
 
+////////////////////////////////////////////////////////////////////////////////////
+// Linear Discriminant Analysis
+
+#ifdef USE_SHOGUN
+#include <shogun/base/init.h>
+
+#include <shogun/lib/config.h>
+#include <shogun/labels/MulticlassLabels.h>
+#include <shogun/classifier/LDA.h>
+//#include <shogun/multiclass/MCLDA.h>
+//#include <shogun/classifier/svm/MulticlassLibSVM.h>
+#include <shogun/features/DenseFeatures.h>
+#include <shogun/io/SGIO.h>
+#include <shogun/lib/common.h>
+#include <shogun/features/DataGenerator.h>
+
+//using namespace shogun;
+
+class LDAClassifier:public baseClassifier{
+private:
+	LDAClassifier(int nf);
+	autodelete<shogun::CLDA> LDA;
+	//autodelete<shogun::CMCLDA> LDA;
+	std::string name;
+public:
+	std::vector<std::string> featureNames;
+	virtual ~LDAClassifier(){ };
+	static LDAClassifier*create(int nf, std::string name);
+	bool do_train();
+	double do_apply(double*vec);
+	void printInfo(char*header);
+};
+
+#endif
+
