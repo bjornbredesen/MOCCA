@@ -4,7 +4,7 @@ Description: Improved usability and optional Shogun integration
  integration with the Shogun machine learning library for additional supervised
  learning algorithms.
  .
- mocca (1.1) stable; urgency=medium
+ mocca (1.2) stable; urgency=medium
  .
    * Improved ease of use functionality, and added optional integration
      with the Shogun machine learning library
@@ -23,16 +23,16 @@ Forwarded: <no|not-needed|url proving that it has been forwarded>
 Reviewed-By: <name and email of someone who approved the patch>
 Last-Update: <YYYY-MM-DD>
 
---- mocca-1.1.orig/Makefile.am
-+++ mocca-1.1/Makefile.am
+--- mocca-1.2.orig/Makefile.am
++++ mocca-1.2/Makefile.am
 @@ -1,4 +1,4 @@
  AUTOMAKE_OPTIONS = foreign subdir-objects
 -AM_LDFLAGS = -shared -O3
 +AM_LDFLAGS = -O3
  SUBDIRS = src
  
---- mocca-1.1.orig/README.md
-+++ mocca-1.1/README.md
+--- mocca-1.2.orig/README.md
++++ mocca-1.2/README.md
 @@ -8,8 +8,13 @@ Copyright Bjørn Bredesen, 2011-2019
  -------------------------------------------------
  
@@ -154,8 +154,8 @@ Last-Update: <YYYY-MM-DD>
 +ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 +POSSIBILITY OF SUCH DAMAGE.
 +
---- mocca-1.1.orig/configure.ac
-+++ mocca-1.1/configure.ac
+--- mocca-1.2.orig/configure.ac
++++ mocca-1.2/configure.ac
 @@ -1,13 +1,23 @@
 -AC_INIT(mocca, 1.0)
 +AC_INIT(mocca, 1.1)
@@ -181,8 +181,8 @@ Last-Update: <YYYY-MM-DD>
  
  AC_CONFIG_FILES([Makefile src/Makefile])
  AC_OUTPUT
---- mocca-1.1.orig/src/Makefile.am
-+++ mocca-1.1/src/Makefile.am
+--- mocca-1.2.orig/src/Makefile.am
++++ mocca-1.2/src/Makefile.am
 @@ -1,4 +1,12 @@
  AUTOMAKE_OPTIONS = foreign subdir-objects
  bin_PROGRAMS = mocca
@@ -197,8 +197,8 @@ Last-Update: <YYYY-MM-DD>
 +mocca_SOURCES = main.cpp aux.cpp config.cpp motifs.cpp sequencelist.cpp sequences.cpp validation.cpp models/baseclassifier.cpp models/cpredictor.cpp models/dummypredictor.cpp models/features.cpp models/seqdummy.cpp models/seqlo.cpp models/seqsvm.cpp models/seqrf.cpp models/sequenceclassifier.cpp models/svmmocca.cpp models/rfmocca.cpp lib/libsvm-3.17/svm.cpp lib/ranger/src/Forest.cpp lib/ranger/src/ForestClassification.cpp lib/ranger/src/ForestProbability.cpp lib/ranger/src/ForestRegression.cpp lib/ranger/src/Tree.cpp lib/ranger/src/TreeClassification.cpp lib/ranger/src/TreeProbability.cpp lib/ranger/src/TreeRegression.cpp lib/ranger/src/Data.cpp lib/ranger/src/utility.cpp
 +endif
  
---- mocca-1.1.orig/src/config.cpp
-+++ mocca-1.1/src/config.cpp
+--- mocca-1.2.orig/src/config.cpp
++++ mocca-1.2/src/config.cpp
 @@ -39,6 +39,7 @@ config _config = config {
  	true,
  	0.0,1.0,0.5,0.995,1.0,
@@ -235,8 +235,8 @@ Last-Update: <YYYY-MM-DD>
  	cout << t_indent << "Log-odds mode: ";
  	switch(wmMode){
  		case wmPREdictor:cout << "PREdictor";break;
---- mocca-1.1.orig/src/config.hpp
-+++ mocca-1.1/src/config.hpp
+--- mocca-1.2.orig/src/config.hpp
++++ mocca-1.2/src/config.hpp
 @@ -37,10 +37,21 @@ enum classifierT{
  	cInvalid,
  	cCPREdictor,
@@ -278,7 +278,7 @@ Last-Update: <YYYY-MM-DD>
  	printInfo
  		Prints out information
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/NEWS
++++ mocca-1.2/src/lib/ranger/NEWS
 @@ -0,0 +1,164 @@
 +
 +##### Version 0.12.2
@@ -445,7 +445,7 @@ Last-Update: <YYYY-MM-DD>
 +* Fixed a bug: Split selection weights are now working as expected
 +* Small changes in documentation
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/NEWS.md
++++ mocca-1.2/src/lib/ranger/NEWS.md
 @@ -0,0 +1,314 @@
 +
 +##### Version 0.12.2
@@ -762,7 +762,7 @@ Last-Update: <YYYY-MM-DD>
 +* Fixed a bug: Split selection weights are now working as expected
 +* Small changes in documentation
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/README.md
++++ mocca-1.2/src/lib/ranger/README.md
 @@ -0,0 +1,82 @@
 +[![Travis Build Status](https://travis-ci.org/imbs-hl/ranger.svg?branch=master)](https://travis-ci.org/imbs-hl/ranger)
 +[![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/imbs-hl/ranger?branch=master&svg=true)](https://ci.appveyor.com/project/mnwright/ranger)
@@ -847,7 +847,7 @@ Last-Update: <YYYY-MM-DD>
 +* Sandri, M. & Zuccolotto, P. (2008). A bias correction algorithm for the Gini variable importance measure in classification trees. J Comput Graph Stat, 17:611-628. https://doi.org/10.1198/106186008X344522.
 +* Coppersmith D., Hong S. J., Hosking J. R. (1999). Partitioning nominal attributes in decision trees. Data Min Knowl Discov 3:197-217. https://doi.org/10.1023/A:1009869804967.
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/cpp_version/COPYING
++++ mocca-1.2/src/lib/ranger/cpp_version/COPYING
 @@ -0,0 +1,9 @@
 +MIT License
 +
@@ -860,7 +860,7 @@ Last-Update: <YYYY-MM-DD>
 +THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 \ No newline at end of file
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/inst/CITATION
++++ mocca-1.2/src/lib/ranger/inst/CITATION
 @@ -0,0 +1,22 @@
 +bibentry(bibtype = "Article",
 +  title        = "{ranger}: A Fast Implementation of Random Forests for High Dimensional Data in {C++} and {R}",
@@ -885,12 +885,12 @@ Last-Update: <YYYY-MM-DD>
 +)
 +
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/inst/include/ranger.h
++++ mocca-1.2/src/lib/ranger/inst/include/ranger.h
 @@ -0,0 +1,2 @@
 +#include "../../src/globals.h"
 +using namespace ranger;
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/AAA_check_cpp11.cpp
++++ mocca-1.2/src/lib/ranger/src/AAA_check_cpp11.cpp
 @@ -0,0 +1,6 @@
 +#ifndef WIN_R_BUILD
 +#if __cplusplus < 201103L
@@ -899,7 +899,7 @@ Last-Update: <YYYY-MM-DD>
 +#endif
 +
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/Data.cpp
++++ mocca-1.2/src/lib/ranger/src/Data.cpp
 @@ -0,0 +1,342 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -1244,7 +1244,7 @@ Last-Update: <YYYY-MM-DD>
 +} // namespace ranger
 +
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/Data.h
++++ mocca-1.2/src/lib/ranger/src/Data.h
 @@ -0,0 +1,228 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -1475,7 +1475,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* DATA_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/DataChar.h
++++ mocca-1.2/src/lib/ranger/src/DataChar.h
 @@ -0,0 +1,75 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -1553,7 +1553,7 @@ Last-Update: <YYYY-MM-DD>
 +#endif /* DATACHAR_H_ */
 +// #nocov end
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/DataDouble.h
++++ mocca-1.2/src/lib/ranger/src/DataDouble.h
 @@ -0,0 +1,75 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -1631,7 +1631,7 @@ Last-Update: <YYYY-MM-DD>
 +#endif /* DATADOUBLE_H_ */
 +// #nocov end
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/DataFloat.h
++++ mocca-1.2/src/lib/ranger/src/DataFloat.h
 @@ -0,0 +1,76 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -1710,7 +1710,7 @@ Last-Update: <YYYY-MM-DD>
 +// #nocov end
 +
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/DataSparse.cpp
++++ mocca-1.2/src/lib/ranger/src/DataSparse.cpp
 @@ -0,0 +1,44 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of Ranger.
@@ -1757,7 +1757,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +} // namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/DataSparse.h
++++ mocca-1.2/src/lib/ranger/src/DataSparse.h
 @@ -0,0 +1,85 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of Ranger.
@@ -1845,7 +1845,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* DATASPARSE_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/Forest.cpp
++++ mocca-1.2/src/lib/ranger/src/Forest.cpp
 @@ -0,0 +1,1087 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -2935,7 +2935,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +} // namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/Forest.h
++++ mocca-1.2/src/lib/ranger/src/Forest.h
 @@ -0,0 +1,264 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -3202,7 +3202,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* FOREST_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/ForestClassification.cpp
++++ mocca-1.2/src/lib/ranger/src/ForestClassification.cpp
 @@ -0,0 +1,333 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -3538,7 +3538,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +}// namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/ForestClassification.h
++++ mocca-1.2/src/lib/ranger/src/ForestClassification.h
 @@ -0,0 +1,76 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -3617,7 +3617,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* FORESTCLASSIFICATION_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/ForestProbability.cpp
++++ mocca-1.2/src/lib/ranger/src/ForestProbability.cpp
 @@ -0,0 +1,341 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -3961,7 +3961,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +}// namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/ForestProbability.h
++++ mocca-1.2/src/lib/ranger/src/ForestProbability.h
 @@ -0,0 +1,76 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -4040,7 +4040,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* FORESTPROBABILITY_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/ForestRegression.cpp
++++ mocca-1.2/src/lib/ranger/src/ForestRegression.cpp
 @@ -0,0 +1,260 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -4303,7 +4303,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +}// namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/ForestRegression.h
++++ mocca-1.2/src/lib/ranger/src/ForestRegression.h
 @@ -0,0 +1,55 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -4361,7 +4361,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* FORESTREGRESSION_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/ForestSurvival.cpp
++++ mocca-1.2/src/lib/ranger/src/ForestSurvival.cpp
 @@ -0,0 +1,336 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -4700,7 +4700,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +}// namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/ForestSurvival.h
++++ mocca-1.2/src/lib/ranger/src/ForestSurvival.h
 @@ -0,0 +1,66 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -4769,7 +4769,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* FORESTSURVIVAL_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/Tree.cpp
++++ mocca-1.2/src/lib/ranger/src/Tree.cpp
 @@ -0,0 +1,593 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -5365,7 +5365,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +} // namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/Tree.h
++++ mocca-1.2/src/lib/ranger/src/Tree.h
 @@ -0,0 +1,234 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -5602,7 +5602,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* TREE_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/TreeClassification.cpp
++++ mocca-1.2/src/lib/ranger/src/TreeClassification.cpp
 @@ -0,0 +1,848 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -6453,7 +6453,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +} // namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/TreeClassification.h
++++ mocca-1.2/src/lib/ranger/src/TreeClassification.h
 @@ -0,0 +1,111 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -6567,7 +6567,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* TREECLASSIFICATION_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/TreeProbability.cpp
++++ mocca-1.2/src/lib/ranger/src/TreeProbability.cpp
 @@ -0,0 +1,842 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -7412,7 +7412,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +} // namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/TreeProbability.h
++++ mocca-1.2/src/lib/ranger/src/TreeProbability.h
 @@ -0,0 +1,120 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -7535,7 +7535,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* TREEPROBABILITY_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/TreeRegression.cpp
++++ mocca-1.2/src/lib/ranger/src/TreeRegression.cpp
 @@ -0,0 +1,926 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -8464,7 +8464,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +} // namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/TreeRegression.h
++++ mocca-1.2/src/lib/ranger/src/TreeRegression.h
 @@ -0,0 +1,103 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -8570,7 +8570,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* TREEREGRESSION_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/TreeSurvival.cpp
++++ mocca-1.2/src/lib/ranger/src/TreeSurvival.cpp
 @@ -0,0 +1,928 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -9501,7 +9501,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +} // namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/TreeSurvival.h
++++ mocca-1.2/src/lib/ranger/src/TreeSurvival.h
 @@ -0,0 +1,115 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -9619,7 +9619,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* TREESURVIVAL_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/globals.h
++++ mocca-1.2/src/lib/ranger/src/globals.h
 @@ -0,0 +1,110 @@
 +/*-------------------------------------------------------------------------------
 +This file is part of ranger.
@@ -9732,7 +9732,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +#endif /* GLOBALS_H_ */
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/rangerCpp.cpp
++++ mocca-1.2/src/lib/ranger/src/rangerCpp.cpp
 @@ -0,0 +1,284 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of Ranger.
@@ -10019,7 +10019,7 @@ Last-Update: <YYYY-MM-DD>
 +}
 +
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/utility.cpp
++++ mocca-1.2/src/lib/ranger/src/utility.cpp
 @@ -0,0 +1,690 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -10712,7 +10712,7 @@ Last-Update: <YYYY-MM-DD>
 +
 +} // namespace ranger
 --- /dev/null
-+++ mocca-1.1/src/lib/ranger/src/utility.h
++++ mocca-1.2/src/lib/ranger/src/utility.h
 @@ -0,0 +1,573 @@
 +/*-------------------------------------------------------------------------------
 + This file is part of ranger.
@@ -11287,8 +11287,8 @@ Last-Update: <YYYY-MM-DD>
 +// namespace ranger
 +
 +#endif /* UTILITY_H_ */
---- mocca-1.1.orig/src/main.cpp
-+++ mocca-1.1/src/main.cpp
+--- mocca-1.2.orig/src/main.cpp
++++ mocca-1.2/src/main.cpp
 @@ -23,11 +23,17 @@ using namespace rapidxml;
  #include "models/baseclassifier.hpp"
  #include "models/sequenceclassifier.hpp"
@@ -11820,8 +11820,8 @@ Last-Update: <YYYY-MM-DD>
  		default:cmdError("Invalid classifier.");return 0;
  	}
  	if(!cls)return 0;
---- mocca-1.1.orig/src/models/baseclassifier.cpp
-+++ mocca-1.1/src/models/baseclassifier.cpp
+--- mocca-1.2.orig/src/models/baseclassifier.cpp
++++ mocca-1.2/src/models/baseclassifier.cpp
 @@ -959,3 +959,188 @@ bool MultiClassSVM::exportAnalysisData(F
  	return true;
  }
@@ -12011,8 +12011,8 @@ Last-Update: <YYYY-MM-DD>
 +}
 +#endif
 +
---- mocca-1.1.orig/src/models/baseclassifier.hpp
-+++ mocca-1.1/src/models/baseclassifier.hpp
+--- mocca-1.2.orig/src/models/baseclassifier.hpp
++++ mocca-1.2/src/models/baseclassifier.hpp
 @@ -133,3 +133,138 @@ public:
  	bool exportAnalysisData(FILE*f, char*title, char*indent);
  };
@@ -12153,7 +12153,7 @@ Last-Update: <YYYY-MM-DD>
 +#endif
 +
 --- /dev/null
-+++ mocca-1.1/src/models/rfmocca.cpp
++++ mocca-1.2/src/models/rfmocca.cpp
 @@ -0,0 +1,429 @@
 +////////////////////////////////////////////////////////////////////////////////////
 +// MOCCA
@@ -12585,7 +12585,7 @@ Last-Update: <YYYY-MM-DD>
 +}
 +
 --- /dev/null
-+++ mocca-1.1/src/models/rfmocca.hpp
++++ mocca-1.2/src/models/rfmocca.hpp
 @@ -0,0 +1,58 @@
 +////////////////////////////////////////////////////////////////////////////////////
 +// MOCCA
@@ -12646,7 +12646,7 @@ Last-Update: <YYYY-MM-DD>
 +};
 +
 --- /dev/null
-+++ mocca-1.1/src/models/seqlda.cpp
++++ mocca-1.2/src/models/seqlda.cpp
 @@ -0,0 +1,97 @@
 +////////////////////////////////////////////////////////////////////////////////////
 +// MOCCA
@@ -12746,7 +12746,7 @@ Last-Update: <YYYY-MM-DD>
 +}
 +
 --- /dev/null
-+++ mocca-1.1/src/models/seqlda.hpp
++++ mocca-1.2/src/models/seqlda.hpp
 @@ -0,0 +1,32 @@
 +////////////////////////////////////////////////////////////////////////////////////
 +// MOCCA
@@ -12781,7 +12781,7 @@ Last-Update: <YYYY-MM-DD>
 +};
 +
 --- /dev/null
-+++ mocca-1.1/src/models/seqperceptron.cpp
++++ mocca-1.2/src/models/seqperceptron.cpp
 @@ -0,0 +1,97 @@
 +////////////////////////////////////////////////////////////////////////////////////
 +// MOCCA
@@ -12881,7 +12881,7 @@ Last-Update: <YYYY-MM-DD>
 +}
 +
 --- /dev/null
-+++ mocca-1.1/src/models/seqperceptron.hpp
++++ mocca-1.2/src/models/seqperceptron.hpp
 @@ -0,0 +1,32 @@
 +////////////////////////////////////////////////////////////////////////////////////
 +// MOCCA
@@ -12916,7 +12916,7 @@ Last-Update: <YYYY-MM-DD>
 +};
 +
 --- /dev/null
-+++ mocca-1.1/src/models/seqrf.cpp
++++ mocca-1.2/src/models/seqrf.cpp
 @@ -0,0 +1,97 @@
 +////////////////////////////////////////////////////////////////////////////////////
 +// MOCCA
@@ -13016,7 +13016,7 @@ Last-Update: <YYYY-MM-DD>
 +}
 +
 --- /dev/null
-+++ mocca-1.1/src/models/seqrf.hpp
++++ mocca-1.2/src/models/seqrf.hpp
 @@ -0,0 +1,32 @@
 +////////////////////////////////////////////////////////////////////////////////////
 +// MOCCA
@@ -13050,8 +13050,8 @@ Last-Update: <YYYY-MM-DD>
 +	bool exportAnalysisData(string path);
 +};
 +
---- mocca-1.1.orig/src/models/sequenceclassifier.cpp
-+++ mocca-1.1/src/models/sequenceclassifier.cpp
+--- mocca-1.2.orig/src/models/sequenceclassifier.cpp
++++ mocca-1.2/src/models/sequenceclassifier.cpp
 @@ -238,40 +238,64 @@ bool sequenceClassifier::predictGenomewi
  		int rbn;
  		long nextSi=0;
@@ -13148,8 +13148,8 @@ Last-Update: <YYYY-MM-DD>
  bool sequenceClassifier::calibrateThresholdGenomewidePrecision(seqList*calpos,double wantPrecision){
  	threshold=0.;
  	int nvp=0;
---- mocca-1.1.orig/src/models/sequenceclassifier.hpp
-+++ mocca-1.1/src/models/sequenceclassifier.hpp
+--- mocca-1.2.orig/src/models/sequenceclassifier.hpp
++++ mocca-1.2/src/models/sequenceclassifier.hpp
 @@ -7,6 +7,20 @@
  
  #pragma once
@@ -13179,8 +13179,8 @@ Last-Update: <YYYY-MM-DD>
  };
  
  ////////////////////////////////////////////////////////////////////////////////////
---- mocca-1.1.orig/src/models/svmmocca.cpp
-+++ mocca-1.1/src/models/svmmocca.cpp
+--- mocca-1.2.orig/src/models/svmmocca.cpp
++++ mocca-1.2/src/models/svmmocca.cpp
 @@ -415,3 +415,190 @@ bool SVMMOCCA::exportAnalysisData(string
  	return true;
  }
@@ -13372,8 +13372,8 @@ Last-Update: <YYYY-MM-DD>
 +	return ret;
 +}
 +
---- mocca-1.1.orig/src/models/svmmocca.hpp
-+++ mocca-1.1/src/models/svmmocca.hpp
+--- mocca-1.2.orig/src/models/svmmocca.hpp
++++ mocca-1.2/src/models/svmmocca.hpp
 @@ -82,5 +82,6 @@ public:
  	bool flush();
  	bool printInfo();
@@ -13381,8 +13381,8 @@ Last-Update: <YYYY-MM-DD>
 +	virtual vector<prediction> predictWindow(char*buf,long long pos,int bufs, corePredictionModeT cpm);
  };
  
---- mocca-1.1.orig/src/sequencelist.cpp
-+++ mocca-1.1/src/sequencelist.cpp
+--- mocca-1.2.orig/src/sequencelist.cpp
++++ mocca-1.2/src/sequencelist.cpp
 @@ -35,6 +35,15 @@ seqClass*getSeqClassByName(std::string n
  	return 0;
  }
@@ -13449,8 +13449,8 @@ Last-Update: <YYYY-MM-DD>
  		if(!addSeq(cloneString((char*)oss.str().c_str()),buf.disown(),len,cls,tm)){
  			return false;
  		}
---- mocca-1.1.orig/src/sequencelist.hpp
-+++ mocca-1.1/src/sequencelist.hpp
+--- mocca-1.2.orig/src/sequencelist.hpp
++++ mocca-1.2/src/sequencelist.hpp
 @@ -21,6 +21,7 @@ typedef struct{
  }seqClass;
  
@@ -13478,8 +13478,8 @@ Last-Update: <YYYY-MM-DD>
  	addClone
  		Adds a clone of the given sequence to the set.
  	*/
---- mocca-1.1.orig/src/sequences.cpp
-+++ mocca-1.1/src/sequences.cpp
+--- mocca-1.2.orig/src/sequences.cpp
++++ mocca-1.2/src/sequences.cpp
 @@ -85,7 +85,7 @@ bool seqStreamBuffer::setpos(long pos){
  }
  
@@ -13603,8 +13603,8 @@ Last-Update: <YYYY-MM-DD>
  ////////////////////////////////////////////////////////////////////////////////////
  // seqStreamFasta
  
---- mocca-1.1.orig/src/sequences.hpp
-+++ mocca-1.1/src/sequences.hpp
+--- mocca-1.2.orig/src/sequences.hpp
++++ mocca-1.2/src/sequences.hpp
 @@ -72,7 +72,7 @@ public:
  
  /*
