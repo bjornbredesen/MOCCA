@@ -1,8 +1,0 @@
-<motifs>
-	<motif name="En" misses="1" seq="GSNMACGCCCC"/>
-	<motif name="G10" misses="1" seq="GAGAGAGAGA"/>
-	<motif name="GAF" misses="0" seq="GAGAG"/>
-	<motif name="Z" misses="0" seq="YGAGYG"/>
-	<motif name="CG" misses="0" seq="GTGT"/>
-</motifs>
-
