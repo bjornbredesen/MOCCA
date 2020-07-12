@@ -1057,11 +1057,9 @@ LDAClassifier*LDAClassifier::create(int nf, std::string name){
 
 bool LDAClassifier::do_train(){
 	shogun::init_shogun_with_defaults();
-	cout << "DBG - LDAClassifier::do_train\n";
 	int ntrain = trainingExamples.v.size();
 	shogun::SGVector<double> lvec(ntrain);
 	shogun::SGMatrix<double> fmat(nFeatures, ntrain);
-	cout << "DBG - Filling in training data\n";
 	int row = 0;
 	for(baseClassifierSmp*t: trainingExamples.v){
 		for(int i=0; i<nFeatures; i++)
