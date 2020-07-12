@@ -32,6 +32,7 @@ using namespace rapidxml;
 #include "models/seqdummy.hpp"
 #ifdef USE_SHOGUN
 #include "models/seqlda.hpp"
+#include "models/seqperceptron.hpp"
 #endif
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -928,6 +929,23 @@ cmdArg argumentTypes[] = {
 		// Code
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			cfg->classifier=cSEQLDA;
+			return true;
+		}
+	},
+	{
+		// Argument
+		"-C:Perceptron",
+		// Pass
+		1,
+		// Parameters
+		0,
+		// Documentation
+		"-C:Perceptron",
+		{ "Sets the classifier to a perceptron, using separately specified feature",
+		  "spaces." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->classifier=cSEQPerceptron;
 			return true;
 		}
 	},
@@ -2173,6 +2191,7 @@ sequenceClassifier*constructClassifier(motifList*motifs,featureSet*features,seqL
 		case cSEQDummy:cls=SEQDummy::create(motifs,features);break;
 		#ifdef USE_SHOGUN
 		case cSEQLDA:cls=SEQLDA::create(motifs,features);break;
+		case cSEQPerceptron:cls=SEQPerceptron::create(motifs,features);break;
 		#endif
 		default:cmdError("Invalid classifier.");return 0;
 	}
