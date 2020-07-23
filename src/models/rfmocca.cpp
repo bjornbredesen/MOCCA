@@ -421,7 +421,7 @@ vector<prediction> RFMOCCA::predictWindow(char*buf,long long pos,int bufs, coreP
 				*/
 			}
 		}
-	}else{
+	}else if(cvalue >= threshold){
 		ret.push_back(prediction(pos, pos+bufs, cvalue));
 	}
 	return ret;
