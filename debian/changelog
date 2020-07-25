@@ -1,3 +1,10 @@
+mocca (1.3-0ubuntu1) trusty; urgency=critical
+
+  * Fixed bug in genome-wide prediction that was introduced while improving
+    core-CRE prediction.
+
+ -- Bjørn Bredesen <bjorn@bjornbredesen.no>  Sat, 25 Jul 2020 15:51:30 +0200
+
 mocca (1.2-0ubuntu1) trusty; urgency=medium
 
   * Improved ease of use functionality, and added optional integration
