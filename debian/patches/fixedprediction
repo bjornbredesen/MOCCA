@@ -1,0 +1,93 @@
+Description: Genome-wide prediction bugfix.
+ Fixes bug in genome-wide prediction that was introduces after improving core-CRE prediction.
+ .
+ mocca (1.3-0ubuntu1) trusty; urgency=critical
+ .
+   * Fixed bug in genome-wide prediction that was introduced while improving
+     core-CRE prediction.
+Author: Bjørn Bredesen <bjorn@bjornbredesen.no>
+
+---
+The information above should follow the Patch Tagging Guidelines, please
+checkout http://dep.debian.net/deps/dep3/ to learn about the format. Here
+are templates for supplementary fields that you might want to add:
+
+Origin: <vendor|upstream|other>, <url of original patch>
+Bug: <url in upstream bugtracker>
+Bug-Debian: https://bugs.debian.org/<bugnumber>
+Bug-Ubuntu: https://launchpad.net/bugs/<bugnumber>
+Forwarded: <no|not-needed|url proving that it has been forwarded>
+Reviewed-By: <name and email of someone who approved the patch>
+Last-Update: <YYYY-MM-DD>
+
+--- mocca-1.3.orig/README.md
++++ mocca-1.3/README.md
+@@ -31,7 +31,7 @@ On Debian-based systems, the easiest way
+ To build, run
+ `autoreconf --install && ./configure && make`.
+ 
+-MOCCA can optionally link with Shogun, for support for additional supervised learning methods. In order to link with Shogun (version => 16), run `./configure` with the additional directive `--use-shogun`.
++MOCCA can optionally link with Shogun, for support for additional supervised learning methods. In order to link with Shogun (version 18), run `./configure` with the additional directive `--use-shogun`.
+ `autoreconf --install && ./configure --enable-shogun && make`.
+ 
+ After building, MOCCA can be installed by running
+--- mocca-1.3.orig/configure.ac
++++ mocca-1.3/configure.ac
+@@ -1,4 +1,4 @@
+-AC_INIT(mocca, 1.2)
++AC_INIT(mocca, 1.3)
+ 
+ AM_INIT_AUTOMAKE
+ 
+--- mocca-1.3.orig/src/models/rfmocca.cpp
++++ mocca-1.3/src/models/rfmocca.cpp
+@@ -421,7 +421,7 @@ vector<prediction> RFMOCCA::predictWindo
+ 				*/
+ 			}
+ 		}
+-	}else{
++	}else if(cvalue >= threshold){
+ 		ret.push_back(prediction(pos, pos+bufs, cvalue));
+ 	}
+ 	return ret;
+--- mocca-1.3.orig/src/models/sequenceclassifier.cpp
++++ mocca-1.3/src/models/sequenceclassifier.cpp
+@@ -238,6 +238,7 @@ bool sequenceClassifier::predictGenomewi
+ 		int rbn;
+ 		long nextSi=0;
+ 		double cvalue;
++		int slack = cfg->corePredictionMode == cpmNone ? cfg->windowStep : 0;
+ 		vector<prediction> pred;
+ 		flush();
+ 		int lastPredWndEnd = -1;
+@@ -250,8 +251,8 @@ bool sequenceClassifier::predictGenomewi
+ 			vector<prediction> wpred = predictWindow(rb, i, rbn, cfg->corePredictionMode);
+ 			cvalue = wpred.size() > 0 ? wpred.back().score : -9999999999.;
+ 			if(ofWig.is_open())
+-				ofWig << (cvalue+threshold) << "\n";
+-			if(cvalue>=0.){
++				ofWig << (cvalue) << "\n";
++			if(cvalue >= threshold){
+ 				if(cfg->corePredictionMax){
+ 					// For maximum core prediction mode, find the maximally scoring
+ 					// core prediction, and add/replace last depending on whether
+@@ -282,7 +283,7 @@ bool sequenceClassifier::predictGenomewi
+ 		});
+ 		vector<prediction> fpred = vector<prediction>();
+ 		for(auto&p: pred){
+-			if(fpred.size() > 0 && p.start < fpred.back().end){
++			if(fpred.size() > 0 && p.start <= fpred.back().end + slack){
+ 				fpred.back().end = max(fpred.back().end, p.end);
+ 				fpred.back().score = max(fpred.back().score, p.score);
+ 			}else{
+--- mocca-1.3.orig/src/models/svmmocca.cpp
++++ mocca-1.3/src/models/svmmocca.cpp
+@@ -596,7 +596,7 @@ vector<prediction> SVMMOCCA::predictWind
+ 				*/
+ 			}
+ 		}
+-	}else{
++	}else if(cvalue >= threshold){
+ 		ret.push_back(prediction(pos, pos+bufs, cvalue));
+ 	}
+ 	return ret;
