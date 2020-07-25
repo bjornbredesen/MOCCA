@@ -238,6 +238,7 @@ bool sequenceClassifier::predictGenomewideFASTA(std::string inFASTAPath, std::st
 		int rbn;
 		long nextSi=0;
 		double cvalue;
+		int slack = cfg->corePredictionMode == cpmNone ? cfg->windowStep : 0;
 		vector<prediction> pred;
 		flush();
 		int lastPredWndEnd = -1;
@@ -250,8 +251,8 @@ bool sequenceClassifier::predictGenomewideFASTA(std::string inFASTAPath, std::st
 			vector<prediction> wpred = predictWindow(rb, i, rbn, cfg->corePredictionMode);
 			cvalue = wpred.size() > 0 ? wpred.back().score : -9999999999.;
 			if(ofWig.is_open())
-				ofWig << (cvalue+threshold) << "\n";
-			if(cvalue>=0.){
+				ofWig << (cvalue) << "\n";
+			if(cvalue >= threshold){
 				if(cfg->corePredictionMax){
 					// For maximum core prediction mode, find the maximally scoring
 					// core prediction, and add/replace last depending on whether
@@ -282,7 +283,7 @@ bool sequenceClassifier::predictGenomewideFASTA(std::string inFASTAPath, std::st
 		});
 		vector<prediction> fpred = vector<prediction>();
 		for(auto&p: pred){
-			if(fpred.size() > 0 && p.start < fpred.back().end){
+			if(fpred.size() > 0 && p.start <= fpred.back().end + slack){
 				fpred.back().end = max(fpred.back().end, p.end);
 				fpred.back().score = max(fpred.back().score, p.score);
 			}else{

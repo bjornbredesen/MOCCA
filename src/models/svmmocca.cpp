@@ -596,7 +596,7 @@ vector<prediction> SVMMOCCA::predictWindow(char*buf,long long pos,int bufs, core
 				*/
 			}
 		}
-	}else{
+	}else if(cvalue >= threshold){
 		ret.push_back(prediction(pos, pos+bufs, cvalue));
 	}
 	return ret;
