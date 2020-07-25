@@ -1,4 +1,4 @@
-AC_INIT(mocca, 1.1)
+AC_INIT(mocca, 1.3)
 
 AM_INIT_AUTOMAKE
 
