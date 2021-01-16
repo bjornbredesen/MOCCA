@@ -14,10 +14,20 @@ jobs:
     - name: Get latest CMake
       uses: lukka/get-cmake@latest
       
+    - name: Run vcpkg
+      uses: lukka/run-vcpkg@v6
+      with:
+        setupOnly: true
+        vcpkgDirectory: '${{ github.workspace }}/vcpkg'
+        vcpkgTriplet: ${{ matrix.triplet }}
+        additionalCachedPaths: ${{ env.buildDir }}/vcpkg_installed
+      
     - name: Build with CMake
       uses: lukka/run-cmake@main
       with:
         buildDirectory: '${{ github.workspace }}'
+        useVcpkgToolchainFile: true
+        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
       
     - name: Check output
       run: |
