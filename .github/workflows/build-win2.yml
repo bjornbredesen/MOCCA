@@ -22,14 +22,14 @@ jobs:
     - name: Check output
       run: |
         ls
-      
-    - name: Test
-      run: |
-        mocca.exe
 
     - name: Store bundles
       uses: actions/upload-artifact@v2
       with:
         name: mocca-windows
         path: mocca.exe
+      
+#    - name: Test
+#      run: |
+#        mocca.exe
 
