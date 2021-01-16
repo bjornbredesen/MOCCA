@@ -10,5 +10,8 @@ override_dh_auto_build:
 	dh_auto_build
 
 %:
-	dh $@ --with autoreconf
+	dh $@ --buildsystem=cmake
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DWITH-MATH=1
 
