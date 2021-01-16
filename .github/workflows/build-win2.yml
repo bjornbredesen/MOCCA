@@ -21,11 +21,12 @@ jobs:
       uses: lukka/run-cmake@main
       with:
         buildDirectory: '${{ github.workspace }}/build'
-        cmakeGenerator: 'VS16Win64'
       
     - name: Check output
       run: |
         ls
+
+#        cmakeGenerator: 'VS16Win64'
 #        os: [macos-latest, windows-latest, ubuntu-latest]
 #      cmakeAppendedArgs: ' -GNinja'
 
