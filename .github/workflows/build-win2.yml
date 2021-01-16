@@ -19,8 +19,9 @@ jobs:
       
     - name: Build with CMake
       uses: lukka/run-cmake@main
-      buildDirectory: '${{ github.workspace }}/build'
-      cmakeGenerator: ' -VS16Win64'
+      with:
+        buildDirectory: '${{ github.workspace }}/build'
+        cmakeGenerator: ' -VS16Win64'
       
     - name: Check output
       run: |
