@@ -20,7 +20,7 @@ jobs:
     - name: Build with CMake
       uses: lukka/run-cmake@main
       with:
-        buildDirectory: '${{ github.workspace }}/build'
+        buildDirectory: '${{ github.workspace }}'
       
     - name: Check output
       run: |
@@ -30,7 +30,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: mocca-windows
-        path: mocca.exe
+        path: build/mocca.exe
 
 #        retention-days: 5
 #        path: build/bundles
