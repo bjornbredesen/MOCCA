@@ -1,0 +1,14 @@
+name: Build (Windows, 2)
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [macos-latest, windows-latest, ubuntu-latest]
+    steps:
+    - uses: actions/checkout@v2
+
+
