@@ -7,7 +7,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [windows-latest]
     steps:
     
     - uses: actions/checkout@v2
@@ -19,4 +19,9 @@ jobs:
       
     - name: Build with CMake
       uses: lukka/run-cmake@main
+      
+    - name: Check output
+      run: |
+        ls
+#        os: [macos-latest, windows-latest, ubuntu-latest]
 
