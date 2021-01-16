@@ -22,6 +22,10 @@ jobs:
     - name: Check output
       run: |
         ls
+      
+    - name: Test
+      run: |
+        mocca.exe
 
     - name: Store bundles
       uses: actions/upload-artifact@v2
