@@ -10,5 +10,6 @@ jobs:
         os: [macos-latest, windows-latest, ubuntu-latest]
     steps:
     - uses: actions/checkout@v2
-
+      with:
+        ref: master
 
