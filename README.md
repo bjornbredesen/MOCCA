@@ -37,9 +37,6 @@ MOCCA can optionally link with Shogun, for support for additional supervised lea
 After building, MOCCA can be installed by running
 `sudo make install`.
 
-To build a Debian-package with CMake/CPack, run
-`sudo make package`.
-
 To build a Debian-package, run
 `debuild -b`.
 
