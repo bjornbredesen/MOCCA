@@ -29,16 +29,16 @@ On Debian-based systems, the easiest way to install MOCCA is using `apt-get`. Ub
 ```sudo add-apt-repository ppa:bjornbredesen/mocca && sudo apt-get update && sudo apt-get install mocca```
 
 To build, run
-`autoreconf --install && ./configure && make`.
+`cmake . && make`.
 
-MOCCA can optionally link with Shogun, for support for additional supervised learning methods. In order to link with Shogun (version 18), run `./configure` with the additional directive `--use-shogun`.
-`autoreconf --install && ./configure --enable-shogun && make`.
+MOCCA can optionally link with Shogun, for support for additional supervised learning methods. In order to link with Shogun (version 18), run
+`cmake -USE_SHOGUN=ON . && make`.
 
 After building, MOCCA can be installed by running
 `sudo make install`.
 
-Similarly, MOCCA can be uninstalled by running
-`sudo make uninstall`.
+To build a Debian-package with CMake/CPack, run
+`sudo make package`.
 
 To build a Debian-package, run
 `debuild -b`.
