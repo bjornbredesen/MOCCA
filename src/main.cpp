@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////////
 // MOCCA
-// Copyright, Bjørn Bredesen, 2019
+// Copyright, Bjørn Bredesen, 2021
 // E-mail: bjorn@bjornbredesen.no
 ////////////////////////////////////////////////////////////////////////////////////
 // Basics
@@ -1987,7 +1987,7 @@ void print_licenses(){
 	cout << t_bold("SVM-MOCCA") << "\n\n";
 	cout << "MIT License\n\
 \n\
-Copyright (c) 2019 Bjørn André Bredesen\n\
+Copyright (c) 2021 Bjørn André Bredesen\n\
 \n\
 Permission is hereby granted, free of charge, to any person obtaining a copy\n\
 of this software and associated documentation files (the \"Software\"), to deal\n\
@@ -2283,7 +2283,7 @@ main
 */
 int main(int argc,char**argv){
 	timer mainTimer((char*)"Full run");
-	cout << sepline << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2019\n bjorn@bjornbredesen.no\n" << sepline;
+	cout << sepline << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2021\n bjorn@bjornbredesen.no\n" << sepline;
 	
 	svm_set_print_string_function(&libsvm_print_null);
 	
