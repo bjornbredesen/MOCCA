@@ -25,6 +25,7 @@ jobs:
       with:
         buildDirectory: '${{ github.workspace }}'
         useVcpkgToolchainFile: true
+        cmakeGenerator: VS16Win64
       
     - name: Check output
       run: |
