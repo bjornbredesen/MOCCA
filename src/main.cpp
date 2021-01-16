@@ -1984,7 +1984,7 @@ print_help
 void print_licenses(){
 	cout << " Licenses:\n";
 	cout << sepline;
-	cout << t_bold("SVM-MOCCA") << "\n\n";
+	cout << t_bold("MOCCA") << "\n\n";
 	cout << "MIT License\n\
 \n\
 Copyright (c) 2021 Bjørn André Bredesen\n\
