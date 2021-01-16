@@ -27,7 +27,6 @@ jobs:
       with:
         buildDirectory: '${{ github.workspace }}'
         useVcpkgToolchainFile: true
-        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
       
     - name: Check output
       run: |
@@ -39,6 +38,7 @@ jobs:
         name: mocca-windows
         path: mocca.exe
       
+#        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
 #    - name: Test
 #      run: |
 #        mocca.exe
