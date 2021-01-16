@@ -1,0 +1,21 @@
+name: Build
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    
+    - uses: actions/checkout@v2
+    
+    - name: Get latest CMake
+      uses: lukka/get-cmake@latest
+      
+    - name: Build with CMake
+      uses: lukka/run-cmake@main
+    
+#    - name: Build package
+#      run: |
+#        cmake . && make
+
