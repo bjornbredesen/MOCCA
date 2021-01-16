@@ -26,7 +26,7 @@ add_library(ranger STATIC
 
 set(SOURCES
     src/main.cpp
-    src/aux.cpp
+    src/vaux.cpp
     src/config.cpp
     src/motifs.cpp
     src/sequencelist.cpp

@@ -6,7 +6,7 @@
 // General
 
 #include "common.hpp"
-#include "aux.hpp"
+#include "vaux.hpp"
 #include "sequences.hpp"
 #include "sequencelist.hpp"
 

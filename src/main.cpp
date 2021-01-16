@@ -13,7 +13,7 @@ using namespace rapidxml;
 ////////////////////////////////////////////////////////////////////////////////////
 // Program parts
 
-#include "aux.hpp"
+#include "vaux.hpp"
 #include "config.hpp"
 #include "sequences.hpp"
 #include "sequencelist.hpp"

@@ -9,7 +9,7 @@
 #include "./lib/rapidxml-1.13/rapidxml.hpp"
 using namespace rapidxml;
 #include "config.hpp"
-#include "aux.hpp"
+#include "vaux.hpp"
 #include "motifs.hpp"
 #include "sequences.hpp"
 #include <unordered_map>

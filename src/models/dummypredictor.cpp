@@ -7,7 +7,7 @@
 
 #include "../common.hpp"
 #include "../lib/libsvm-3.17/svm.h"
-#include "../aux.hpp"
+#include "../vaux.hpp"
 #include "../config.hpp"
 #include "../validation.hpp"
 #include "../motifs.hpp"
