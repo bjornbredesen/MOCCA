@@ -295,11 +295,11 @@ int seqStreamFasta::read(int len,char*dest){
 				if(c==EOF){
 					*b=0;
 					return r;
-				}else if(c=='\n'){
+				}else if(c==0x0a || c==0x0d){
 					break;
 				}
 			}
-		}else if(c!='\n'){
+		}else if(c!=0x0a && c!=0x0d){
 			*(b++)=c;
 			r++;
 		}
@@ -363,7 +363,7 @@ seqStreamFastaBatchBlock*seqStreamFastaBatchBlock::load(FILE*_f){
 			b=&buf[ibuf];
 		}
 		c=(char)fgetc(_f);
-		if(c=='\n'||c==EOF){
+		if(c==0x0a||c==0x0d||c==EOF){
 			*b=0;
 			break;
 		}
@@ -393,7 +393,7 @@ int seqStreamFastaBatchBlock::read(int len,char*dest){
 				fseek(f,-1,SEEK_CUR);
 			}
 			break;
-		}else if(c!='\n'){
+		}else if(c!=0x0a && c!=0x0d){
 			*(b++)=c;
 			r++;
 		}
