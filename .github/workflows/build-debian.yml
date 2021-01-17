@@ -1,0 +1,43 @@
+name: Build (Debian)
+
+on: workflow_dispatch
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    
+    - uses: actions/checkout@v2
+      with:
+        ref: master
+
+    - name: Get latest CMake
+      uses: lukka/get-cmake@latest
+      
+    - name: Build package
+      run: |
+        debuild -b -uc -us
+      
+    - name: Install package
+      run: |
+        sudo apt install ../mocca_*.deb
+      
+    - name: Test
+      run: |
+        ${{ github.workspace }}/mocca -motif:XML '${{ github.workspace }}/tutorial/motifs2019.xml' -C:CPREdictor -train:FASTA '${{ github.workspace }}/tutorial/KahnPcG.fa' + full -train:FASTA '${{ github.workspace }}/tutorial/tCDS.fa' - full
+
+    - name: Store bundles
+      uses: actions/upload-artifact@v2
+      with:
+        name: mocca-windows
+        path: '${{ github.workspace }}/mocca'
+        retention-days: 2
+      
+#    - name: Build with CMake
+#      uses: lukka/run-cmake@main
+#      with:
+#        buildDirectory: '${{ github.workspace }}'
+#        cmakeBuildType: "Release"
+
+
+
