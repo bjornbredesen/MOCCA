@@ -24,7 +24,8 @@ jobs:
       
     - name: Install package
       run: |
-        sudo apt install ../mocca_*.deb
+        cp ../mocca_*.deb ${{ github.workspace }}/mocca.deb
+        sudo apt install ${{ github.workspace }}mocca.deb
       
     - name: Test
       run: |
@@ -34,6 +35,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: mocca-windows
-        path: '../mocca_*.deb'
+        path: '${{ github.workspace }}/mocca.deb'
         retention-days: 2
 
