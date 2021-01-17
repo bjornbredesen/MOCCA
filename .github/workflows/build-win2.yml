@@ -30,11 +30,13 @@ jobs:
       
     - name: Test
       run: |
-        Invoke-Expression '${{ github.workspace }}/Release/mocca.exe'
+        ${{ github.workspace }}/Release/mocca.exe -motif:XML '${{ github.workspace }}/tutorial/motifs2019.xml' -C:CPREdictor -train:FASTA '${{ github.workspace }}/tutorial/KahnPcG.fa' + full -train:FASTA '${{ github.workspace }}/tutorial/tCDS.fa' - full
 
     - name: Store bundles
       uses: actions/upload-artifact@v2
       with:
         name: mocca-windows
         path: '${{ github.workspace }}/Release/mocca.exe'
+
+#        Invoke-Expression '${{ github.workspace }}/Release/mocca.exe'
 
