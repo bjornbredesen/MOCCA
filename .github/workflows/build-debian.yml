@@ -16,7 +16,7 @@ jobs:
       
     - name: Install dependencies
       run: |
-        sudo apt install build-essential devscripts debhelper
+        sudo apt install build-essential devscripts debhelper docbook-to-man cmake
       
     - name: Build package
       run: |
