@@ -37,7 +37,7 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: mocca-windows
-        path: mocca.exe
+        path: '${{ github.workspace }}/Release/mocca.exe'
       
 #        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
 #    - name: Test
