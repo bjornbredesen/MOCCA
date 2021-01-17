@@ -27,7 +27,7 @@ jobs:
     - name: Store bundles
       uses: actions/upload-artifact@v2
       with:
-        name: mocca-windows
+        name: mocca-mac
         path: '${{ github.workspace }}/mocca'
         retention-days: 2
 
