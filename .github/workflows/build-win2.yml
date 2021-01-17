@@ -37,6 +37,7 @@ jobs:
       with:
         name: mocca-windows
         path: '${{ github.workspace }}/Release/mocca.exe'
+        retention-days: 2
 
 #        Invoke-Expression '${{ github.workspace }}/Release/mocca.exe'
 
