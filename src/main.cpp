@@ -325,10 +325,10 @@ cmdArg argumentTypes[] = {
 			std::string bgPath = params[0];
 			double oFreq = strtod((char*)params[1].c_str(), 0);
 			if(oFreq <= 0){
-				cout << m_error << "Desired motif occurrence frequency cannot be negative.\n";
+				cmdError("Desired motif occurrence frequency cannot be negative.");
 				return false;
 			}else if(oFreq >= 1000){
-				cout << m_error << "Desired motif occurrence frequency per kilobase cannot be greater than 1000.\n";
+				cmdError("Desired motif occurrence frequency per kilobase cannot be greater than 1000.");
 				return false;
 			}
 			if(!calibratePWMThresholdsIid(ml, bgPath, oFreq))
@@ -1844,7 +1844,7 @@ cmdArg argumentTypes[] = {
 			// 
 			cmdSection("Automated CRE machine learning");
 			if(trainseq->nseq||valseq->nseq||calseq->nseq){
-				cout << m_error << "No previous sequences can be defined for automated CRE machine learning.\n";
+				cmdError("No previous sequences can be defined for automated CRE machine learning.");
 			}
 			getSeqClassByName((char*)"+")->name = "CRE";
 			getSeqClassByName((char*)"-")->name = "Dummy CRE";
@@ -1859,7 +1859,7 @@ cmdArg argumentTypes[] = {
 				return false;
 			}
 			if(!inseq.ptr->nseq){
-				cout << m_error << "The FASTA file for automated learning contains no sequences.\n";
+				cmdError("The FASTA file for automated learning contains no sequences.");
 				return false;
 			}
 			// Randomly shuffle indices
@@ -1894,7 +1894,7 @@ cmdArg argumentTypes[] = {
 			meanLen /= inseq.ptr->nseq;
 			// Get genome size
 			if(!cfg->genomeFASTAPath.length()){
-				cout << m_error << "Genome FASTA file must be specified for automated learning.\n";
+				cmdError("Genome FASTA file must be specified for automated learning.");
 				return false;
 			}
 			autodelete<seqStreamFastaBatch> ssfb(seqStreamFastaBatch::load((char*)cfg->genomeFASTAPath.c_str()));
@@ -1978,7 +1978,7 @@ void print_help(){
 			printf(argFmtStrC, "", argType.helpLines[i].c_str());
 		}
 	}
-	cout << sepline;
+	cmdSepline();
 }
 
 /*
@@ -1987,9 +1987,10 @@ print_help
 */
 void print_licenses(){
 	cout << " Licenses:\n";
-	cout << sepline;
-	cout << t_bold("MOCCA") << "\n\n";
-	cout << "MIT License\n\
+	cmdSepline();
+	cmdBoldLine("MOCCA");
+	cout << "\n\
+MIT License\n\
 \n\
 Copyright (c) 2021 Bjørn André Bredesen\n\
 \n\
@@ -2010,9 +2011,9 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n\
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n\
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n\
 SOFTWARE.\n";
-	cout << sepline;
-	cout << t_bold("Dependency license: LibSVM") << "\n\
-\n\
+	cmdSepline();
+	cmdBoldLine("Dependency license: LibSVM");
+	cout << "\n\
 Copyright (c) 2000-2013 Chih-Chung Chang and Chih-Jen Lin\n\
 All rights reserved.\n\
 \n\
@@ -2043,8 +2044,9 @@ PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF\n\
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\n\
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n\
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n";
-	cout << sepline;
-	cout << t_bold("Dependency license: Ranger") << "\n\
+	cmdSepline();
+	cmdBoldLine("Dependency license: Ranger");
+	cout << "\n\
 MIT License\n\
 \n\
 Copyright (c) [2014-2018] [Marvin N. Wright]\n\
@@ -2054,9 +2056,9 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\
 \n\
 THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n";
-	cout << sepline;
-	cout << t_bold("Dependency license: RapidXML") << "\n\
-\n\
+	cmdSepline();
+	cmdBoldLine("Dependency license: RapidXML");
+	cout << "\n\
 Copyright (c) 2006, 2007 Marcin Kalicinski\n\
 \n\
 Permission is hereby granted, free of charge, to any person obtaining a copy \n\
@@ -2077,9 +2079,9 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, \n
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS \n\
 IN THE SOFTWARE.\n";
 	#ifdef USE_SHOGUN
-	cout << sepline;
-	cout << t_bold("Dependency license: Shogun") << "\n\
-\n\
+	cmdSepline();
+	cmdBoldLine("Dependency license: Shogun");
+	cout << "\n\
 Copyright (c) Shogun Machine Learning Toolbox developers <shogun-team@shogun-toolbox.org>\n\
 All rights reserved.\n\
 \n\
@@ -2109,7 +2111,7 @@ CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n\
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n\
 POSSIBILITY OF SUCH DAMAGE.\n";
 	#endif
-	cout << sepline;
+	cmdSepline();
 }
 
 /*
@@ -2133,7 +2135,9 @@ bool parse_arg(int _argc,char**argv,motifList*ml,featureSet*features,seqList*tra
 			auto cArgTypeF = argumentMap.find(cArg);
 			// Ensure argument type is familiar
 			if (cArgTypeF == argumentMap.end()) {
-				cout << m_error << "Invalid command-line argument \"" << cArg << "\". Aborting.\n";
+				ostringstream os;
+				os << "Invalid command-line argument \"" << cArg << "\". Aborting.";
+				cmdError(os.str());
 				return false;
 			}
 			// Skip if for different pass
@@ -2217,7 +2221,7 @@ runPipeline
 	Runs the main application pipeline.
 */
 bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqList*calseq,seqList*valseq){
-	cout << sepline;
+	cmdSepline();
 	
 	autodelete<sequenceClassifier>cls((sequenceClassifier*)0);
 	cls.ptr=constructClassifier(motifs,features,trainseq);
@@ -2272,7 +2276,7 @@ bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqLis
 			cls.ptr->predictGenomewideFASTA(cfg->genomeFASTAPath, cfg->predictGFFPath, cfg->predictWigPath);
 		}
 	}
-	cout << sepline;
+	cmdSepline();
 	return true;
 }
 
@@ -2287,7 +2291,9 @@ main
 */
 int main(int argc,char**argv){
 	timer mainTimer((char*)"Full run");
-	cout << sepline << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2021\n bjorn@bjornbredesen.no\n" << sepline;
+	cmdSepline();
+	cmdLogo();
+	cmdSepline();
 	
 	svm_set_print_string_function(&libsvm_print_null);
 	#ifdef WINDOWS

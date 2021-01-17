@@ -10,24 +10,24 @@
 ////////////////////////////////////////////////////////////////////////////////////
 // Console output
 
-// Some general output styling
-#define sepline "\033[35m-----------------------------------------------------------------\033[0m\n"
-#define t_success "\033[1;32mSuccess\033[0m"
-#define m_error "\r \033[1;24m!\033[0m \033[1;31mError\033[0m: "
-#define m_warning "\r \033[1;24m!\033[0m \033[1;32mWarning\033[0m: "
+//#define t_indent " \033[35m-\033[0m "
+#define t_indent "   "
 
-#define t_indent " \033[35m-\033[0m "
-#define t_star " \033[1;34m*\033[0m "
-#define t_bold(X) " \033[1;24m" << X << "\033[0m "
+//----------------------------------------------
 
+#define cmdBoldLine(X) cout << " \033[1;24m" << X << "\033[0m \n"
+
+#define cmdSepline() cout << "\033[35m-----------------------------------------------------------------\033[0m\n"
+
+#define cmdLogo() cout << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2021\n bjorn@bjornbredesen.no\n"
 
 #define cmdSection(txt) cout << "\033[1;4m" << txt << "\033[0m:\n"
 
-#define cmdError(errt) cout << m_error << errt << "\n"
+#define cmdError(errt) cout << "\r \033[1;24m!\033[0m \033[1;31mError\033[0m: " << errt << "\n"
 
-#define cmdWarning(warnt) cout << m_warning << warnt << "\n"
+#define cmdWarning(warnt) cout << "\r \033[1;24m!\033[0m \033[1;32mWarning\033[0m: " << warnt << "\n"
 
-#define cmdTaskComplete(compt) cmdTask::wipe();cout << t_star << "\033[1;24m" << compt << "\033[0m" << t_indent << "\033[1;32mComplete\033[0m\n"
+#define cmdTaskComplete(compt) cmdTask::wipe();cout << " \033[1;34m*\033[0m " << "\033[1;24m" << compt << "\033[0m" << t_indent << "\033[1;32mComplete\033[0m\n"
 
 #define outOfMemory() cmdError("Out of memory.")
 

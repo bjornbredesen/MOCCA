@@ -83,7 +83,9 @@ motifListMotif*motifList::addMotif(char*name,motifType type,void*data,int len){
 bool motifList::addMotifsFromXML(std::string path){
 	FILE*f=fopen(path.c_str(),"rb");
 	if(!f){
-		cout << m_error << "Could not open file \"" << path << "\".\n";
+		ostringstream os;
+		os << "Could not open file \"" << path << "\".";
+		cmdError(os.str());
 		return false;
 	}
 	fseek(f,0,SEEK_END);

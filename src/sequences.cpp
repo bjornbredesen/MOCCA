@@ -442,7 +442,9 @@ seqStreamFastaBatch*seqStreamFastaBatch::load(char*path){
 	}
 	r->f=fopen(path,"rb");
 	if(!r->f){
-		cout << m_error << "Could not open file \"" << path << "\" for reading.\n";
+		ostringstream os;
+		os << "Could not open file \"" << path << "\" for reading.";
+		cmdError(os.str());
 		delete r;
 		return 0;
 	}
