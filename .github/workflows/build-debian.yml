@@ -34,14 +34,6 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: mocca-windows
-        path: '${{ github.workspace }}/mocca'
+        path: '../mocca_*.deb'
         retention-days: 2
-      
-#    - name: Build with CMake
-#      uses: lukka/run-cmake@main
-#      with:
-#        buildDirectory: '${{ github.workspace }}'
-#        cmakeBuildType: "Release"
-
-
 
