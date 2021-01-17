@@ -2286,6 +2286,9 @@ int main(int argc,char**argv){
 	cout << sepline << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2021\n bjorn@bjornbredesen.no\n" << sepline;
 	
 	svm_set_print_string_function(&libsvm_print_null);
+	#ifdef WINDOWS
+	SetConsoleMode(GetStdHandle(STD_OUTPUT_HANDLE), ENABLE_VIRTUAL_TERMINAL_PROCESSING);
+	#endif
 	
 	config*cfg=getConfiguration();
 	{

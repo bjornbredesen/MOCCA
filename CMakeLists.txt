@@ -53,6 +53,10 @@ set(LIBS
     Threads::Threads
 )
 
+IF(WIN32)
+	add_definitions(-DWINDOWS)
+ENDIF(WIN32)
+
 OPTION(USE_SHOGUN "Use Shogun." OFF)
 IF(USE_SHOGUN)
 	set(SOURCES
