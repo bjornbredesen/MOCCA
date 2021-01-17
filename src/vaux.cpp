@@ -34,10 +34,13 @@ int winColorMap[] = { 8, 12, 10, 14, 9, 5, 11, 15 };
 void cmdColor(std::string text, int col) {
 	if (cmdColorsEnabled) {
 		#ifdef WINDOWS
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		GetConsoleScreenBufferInfo(hConsole, &csbi);
+		WORD oldAttr = csbi.wAttributes;
 		SetConsoleTextAttribute(hConsole, winColorMap[col]);
 		cout << text;
-		SetConsoleTextAttribute(hConsole, 0);
+		SetConsoleTextAttribute(hConsole, oldAttr);
 		#else
 		cout << "\033[0;24;" << int(col+30) << "m" << text << "\033[0m";
 		#endif
@@ -70,10 +73,13 @@ void cmdBoldUnderline(std::string text) {
 void cmdBoldColor(std::string text, int col) {
 	if (cmdColorsEnabled) {
 		#ifdef WINDOWS
+		CONSOLE_SCREEN_BUFFER_INFO csbi;
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		GetConsoleScreenBufferInfo(hConsole, &csbi);
+		WORD oldAttr = csbi.wAttributes;
 		SetConsoleTextAttribute(hConsole, winColorMap[col]);
 		cout << text;
-		SetConsoleTextAttribute(hConsole, 0);
+		SetConsoleTextAttribute(hConsole, oldAttr);
 		#else
 		cout << "\033[1;24;" << int(col+30) << "m" << text << "\033[0m";
 		#endif
