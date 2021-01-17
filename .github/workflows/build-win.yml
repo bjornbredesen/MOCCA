@@ -1,14 +1,41 @@
-name: Build - Windows
+name: Build (Windows)
 
 on: workflow_dispatch
 
 jobs:
   build:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+    runs-on: windows-latest
     steps:
+    
     - uses: actions/checkout@v2
+      with:
+        ref: master
 
+    - name: Get latest CMake
+      uses: lukka/get-cmake@latest
+      
+    - name: Run vcpkg
+      uses: lukka/run-vcpkg@v6
+      with:
+        vcpkgDirectory: '${{ github.workspace }}/vcpkg/'
+        vcpkgTriplet: ${{ matrix.triplet }}
+      
+    - name: Build with CMake
+      uses: lukka/run-cmake@main
+      with:
+        buildDirectory: '${{ github.workspace }}'
+        useVcpkgToolchainFile: true
+        cmakeGenerator: VS16Win64
+        cmakeBuildType: "Release"
+      
+    - name: Test
+      run: |
+        ${{ github.workspace }}/Release/mocca.exe -motif:XML '${{ github.workspace }}/tutorial/motifs2019.xml' -C:CPREdictor -train:FASTA '${{ github.workspace }}/tutorial/KahnPcG.fa' + full -train:FASTA '${{ github.workspace }}/tutorial/tCDS.fa' - full
+
+    - name: Store bundles
+      uses: actions/upload-artifact@v2
+      with:
+        name: mocca-windows
+        path: '${{ github.workspace }}/Release/mocca.exe'
+        retention-days: 2
 
