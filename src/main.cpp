@@ -10,6 +10,10 @@
 #include "./lib/libsvm-3.17/svm.h"
 using namespace rapidxml;
 
+#ifdef WINDOWS
+#include "Windows.h"
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////////
 // Program parts
 
