@@ -537,6 +537,9 @@ inline bool checkInterrupt() {
 #endif
 
 // Provide make_unique (not available in C++11)
+using std::make_unique;
+/*
+// XXX Removed in favour of C++14 implementation of make_unqiue
 namespace detail {
 
 template<class T> struct _Unique_if {
@@ -566,7 +569,7 @@ typename detail::_Unique_if<T>::_Unknown_bound make_unique(size_t n) {
 
 template<class T, class ... Args>
 typename detail::_Unique_if<T>::_Known_bound make_unique(Args&&...) = delete;
-
+*/
 }
 // namespace ranger
 
