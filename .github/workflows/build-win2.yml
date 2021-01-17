@@ -30,7 +30,7 @@ jobs:
       
     - name: Test
       run: |
-        '${{ github.workspace }}/Release/mocca.exe'
+        Invoke-Expression '${{ github.workspace }}/Release/mocca.exe'
 
     - name: Store bundles
       uses: actions/upload-artifact@v2
