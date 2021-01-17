@@ -161,7 +161,7 @@ public:
 class timer{
 private:
 	char*name;
-	timeval timerStart;
+	long long timerStart;
 public:
 	timer(char*n);
 	~timer();

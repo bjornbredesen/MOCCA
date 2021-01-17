@@ -146,14 +146,12 @@ void cmdTask::setLongT(long l,char*t){
 // Timing
 
 timer::timer(char*n){
-	gettimeofday(&timerStart,0);
+	timerStart = time(0);
 	name=n?n:(char*)"Unnamed timer";
 }
 
 timer::~timer(){
-	timeval end;
-	gettimeofday(&end,0);
-	int sec = int(end.tv_sec-timerStart.tv_sec);
+	int sec = time(0) - timerStart;
 	int min=int(sec)/60;
 	int hr=int(min)/60;
 	sec-=min*60;

@@ -2289,9 +2289,7 @@ int main(int argc,char**argv){
 	
 	config*cfg=getConfiguration();
 	{
-		timeval tv;
-		gettimeofday(&tv,0);
-		cfg->randSeed=(int)tv.tv_usec;
+		cfg->randSeed=time(NULL);
 		srand(cfg->randSeed);
 	}
 	initIUPACTbl();
