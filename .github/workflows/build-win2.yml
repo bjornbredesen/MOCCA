@@ -28,19 +28,13 @@ jobs:
         cmakeGenerator: VS16Win64
         cmakeBuildType: "Release"
       
-    - name: Check output
+    - name: Test
       run: |
-        ls
-        ls -R
+        '${{ github.workspace }}/Release/mocca.exe'
 
     - name: Store bundles
       uses: actions/upload-artifact@v2
       with:
         name: mocca-windows
         path: '${{ github.workspace }}/Release/mocca.exe'
-      
-#        cmakeListsOrSettingsJson: CMakeListsTxtAdvanced
-#    - name: Test
-#      run: |
-#        mocca.exe
 
