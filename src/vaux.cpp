@@ -24,6 +24,78 @@ char*cloneString(char*sstr){
 	return r;
 }
 
+////////////////////////////////////////////////////////////////////////////////////
+// Console output
+
+bool cmdColorsEnabled = true;
+
+int winColorMap[] = { 8, 12, 10, 14, 9, 5, 11, 15 };
+
+void cmdColor(std::string text, int col) {
+	if (cmdColorsEnabled) {
+		#ifdef WINDOWS
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, winColorMap[col]);
+		cout << text;
+		SetConsoleTextAttribute(hConsole, 0);
+		#else
+		cout << "\033[0;24;" << int(col+30) << "m" << text << "\033[0m";
+		#endif
+	} else
+		cout << text;
+}
+
+void cmdBold(std::string text) {
+	if (cmdColorsEnabled) {
+		#ifdef WINDOWS
+		cout << text;
+		#else
+		cout << "\033[1;24m" << text << "\033[0m";
+		#endif
+	} else
+		cout << text;
+}
+
+void cmdBoldUnderline(std::string text) {
+	if (cmdColorsEnabled) {
+		#ifdef WINDOWS
+		cout << text;
+		#else
+		cout << "\033[1;4m" << text << "\033[0m";
+		#endif
+	} else
+		cout << text;
+}
+
+void cmdBoldColor(std::string text, int col) {
+	if (cmdColorsEnabled) {
+		#ifdef WINDOWS
+		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleTextAttribute(hConsole, winColorMap[col]);
+		cout << text;
+		SetConsoleTextAttribute(hConsole, 0);
+		#else
+		cout << "\033[1;24;" << int(col+30) << "m" << text << "\033[0m";
+		#endif
+	} else
+		cout << text;
+}
+
+void cmdBoldLine(std::string text) {
+	if (cmdColorsEnabled) {
+		#ifdef WINDOWS
+		cout << text;
+		#else
+		cmdBold(text + std::string("\n"));
+		#endif
+	} else
+		cout << text;
+}
+
+void cmdSetColorsEnabled(bool state) {
+	cmdColorsEnabled = state;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Task
 
@@ -80,12 +152,14 @@ void cmdTask::refresh(){
 	cmdTaskI++;
 	if((cmdTaskI>>5)>=4)cmdTaskI=0;
 	// Write the status.
-	cout << "\r \033[0;34m" << cmdTaskC[(cmdTaskI>>5)&3] << "\033[0m \033[1;24m[\033[0m ";
+	cout << "\r ";
+	cmdColor(std::string(cmdTaskC[(cmdTaskI>>5)&3]), cmdColBlue);
+	cmdBold(" [ ");
 	cmdTask*t=cmdTasks;
 	while(t){
 		// Print name and status
 		if(t->name[0]){
-			cout << "\033[1;34m" << t->name << "\033[0m";
+			cmdColor(std::string(t->name), cmdColBlue);
 			if(t->text[0])cout << ": " << t->text;
 		}else if(t->text[0]){
 			cout << t->text;
@@ -93,7 +167,8 @@ void cmdTask::refresh(){
 		t=t->Next;
 		if(t)cout << " | ";
 	}
-	cout << " \033[1;24m]\033[0m" << flush;
+	cmdBold(" ]");
+	cout << flush;
 }
 
 /*
@@ -156,6 +231,8 @@ timer::~timer(){
 	int hr=int(min)/60;
 	sec-=min*60;
 	min-=hr*60;
-	printf(" > \033[1;24mTimer\033[0m(%s): %d:%02d:%02d\n", name, hr, min, sec);
+	cout << " > ";
+	cmdBold("Timer");
+	printf("(%s): %d:%02d:%02d\n", name, hr, min, sec);
 }
 

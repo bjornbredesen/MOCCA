@@ -10,10 +10,6 @@
 #include "./lib/libsvm-3.17/svm.h"
 using namespace rapidxml;
 
-#ifdef WINDOWS
-#include "Windows.h"
-#endif
-
 ////////////////////////////////////////////////////////////////////////////////////
 // Program parts
 
@@ -141,6 +137,22 @@ cmdArg argumentTypes[] = {
 		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
 			print_licenses();
 			return false;
+		}
+	},
+	{
+		// Argument
+		"--no-color",
+		// Pass
+		0,
+		// Parameters
+		0,
+		// Documentation
+		"--no-color",
+		{ "Disables color output." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cmdSetColorsEnabled(false);
+			return true;
 		}
 	},
 	{

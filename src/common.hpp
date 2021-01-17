@@ -23,4 +23,7 @@
 using namespace std;
 #include <vector>
 
+#ifdef WINDOWS
+#include "Windows.h"
+#endif
 

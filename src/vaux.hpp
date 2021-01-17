@@ -15,19 +15,36 @@
 
 //----------------------------------------------
 
-#define cmdBoldLine(X) cout << " \033[1;24m" << X << "\033[0m \n"
+void cmdSetColorsEnabled(bool state);
 
-#define cmdSepline() cout << "\033[35m-----------------------------------------------------------------\033[0m\n"
+#define cmdColGray 0
+#define cmdColRed 1
+#define cmdColGreen 2
+#define cmdColYellow 3
+#define cmdColBlue 4
+#define cmdColMag 5
+#define cmdColCyan 6
+#define cmdColWhite 7
 
-#define cmdLogo() cout << " \033[1;34mMOCCA\033[0m\n Copyright, Bjørn Bredesen, 2013-2021\n bjorn@bjornbredesen.no\n"
+void cmdColor(std::string text, int col);
+void cmdBold(std::string text);
+void cmdBoldUnderline(std::string text);
+void cmdBoldColor(std::string text, int col);
+void cmdBoldLine(std::string X);
 
-#define cmdSection(txt) cout << "\033[1;4m" << txt << "\033[0m:\n"
+//----------------------------------------------
 
-#define cmdError(errt) cout << "\r \033[1;24m!\033[0m \033[1;31mError\033[0m: " << errt << "\n"
+#define cmdSepline() cmdColor("-----------------------------------------------------------------\n", cmdColMag);
 
-#define cmdWarning(warnt) cout << "\r \033[1;24m!\033[0m \033[1;32mWarning\033[0m: " << warnt << "\n"
+#define cmdLogo() { cmdBoldColor(" MOCCA", cmdColBlue); cout << "\n Copyright, Bjørn Bredesen, 2013-2021\n bjorn@bjornbredesen.no\n"; }
 
-#define cmdTaskComplete(compt) cmdTask::wipe();cout << " \033[1;34m*\033[0m " << "\033[1;24m" << compt << "\033[0m" << t_indent << "\033[1;32mComplete\033[0m\n"
+#define cmdSection(txt) cmdBoldUnderline(txt + std::string("\n"))
+
+#define cmdError(errt) { cout << "\r "; cmdBold("! "); cmdBoldColor("Error", cmdColRed); cout << ": " << errt << "\n"; }
+
+#define cmdWarning(warnt) { cout << "\r "; cmdBold("! "); cmdBoldColor("Warning", cmdColGreen); cout << ": " << warnt << "\n"; }
+
+#define cmdTaskComplete(compt) { cmdTask::wipe(); cmdBoldColor(" * ", cmdColBlue); cmdBold(compt); cout << t_indent; cmdBoldColor("Complete", cmdColGreen); }
 
 #define outOfMemory() cmdError("Out of memory.")
 
