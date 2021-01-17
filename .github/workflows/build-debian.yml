@@ -14,6 +14,10 @@ jobs:
     - name: Get latest CMake
       uses: lukka/get-cmake@latest
       
+    - name: Install dependencies
+      run: |
+        sudo apt install build-essential devscripts debhelper
+      
     - name: Build package
       run: |
         debuild -b -uc -us
