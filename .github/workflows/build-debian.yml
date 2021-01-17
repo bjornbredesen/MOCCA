@@ -25,7 +25,7 @@ jobs:
     - name: Install package
       run: |
         cp ../mocca_*.deb ${{ github.workspace }}/mocca.deb
-        sudo apt install ${{ github.workspace }}mocca.deb
+        sudo apt install ${{ github.workspace }}/mocca.deb
       
     - name: Test
       run: |
