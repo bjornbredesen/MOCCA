@@ -26,10 +26,12 @@ jobs:
         buildDirectory: '${{ github.workspace }}'
         useVcpkgToolchainFile: true
         cmakeGenerator: VS16Win64
+        cmakeBuildType: "Release"
       
     - name: Check output
       run: |
         ls
+        ls -R
 
     - name: Store bundles
       uses: actions/upload-artifact@v2
