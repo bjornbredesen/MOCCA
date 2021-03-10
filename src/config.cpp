@@ -39,7 +39,7 @@ config _config = config {
 	true,
 	0.0,1.0,0.5,0.995,1.0,
 	0.0,
-	500, 8,
+	500, 0, 8,
 	//bool MOCCA_nOcc, MOCCA_GC, MOCCA_DNT;
 	false, false, false,
 	EPSILON_SVR,

@@ -67,7 +67,7 @@ public:
 	bool motifPairsCanOverlap;
 	double SVM_c0,SVM_C,SVM_nu,SVM_p,SVM_gamma;
 	double threshold;
-	int RF_nTrees, nThreads;
+	int RF_nTrees, RF_maxDepth, nThreads;
 	bool MOCCA_nOcc, MOCCA_GC, MOCCA_DNT;
 	int svmtype;
 	weightMode wmMode;

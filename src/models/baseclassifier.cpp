@@ -1016,12 +1016,11 @@ bool RFClassifier::do_train(){
 		ranger::PredictionType::RESPONSE, //PredictionType prediction_type,
 		ranger::DEFAULT_NUM_RANDOM_SPLITS, //uint num_random_splits,
 		false, //bool order_snps,
-		ranger::DEFAULT_MAXDEPTH, //uint max_depth,
+		getConfiguration()->RF_maxDepth, //uint max_depth,
 		regfac,//const std::vector<double>& regularization_factor,
 		false //bool regularization_usedepth
 	);
 	rf.ptr->train();
-	
 	
 	return true;
 }

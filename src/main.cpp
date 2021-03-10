@@ -1241,6 +1241,22 @@ cmdArg argumentTypes[] = {
 	},
 	{
 		// Argument
+		"-RF:maxdepth",
+		// Pass
+		1,
+		// Parameters
+		1,
+		// Documentation
+		"-RF:maxdepth VALUE",
+		{ "Sets the maximum depth of trees for random forests." },
+		// Code
+		[](std::vector<std::string> params, config*cfg, motifList*ml, featureSet*features, seqList*trainseq, seqList*calseq, seqList*valseq) -> bool {
+			cfg->RF_maxDepth=strtod(params[0].c_str(), 0);
+			return true;
+		}
+	},
+	{
+		// Argument
 		"-threshold",
 		// Pass
 		1,
