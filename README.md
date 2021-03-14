@@ -2,7 +2,7 @@
 ![alt text](markdown/mocca.png "")
 
 # MOCCA
-Copyright Bjørn Bredesen, 2011-2019
+Copyright Bjørn Bredesen, 2011-2021
 
 
 -------------------------------------------------
@@ -105,7 +105,7 @@ If you use MOCCA in published research, MOCCA must be cited. An article for MOCC
 
 MIT License
 
-Copyright (c) 2019 Bjørn André Bredesen
+Copyright (c) 2021 Bjørn André Bredesen
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
