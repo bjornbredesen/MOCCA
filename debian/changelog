@@ -1,3 +1,9 @@
+mocca (1.4.7-0ubuntu1) xenial; urgency=medium
+
+  * Added configuration of decision tree depth.
+
+ -- Bjørn Bredesen <bjorn@bjornbredesen.no>  Sun, 14 Mar 2021 21:17:38 +0100
+
 mocca (1.4.6-0ubuntu1) xenial; urgency=medium
 
   * Changed requirement to more recent version of CMake and Ubuntu, in order
