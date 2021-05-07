@@ -17,6 +17,7 @@ In addition, MOCCA implements support for training log-odds models and classical
 MOCCA includes functionality for the generation of negative data, threshold calibration and genome-wide prediction, and also an automated mode that requires only that the user specifies positive sequences, motifs and a genome.
 
 #### References
+ * Bredesen *et al.* 2021: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04143-2
  * Bredesen *et al.* 2019: https://academic.oup.com/nar/article/47/15/7781/5538007
  * Ringrose *et al.* 2003: https://www.sciencedirect.com/science/article/pii/S153458070300337X
 
@@ -96,7 +97,7 @@ See the `tutorial/` folder and `mocca --help` for more information.
 -------------------------------------------------
 
 ## Citing
-If you use MOCCA in published research, MOCCA must be cited. An article for MOCCA is in the process of being submitted for peer review. Please check back for an updated citation policy.
+If you use MOCCA in published research, please cite: https://bmcbioinformatics.biomedcentral.com/articles/10.1186/s12859-021-04143-2. If you use SVM-MOCCA, for the method, please additionally cite: https://academic.oup.com/nar/article/47/15/7781/5538007.
 
 
 -------------------------------------------------
