@@ -230,7 +230,7 @@ bool featureSet::skipUnusedMotifs(motifList*ml){
 	m=ml->motifs;
 	for(int l=0;l<ml->nmotifs;l++,m++)
 		if(m->skip)nskip++;
-	cout << t_indent << "Skipped motifs: " << nskip << "/" << ml->nmotifs << "\n";
+	cout << t_indent << "Skipped motifs: " << nskip << "/" << ml->nmotifs << cmdNewline;
 	return true;
 }
 
@@ -254,7 +254,7 @@ void featureSet::printInfo(){
 			case featureType_GC:break;
 			case featureType_nPair2D:cout << "(" << f->da << ", " << f->db << ", " << (f->icf?"Y-axis":"X-axis") << ")";break;
 		}
-		cout << "\n";
+		cout << cmdNewline;
 	}
 }
 
@@ -263,12 +263,12 @@ void featureSet::printInfoI(motifList*ml){
 		return;
 	}
 	cmdSection("Instantiated features");
-	cout << t_indent << "# instantiated features: " << nifeatures << "\n";
+	cout << t_indent << "# instantiated features: " << nifeatures << cmdNewline;
 	featureSetInstFeature*f=ifeatures;
 	for(int l=0;l<nifeatures;l++,f++){
 		cout << t_indent;
 		printInstFeatureName(f,ml);
-		cout << "\n";
+		cout << cmdNewline;
 	}
 }
 
@@ -308,7 +308,7 @@ std::vector<std::string> featureSet::getInstFeatureNames(motifList*ml){
 	for(int l=0;l<nifeatures;l++,f++){
 		/*cout << t_indent;
 		printInstFeatureName(f,ml);
-		cout << "\n";*/
+		cout << cmdNewline;*/
 		std::stringstream cname;
 		int cardl=featureCardinalityL[(int)featureInfo[(int)f->fsf->f].cardinality];
 		cname << featureInfo[(int)f->fsf->f].name;

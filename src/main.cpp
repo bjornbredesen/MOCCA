@@ -10,6 +10,13 @@
 #include "./lib/libsvm-3.17/svm.h"
 using namespace rapidxml;
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten/emscripten.h>
+EM_JS(void, MOCCAExited, (int x), {
+	MOCCAExitedJS(x);
+});
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////////
 // Program parts
 
@@ -62,9 +69,9 @@ void printRegisteredFiles(){
 	cmdSection("Files");
 	if(fileList.size() > 0){
 		for(auto& f: fileList)
-			cout << t_indent << f.name << t_indent << f.path << "\n";
+			cout << t_indent << f.name << t_indent << f.path << cmdNewline;
 	}else{
-		cout << t_indent << "None\n";
+		cout << t_indent << "None" << cmdNewline;
 	}
 }
 
@@ -1918,7 +1925,7 @@ cmdArg argumentTypes[] = {
 			int meanLen = 0;
 			for(int i=0; i<inseq.ptr->nseq; i++)
 				meanLen += inseq.ptr->seq[i].bufs;
-			cout << "Input sequences: " << params[0].c_str() << " (" << inseq.ptr->nseq << " sequences; " << meanLen << " bp)\n";
+			cout << "Input sequences: " << params[0].c_str() << " (" << inseq.ptr->nseq << " sequences; " << meanLen << " bp)" << cmdNewline;
 			meanLen /= inseq.ptr->nseq;
 			// Get genome size
 			if(!cfg->genomeFASTAPath.length()){
@@ -1933,9 +1940,9 @@ cmdArg argumentTypes[] = {
 			for(seqStreamFastaBatchBlock*ssfbblk;(ssfbblk=ssfb.ptr->getBlock());){
 				genomeSize+=ssfbblk->getLength();
 			}
-			cout << "Input genome: " << cfg->genomeFASTAPath << " (" << genomeSize << " bp)\n";
+			cout << "Input genome: " << cfg->genomeFASTAPath << " (" << genomeSize << " bp)" << cmdNewline;
 			// For SVM-MOCCA classifier, if no features were specified, set to standard
-			cout << "Background model order: " << cfg->bgOrder << "\n";
+			cout << "Background model order: " << cfg->bgOrder << cmdNewline;
 			if(cfg->classifier == cSVMMOCCA || cfg->classifier == cRFMOCCA){
 				if(!( cfg->MOCCA_nOcc | cfg->MOCCA_DNT | cfg->MOCCA_GC )){
 					cfg->MOCCA_nOcc = cfg->MOCCA_DNT = true;
@@ -1974,9 +1981,9 @@ cmdArg argumentTypes[] = {
 					return false;
 				}
 			}
-			cout << "Training sequences: " << trainseq->nseq << "\n";
-			cout << "Validation sequences: " << valseq->nseq << "\n";
-			cout << "Calibration sequences: " << calseq->nseq << "\n";
+			cout << "Training sequences: " << trainseq->nseq << cmdNewline;
+			cout << "Validation sequences: " << valseq->nseq << cmdNewline;
+			cout << "Calibration sequences: " << calseq->nseq << cmdNewline;
 			// If no threshold precision was set, initialize to standard (80%)
 			if(cfg->wantPrecision<=0.0)
 				cfg->wantPrecision=0.8;
@@ -1997,7 +2004,7 @@ print_help
 	Outputs help message.
 */
 void print_help(){
-	cout << " Usage:\n";
+	cout << " Usage:" << cmdNewline;
 	char argFmtStr[] = " %35s - %s\n";
 	char argFmtStrC[] = " %35s   %s\n";
 	for(auto argType: argumentTypes) {
@@ -2014,7 +2021,7 @@ print_help
 	Outputs license information.
 */
 void print_licenses(){
-	cout << " Licenses:\n";
+	cout << " Licenses:" << cmdNewline;
 	cmdSepline();
 	cmdBoldLine("MOCCA");
 	cout << "\n\
@@ -2038,7 +2045,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n\
 AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n\
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n\
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n\
-SOFTWARE.\n";
+SOFTWARE." << cmdNewline;
 	cmdSepline();
 	cmdBoldLine("Dependency license: LibSVM");
 	cout << "\n\
@@ -2071,7 +2078,7 @@ PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR\n\
 PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF\n\
 LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING\n\
 NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS\n\
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.\n";
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE." << cmdNewline;
 	cmdSepline();
 	cmdBoldLine("Dependency license: Ranger");
 	cout << "\n\
@@ -2083,7 +2090,7 @@ Permission is hereby granted, free of charge, to any person obtaining a copy of 
 \n\
 The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.\n\
 \n\
-THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.\n";
+THE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE." << cmdNewline;
 	cmdSepline();
 	cmdBoldLine("Dependency license: RapidXML");
 	cout << "\n\
@@ -2105,7 +2112,7 @@ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL \n\
 THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER \n\
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, \n\
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS \n\
-IN THE SOFTWARE.\n";
+IN THE SOFTWARE." << cmdNewline;
 	#ifdef USE_SHOGUN
 	cmdSepline();
 	cmdBoldLine("Dependency license: Shogun");
@@ -2137,7 +2144,7 @@ SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS\n\
 INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN\n\
 CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)\n\
 ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE\n\
-POSSIBILITY OF SUCH DAMAGE.\n";
+POSSIBILITY OF SUCH DAMAGE." << cmdNewline;
 	#endif
 	cmdSepline();
 }
@@ -2274,7 +2281,7 @@ bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqLis
 			autofree<validationPair>vp((validationPair*)0);
 			int nvp=0;
 			if(!cls.ptr->getValidationTable(trainseq,vp.ptr,nvp))return false;
-			cout << t_indent << "Training set\n";
+			cout << t_indent << "Training set" << cmdNewline;
 			printValidationMeasures(vp,nvp,cls.ptr->threshold);
 		}
 		
@@ -2282,7 +2289,7 @@ bool runPipeline(motifList*&motifs,featureSet*&features,seqList*&trainseq,seqLis
 			autofree<validationPair>vp((validationPair*)0);
 			int nvp=0;
 			if(!cls.ptr->getValidationTable(valseq,vp.ptr,nvp))return false;
-			cout << t_indent << "Validation set\n";
+			cout << t_indent << "Validation set" << cmdNewline;
 			if(cfg->validate)printValidationMeasures(vp,nvp,cls.ptr->threshold);
 			if(cfg->outSCVal.length() > 0)if(!saveVPairTable(cfg->outSCVal, vp.ptr, nvp))return false;
 		}
@@ -2373,6 +2380,9 @@ int main(int argc,char**argv){
 	if(trainseq)delete trainseq;
 	if(valseq)delete valseq;
 	if(calseq)delete calseq;
+	#ifdef __EMSCRIPTEN__
+	MOCCAExited(err?-1:0);
+	#endif
 	return err?-1:0;
 }
 

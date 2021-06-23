@@ -86,7 +86,7 @@ double SEQSVM::do_applyWindow(char*buf,long long pos,int bufs){
 }
 
 bool SEQSVM::printInfo(){
-	cout << t_indent << "SEQSVM classifier\n";
+	cout << t_indent << "SEQSVM classifier" << cmdNewline;
 	classifier.ptr->printInfo((char*)"SVM");
 	return true;
 }
@@ -106,7 +106,7 @@ bool SEQSVM::exportAnalysisData(string path){
 	}
 	fclose(f);
 	cout << "Saved classifier analysis data to \"" << path << "\"\n";*/
-	cout << "Model analysis export not yet supported for SEQSVM";
+	cout << "Model analysis export not yet supported for SEQSVM" << cmdNewline;
 	return false;
 }
 

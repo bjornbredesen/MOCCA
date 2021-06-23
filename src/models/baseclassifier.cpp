@@ -52,7 +52,7 @@ baseClassifier::baseClassifier(int nf){
 baseClassifierSmp*baseClassifier::addTrain(double*v,int vl,seqClass*c){
 	if(vl!=nFeatures){
 		cmdError("Training vector of incorrect size.");
-		cout << t_indent << vl << " != " << nFeatures << "\n";
+		cout << t_indent << vl << " != " << nFeatures << cmdNewline;
 		return 0;
 	}
 	baseClassifierSmp*t = baseClassifierSmp::create(v,vl,c);
@@ -209,15 +209,15 @@ double logoddsClassifier::do_apply(double*vec){
 }
 
 void logoddsClassifier::printInfo(char*header){
-	cout << t_indent << header << "\n";
-	cout << t_indent << t_indent << "Weights:\n";
+	cout << t_indent << header << cmdNewline;
+	cout << t_indent << t_indent << "Weights:" << cmdNewline;
 	if(featureNames.size() == (unsigned int)nFeatures){
 		for(int i=0;i<nFeatures;i++){
-			cout << t_indent << t_indent << t_indent << featureNames[i] << ": " << weights[i] << "\n";
+			cout << t_indent << t_indent << t_indent << featureNames[i] << ": " << weights[i] << cmdNewline;
 		}
 	}else{
 		for(int i=0;i<nFeatures;i++){
-			cout << t_indent << t_indent << t_indent << weights[i] << "\n";
+			cout << t_indent << t_indent << t_indent << weights[i] << cmdNewline;
 		}
 	}
 }
@@ -532,39 +532,39 @@ double fastSVMClassifier::do_apply(double*fv){
 
 void fastSVMClassifier::printInfo(char*header){
 	if(name.length() > 0){
-		cout << t_indent << header << " - " << name << "\n";
+		cout << t_indent << header << " - " << name << cmdNewline;
 	}else{
-		cout << t_indent << header << "\n";
+		cout << t_indent << header << cmdNewline;
 	}
 	config*cfg=getConfiguration();
-	cout << t_indent << t_indent << "Kernel: " << getKernelName(cfg->kernel) << "\n";
+	cout << t_indent << t_indent << "Kernel: " << getKernelName(cfg->kernel) << cmdNewline;
 	cout << t_indent << t_indent << "Type: ";
 	switch(svmparam.svm_type){
-	case C_SVC: cout << "C_SVC\n"; break;
-	case NU_SVC: cout << "NU_SVC\n"; break;
-	case ONE_CLASS: cout << "ONE_CLASS\n"; break;
-	case EPSILON_SVR: cout << "EPSILON_SVR\n"; break;
-	case NU_SVR: cout << "NU_SVR\n"; break;
-	default: cout << "Invalid\n"; break;
+	case C_SVC: cout << "C_SVC" << cmdNewline; break;
+	case NU_SVC: cout << "NU_SVC" << cmdNewline; break;
+	case ONE_CLASS: cout << "ONE_CLASS" << cmdNewline; break;
+	case EPSILON_SVR: cout << "EPSILON_SVR" << cmdNewline; break;
+	case NU_SVR: cout << "NU_SVR" << cmdNewline; break;
+	default: cout << "Invalid" << cmdNewline; break;
 	}
 	if(svmparam.svm_type==C_SVC||svmparam.svm_type==EPSILON_SVR){
-		cout << t_indent << t_indent << "C: " << cfg->SVM_C << "\n";
+		cout << t_indent << t_indent << "C: " << cfg->SVM_C << cmdNewline;
 	}
 	if(svmparam.svm_type==NU_SVC||svmparam.svm_type==NU_SVR){
-		cout << t_indent << t_indent << "nu: " << cfg->SVM_nu << "\n";
+		cout << t_indent << t_indent << "nu: " << cfg->SVM_nu << cmdNewline;
 	}
 	if(cfg->kernel!=kLinear){
-		cout << t_indent << t_indent << "gamma: " << cfg->SVM_gamma << "\n";
-		cout << t_indent << t_indent << "c0: " << cfg->SVM_c0 << "\n";
+		cout << t_indent << t_indent << "gamma: " << cfg->SVM_gamma << cmdNewline;
+		cout << t_indent << t_indent << "c0: " << cfg->SVM_c0 << cmdNewline;
 	}
 	if(svmparam.svm_type==EPSILON_SVR){
-		cout << t_indent << t_indent << "p: " << cfg->SVM_p << "\n";
+		cout << t_indent << t_indent << "p: " << cfg->SVM_p << cmdNewline;
 	}
-	cout << t_indent << t_indent << "# SV: " << svmmdl->l << "\n";
+	cout << t_indent << t_indent << "# SV: " << svmmdl->l << cmdNewline;
 	
 	if(svmparam.kernel_type == LINEAR){
 		
-		cout << t_indent << t_indent << "Model weights (linear SVM)\n";
+		cout << t_indent << t_indent << "Model weights (linear SVM)" << cmdNewline;
 		double modelBias = 0.0;
 		for(int l=0;l<nFeatures;l++){
 			double range = vMax[l] - vMin[l];
@@ -573,19 +573,19 @@ void fastSVMClassifier::printInfo(char*header){
 			modelBias -= (vMin[l] * s + 1.0) * SVcoef[l];
 		}
 		modelBias -= svmmdl->rho[0];
-		cout << t_indent << t_indent << t_indent << "Model bias: " << modelBias << "\n";
+		cout << t_indent << t_indent << t_indent << "Model bias: " << modelBias << cmdNewline;
 		for(int l=0;l<nFeatures;l++){
 			double range = vMax[l] - vMin[l];
 			double s = 0;
 			if(range != 0.0) s = 2.0 / range;
 			// Show coefficient
 			double weight = s * SVcoef[l];
-			cout << t_indent << t_indent << t_indent << "Feature weight - " << featureNames[l] << ": " << weight << "\n";
+			cout << t_indent << t_indent << t_indent << "Feature weight - " << featureNames[l] << ": " << weight << cmdNewline;
 		}
 		
 	}else if(svmparam.kernel_type == POLY && svmparam.degree == 2 && svmparam.coef0 == 0.0){
 		
-		cout << t_indent << t_indent << "Model weights (quadratic SVM)\n";
+		cout << t_indent << t_indent << "Model weights (quadratic SVM)" << cmdNewline;
 		
 		double gamma = svmparam.gamma;
 		
@@ -607,7 +607,7 @@ void fastSVMClassifier::printInfo(char*header){
 					w_ij += gamma * gamma * c * ( (2.0*v_i)/(beta_i - alpha_i) ) * ( (2.0*v_j)/(beta_j - alpha_j) );
 					//
 				}
-				cout << t_indent << t_indent << t_indent << "Feature pair weight - " << featureNames[i] << " / " << featureNames[j] << ": " << w_ij << "\n";
+				cout << t_indent << t_indent << t_indent << "Feature pair weight - " << featureNames[i] << " / " << featureNames[j] << ": " << w_ij << cmdNewline;
 			}
 		}
 		
@@ -631,7 +631,7 @@ void fastSVMClassifier::printInfo(char*header){
 				}
 			}
 			//
-			cout << t_indent << t_indent << t_indent << "Single feature weight - " << featureNames[i] << ": " << w_i << "\n";
+			cout << t_indent << t_indent << t_indent << "Single feature weight - " << featureNames[i] << ": " << w_i << cmdNewline;
 		}
 		
 		// Bias
@@ -650,7 +650,7 @@ void fastSVMClassifier::printInfo(char*header){
 			modelBias += gamma * gamma * c * Q * Q;
 		}
 		modelBias -= svmmdl->rho[0];
-		cout << t_indent << t_indent << t_indent << "Model bias: " << modelBias << "\n";
+		cout << t_indent << t_indent << t_indent << "Model bias: " << modelBias << cmdNewline;
 		
 	}
 
@@ -831,7 +831,7 @@ bool MultiClassSVM::addTrain(double*v,int vl,seqClass*c,double cE){
 	}
 	if(vl!=nFeatures){
 		cmdError("Training vector of incorrect size.");
-		cout << t_indent << vl << " != " << nFeatures << "\n";
+		cout << t_indent << vl << " != " << nFeatures << cmdNewline;
 		return false;
 	}
 	baseClassifierSmp*t = baseClassifierSmp::create(v,vl,c);
@@ -931,13 +931,13 @@ seqClass*MultiClassSVM::apply(double*vec,int vecl){
 
 void MultiClassSVM::printInfo(char*header){
 	if(name.length() > 0){
-		cout << t_indent << header << " - " << name << "\n";
+		cout << t_indent << header << " - " << name << cmdNewline;
 	}else{
-		cout << t_indent << header << "\n";
+		cout << t_indent << header << cmdNewline;
 	}
-	cout << t_indent << t_indent << "Training examples: " << (trainingExamples.v.size()) << "\n";
-	cout << t_indent << t_indent << "Classes: " << classes.size() << "\n";
-	cout << t_indent << t_indent << "Class borders: " << borders.size() << "\n";
+	cout << t_indent << t_indent << "Training examples: " << (trainingExamples.v.size()) << cmdNewline;
+	cout << t_indent << t_indent << "Classes: " << classes.size() << cmdNewline;
+	cout << t_indent << t_indent << "Class borders: " << borders.size() << cmdNewline;
 	for(auto&p:borders){
 		p.classifier->printInfo((char*)"Boundary");
 	}
@@ -1030,7 +1030,7 @@ double RFClassifier::do_apply(double*vec){
 }
 
 void RFClassifier::printInfo(char*header){
-	cout << t_indent << header << "\n";
+	cout << t_indent << header << cmdNewline;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////
@@ -1083,7 +1083,7 @@ double LDAClassifier::do_apply(double*vec){
 }
 
 void LDAClassifier::printInfo(char*header){
-	cout << t_indent << header << "\n";
+	cout << t_indent << header << cmdNewline;
 }
 #endif
 
@@ -1139,7 +1139,7 @@ double PerceptronClassifier::do_apply(double*vec){
 }
 
 void PerceptronClassifier::printInfo(char*header){
-	cout << t_indent << header << "\n";
+	cout << t_indent << header << cmdNewline;
 }
 #endif
 

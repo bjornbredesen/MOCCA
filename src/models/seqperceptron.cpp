@@ -85,13 +85,13 @@ double SEQPerceptron::do_applyWindow(char*buf,long long pos,int bufs){
 }
 
 bool SEQPerceptron::printInfo(){
-	cout << t_indent << "SEQPerceptron classifier\n";
-	classifier.ptr->printInfo((char*)"Random Forest");
+	cout << t_indent << "SEQPerceptron classifier" << cmdNewline;
+	classifier.ptr->printInfo((char*)"Perceptron");
 	return true;
 }
 
 bool SEQPerceptron::exportAnalysisData(string path){
-	cout << "Model analysis export not yet supported for SEQPerceptron";
+	cout << "Model analysis export not yet supported for SEQPerceptron" << cmdNewline;
 	return false;
 }
 

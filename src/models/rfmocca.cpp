@@ -216,8 +216,8 @@ bool RFMOCCA::flush(){
 }
 
 bool RFMOCCA::printInfo(){
-	cout << t_indent << "RF-MOCCA\n";
-	cout << t_indent << "Trained?: " << (trained?"Yes":"No") << "\n";
+	cout << t_indent << "RF-MOCCA" << cmdNewline;
+	cout << t_indent << "Trained?: " << (trained?"Yes":"No") << cmdNewline;
 	// Uncomment to always display model analysis
 	//for(int l=0;l<motifs->nmotifs;l++){
 	//	subcls[l]->printInfo();
@@ -236,7 +236,7 @@ bool RFMOCCA::exportAnalysisData(string path){
 	if(!classifier.ptr->exportAnalysisData(f, (char*)"Log-odds", (char*)" - "))
 		return false;
 	fclose(f);
-	cout << "Saved classifier analysis data to \"" << path << "\"\n";
+	cout << "Saved classifier analysis data to \"" << path << "\"" << cmdNewline;
 	return true;
 }
 

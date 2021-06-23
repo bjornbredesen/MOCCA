@@ -132,7 +132,7 @@ double CPREdictor::do_applyWindow(char*buf,long long pos,int bufs){
 }
 
 bool CPREdictor::printInfo(){
-	cout << t_indent << "CPREdictor classifier\n";
+	cout << t_indent << "CPREdictor classifier" << cmdNewline;
 	classifier.ptr->printInfo((char*)"Log-odds");
 	return true;
 }
@@ -150,7 +150,7 @@ bool CPREdictor::exportAnalysisData(string path){
 		}
 	}
 	fclose(f);
-	cout << "Saved classifier analysis data to \"" << path << "\"\n";
+	cout << "Saved classifier analysis data to \"" << path << "\"" << cmdNewline;
 	return false;
 }
 

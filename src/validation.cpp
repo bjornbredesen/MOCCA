@@ -95,7 +95,7 @@ bool printValidationMeasures(validationPair*vp,int nvp,double threshold){
 		cmdError("Invalid validation set.");
 		return false;
 	}
-	cout << t_indent << t_indent << "Validation measures:\n";
+	cout << t_indent << t_indent << "Validation measures:" << cmdNewline;
 	int TP=0,FP=0,TN=0,FN=0;
 	for(int l=0;l<nvp;l++){
 		bool pcls=vp[l].score>=threshold;
@@ -107,16 +107,16 @@ bool printValidationMeasures(validationPair*vp,int nvp,double threshold){
 	}
 	double ACC=double(TP+TN)/double(TP+TN+FP+FN);
 	double PPV=double(TP)/double(TP+FP);
-	cout << t_indent << t_indent << t_indent << "TP = " << TP << t_indent << "TN = " << TN << "\n";
-	cout << t_indent << t_indent << t_indent << "FP = " << FP << t_indent << "FN = " << FN << "\n";
-	cout << t_indent << t_indent << t_indent << "Accuracy = " << (ACC*100.0) << "%\n";
-	cout << t_indent << t_indent << t_indent << "PPV = " << (PPV*100.0) << "%\n";
-	cout << t_indent << t_indent << t_indent << "ROC AUC(0.1) = " << getROCAUCxVP(vp,nvp,0.1) << "\n";
-	cout << t_indent << t_indent << t_indent << "ROC AUC(0.5) = " << getROCAUCxVP(vp,nvp,0.5) << "\n";
-	cout << t_indent << t_indent << t_indent << "ROC AUC(1.0) = " << getROCAUCxVP(vp,nvp,1.0) << "\n";
-	cout << t_indent << t_indent << t_indent << "PRC AUC(0.1) = " << getPRCAUCxVP(vp,nvp,0.1) << "\n";
-	cout << t_indent << t_indent << t_indent << "PRC AUC(0.5) = " << getPRCAUCxVP(vp,nvp,0.5) << "\n";
-	cout << t_indent << t_indent << t_indent << "PRC AUC(1.0) = " << getPRCAUCxVP(vp,nvp,1.0) << "\n";
+	cout << t_indent << t_indent << t_indent << "TP = " << TP << t_indent << "TN = " << TN << cmdNewline;
+	cout << t_indent << t_indent << t_indent << "FP = " << FP << t_indent << "FN = " << FN << cmdNewline;
+	cout << t_indent << t_indent << t_indent << "Accuracy = " << (ACC*100.0) << "%" << cmdNewline;
+	cout << t_indent << t_indent << t_indent << "PPV = " << (PPV*100.0) << "%" << cmdNewline;
+	cout << t_indent << t_indent << t_indent << "ROC AUC(0.1) = " << getROCAUCxVP(vp,nvp,0.1) << cmdNewline;
+	cout << t_indent << t_indent << t_indent << "ROC AUC(0.5) = " << getROCAUCxVP(vp,nvp,0.5) << cmdNewline;
+	cout << t_indent << t_indent << t_indent << "ROC AUC(1.0) = " << getROCAUCxVP(vp,nvp,1.0) << cmdNewline;
+	cout << t_indent << t_indent << t_indent << "PRC AUC(0.1) = " << getPRCAUCxVP(vp,nvp,0.1) << cmdNewline;
+	cout << t_indent << t_indent << t_indent << "PRC AUC(0.5) = " << getPRCAUCxVP(vp,nvp,0.5) << cmdNewline;
+	cout << t_indent << t_indent << t_indent << "PRC AUC(1.0) = " << getPRCAUCxVP(vp,nvp,1.0) << cmdNewline;
 	return true;
 }
 

@@ -85,13 +85,13 @@ double SEQLDA::do_applyWindow(char*buf,long long pos,int bufs){
 }
 
 bool SEQLDA::printInfo(){
-	cout << t_indent << "SEQLDA classifier\n";
-	classifier.ptr->printInfo((char*)"Random Forest");
+	cout << t_indent << "SEQLDA classifier" << cmdNewline;
+	classifier.ptr->printInfo((char*)"LDA");
 	return true;
 }
 
 bool SEQLDA::exportAnalysisData(string path){
-	cout << "Model analysis export not yet supported for SEQLDA";
+	cout << "Model analysis export not yet supported for SEQLDA" << cmdNewline;
 	return false;
 }
 

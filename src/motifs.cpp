@@ -344,19 +344,19 @@ void motifList::printInfo(){
 		cout << t_indent << m->name;
 		switch(m->type){
 			case motifType_IUPAC:
-				cout << " (IUPAC)\n";
+				cout << " (IUPAC)" << cmdNewline;
 				if(!m->data){
-					cout << t_indent << t_indent << "Corrupted\n";
+					cout << t_indent << t_indent << "Corrupted" << cmdNewline;
 				}else{
 					IUPACMotif*d=(IUPACMotif*)m->data;
-					cout << t_indent << t_indent << "Sequence: \"" << d->seq << "\"\n";
-					cout << t_indent << t_indent << "# mismatches: " << d->nmis << "\n";
+					cout << t_indent << t_indent << "Sequence: \"" << d->seq << "\"" << cmdNewline;
+					cout << t_indent << t_indent << "# mismatches: " << d->nmis << cmdNewline;
 				}
 				break;
 			case motifType_PWM:
-				cout << " (PWM)\n";
+				cout << " (PWM)" << cmdNewline;
 				if(!m->data){
-					cout << t_indent << t_indent << "Corrupted\n";
+					cout << t_indent << t_indent << "Corrupted" << cmdNewline;
 				}else{
 					PWMMotif*d=(PWMMotif*)m->data;
 					
@@ -364,26 +364,26 @@ void motifList::printInfo(){
 					
 					cout << t_indent << t_indent << "A: ";
 					for(int l=0; l<d->width; l++)ss << std::fixed << std::setprecision(2) << std::setw(8) << d->tbl[l + (d->width*PWM_iA)];
-					cout << ss.str() << "\n";
+					cout << ss.str() << cmdNewline;
 					ss.str("");
 					
 					cout << t_indent << t_indent << "C: ";
 					for(int l=0; l<d->width; l++)ss << std::fixed << std::setprecision(2) << std::setw(8) << d->tbl[l + (d->width*PWM_iC)];
-					cout << ss.str() << "\n";
+					cout << ss.str() << cmdNewline;
 					ss.str("");
 					
 					cout << t_indent << t_indent << "G: ";
 					for(int l=0; l<d->width; l++)ss << std::fixed << std::setprecision(2) << std::setw(8) << d->tbl[l + (d->width*PWM_iG)];
-					cout << ss.str() << "\n";
+					cout << ss.str() << cmdNewline;
 					ss.str("");
 					
 					cout << t_indent << t_indent << "T: ";
 					for(int l=0; l<d->width; l++)ss << std::fixed << std::setprecision(2) << std::setw(8) << d->tbl[l + (d->width*PWM_iT)];
-					cout << ss.str() << "\n";
-					cout << t_indent << t_indent << "Threshold: " << d->threshold << "\n";
+					cout << ss.str() << cmdNewline;
+					cout << t_indent << t_indent << "Threshold: " << d->threshold << cmdNewline;
 				}
 			default:
-				cout << " (Invalid)\n";
+				cout << " (Invalid)" << cmdNewline;
 		}
 	}
 }
@@ -892,11 +892,11 @@ public:
 		r->flush();
 		cmdTask::wipe();
 		cmdTaskComplete("Constructing motif Finite-State Machine");
-		cout << t_indent << t_indent << "Nodes: " << r->nnodes << "\n";
+		cout << t_indent << t_indent << "Nodes: " << r->nnodes << cmdNewline;
 		int nmotifsused=0;
 		for(int l=0;l<motifs->nmotifs;l++)
 			if(!motifs->motifs[l].skip&&motifs->motifs[l].type==motifType_IUPAC)nmotifsused++;
-		cout << t_indent << t_indent << "Motifs: " << nmotifsused << "\n";
+		cout << t_indent << t_indent << "Motifs: " << nmotifsused << cmdNewline;
 		return r;
 	}
 	~motifFSM(){
@@ -927,7 +927,7 @@ public:
 	*/
 	void feed(char nt,motifOccContainer*oc,long long pos){
 		if(!state){
-			cout << "Error: Illegal state.\n";
+			cout << "Error: Illegal state." << cmdNewline;
 			return;
 		}
 		int nti;
@@ -937,11 +937,11 @@ public:
 			case 'G':nti=2;break;
 			case 'T':nti=3;break;
 			case 'N':flush();return;
-			default:cout << "Warning: Unrecognized character, '" << nt << "', fed to finite state machine.\n";flush();return;
+			default:cout << "Warning: Unrecognized character, '" << nt << "', fed to finite state machine." << cmdNewline;flush();return;
 		}
 		state=state->next[nti];
 		if(!state){
-			cout << "Error: State transition resulted in dead end. Resetting.\n";flush();return;
+			cout << "Error: State transition resulted in dead end. Resetting." << cmdNewline;flush();return;
 		}
 		state->addMotifs(oc,pos);
 	}
@@ -1280,12 +1280,12 @@ bool calibratePWMThresholdsIid(motifList*ml, std::string bgPath, double oFreq){
 			return a > b;
 		});
 		pwm->threshold = mScores[int(oFreq * PWMCAL_UPSCALE)];
-		cout << m->name << " - calibrated threshold: " << pwm->threshold << "\n";
+		cout << m->name << " - calibrated threshold: " << pwm->threshold << cmdNewline;
 		
 		// Output actual observed frequency, for reassurance
 		int nOcc = 0;
 		for(double s: mScores) if(s >= pwm->threshold) nOcc++;
-		cout << m->name << " -  - Frequency: " << (1000.*double(nOcc)/double(PWMCAL_SEQSIZE)) << " occ/kb\n";
+		cout << m->name << " -  - Frequency: " << (1000.*double(nOcc)/double(PWMCAL_SEQSIZE)) << " occ/kb" << cmdNewline;
 	}
 	return true;
 }

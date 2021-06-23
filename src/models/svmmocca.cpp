@@ -83,7 +83,7 @@ bool MotifClassifier_featureSet::addFeatures(MotifClassifier_feature f,int ia,in
 		}
 	}else{
 		cmdError("Can't add batch of this motif-SVM feature.");
-		cout << t_indent << "Feature index " << (int)f << "\n";
+		cout << t_indent << "Feature index " << (int)f << cmdNewline;
 		return false;
 	}
 	return true;
@@ -391,8 +391,8 @@ bool SVMMOCCA::flush(){
 }
 
 bool SVMMOCCA::printInfo(){
-	cout << t_indent << "SVM-MOCCA\n";
-	cout << t_indent << "Trained?: " << (trained?"Yes":"No") << "\n";
+	cout << t_indent << "SVM-MOCCA" << cmdNewline;
+	cout << t_indent << "Trained?: " << (trained?"Yes":"No") << cmdNewline;
 	// Uncomment to always display model analysis
 	//for(int l=0;l<motifs->nmotifs;l++){
 	//	subcls[l]->printInfo();
@@ -411,7 +411,7 @@ bool SVMMOCCA::exportAnalysisData(string path){
 	if(!classifier.ptr->exportAnalysisData(f, (char*)"Log-odds", (char*)" - "))
 		return false;
 	fclose(f);
-	cout << "Saved classifier analysis data to \"" << path << "\"\n";
+	cout << "Saved classifier analysis data to \"" << path << "\"" << cmdNewline;
 	return true;
 }
 

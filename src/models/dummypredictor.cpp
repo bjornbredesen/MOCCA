@@ -109,12 +109,12 @@ double DummyPREdictor::do_applyWindow(char*buf,long long pos,int bufs){
 	return ret;
 }
 bool DummyPREdictor::printInfo(){
-	cout << t_indent << "DummyPREdictor classifier\n";
-	cout << t_indent << "# features = " << nFeatures << "\n";
+	cout << t_indent << "DummyPREdictor classifier" << cmdNewline;
+	cout << t_indent << "# features = " << nFeatures << cmdNewline;
 	return true;
 }
 bool DummyPREdictor::exportAnalysisData(string path){
-	cmdError("Export for classifier analysis not implemented for DummyPREdictor\n");
+	cmdError("Export for classifier analysis not implemented for DummyPREdictor");
 	return false;
 }
 

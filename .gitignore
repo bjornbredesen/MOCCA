@@ -31,3 +31,6 @@ src/models/.dirstamp
 src/lib/libsvm-3.17/.deps/
 src/lib/libsvm-3.17/.dirstamp
 src/lib/libsvm-3.17/*.o
+wasm/mocca.html
+wasm/mocca.js
+wasm/mocca.wasm

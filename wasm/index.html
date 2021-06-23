@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>MOCCA</title>
+		<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">
+		<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/grids-responsive-min.css" crossorigin="anonymous">
+		<link rel="stylesheet" href="assets/theme.css">
+	</head>
+	<body>
+		<div>
+			<div class="header">
+				<div class="home-menu pure-menu pure-menu-horizontal pure-menu-fixed">
+					<div class="pure-g">
+						<div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
+							<img src="assets/mocca.svg" height="60"/>
+						</div>
+						<div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
+							<!--(c) Bjørn Bredesen 2021-->
+							<a class="author">
+								<span>(c) Bjørn Bredesen 2021</span>
+							</a>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			<div class="controls">
+				<div class="spacer"></div>
+				<div class="pure-g">
+					<div class="pure-u-1 pure-u-md-1-1 pure-u-lg-1-1 infobox">
+						<p><b>Using:</b>Select a positive training set (FASTA format file) and a genome (FASTA format file) from local storage. Optionally select a negative training set, modify motifs or select a different model. Then click "Run". Once the genome-wide prediction has finished running, the predictions will be saved as a GFF file.</p>
+						<p><b>Notes:</b> The default motifs are from Polycomb/Trithorax Response Elements in the fruit fly <i>D. melanogaster</i> and may not be appropriate for other classes of regulatory elements or organisms. This is a WebAssembly version of the MOCCA suite. The functionality in this web version is limited, and the runtime performance is generally inferior to that of a natively compiled version. For improved runtime performance, please use the native version of the MOCCA suite.</p>
+						<p>The source code for the MOCCA suite is available on Github, at: <a href="https://github.com/bjornbredesen/MOCCA">https://github.com/bjornbredesen/MOCCA</a></p>
+						
+						<p><b>Citing:</b> If you use MOCCA in published research, the following publication must be cited must be cited: "MOCCA: a flexible suite for modelling DNA sequence motif occurrence combinatorics", Bredesen, B.A., Rehmsmeier, M., BMC Bioinformatics 22, 234 (2021) <a href="https://doi.org/10.1186/s12859-021-04143-2">https://doi.org/10.1186/s12859-021-04143-2</a>. If you use SVM-MOCCA in published research, the following publication must additionally be cited: "DNA sequence models of genome-wide <i>Drosophila melanogaster</i> Polycomb binding sites improve generalization to independent Polycomb Response Elements", Bredesen, B.A., Rehmsmeier, M., Nucleic Acids Research, Volume 47, Issue 15, 05 September 2019, Pages 7781–7797, <a href="https://doi.org/10.1093/nar/gkz617">https://doi.org/10.1093/nar/gkz617</a></p>
+					</div>
+				</div>
+				<form class="pure-form pure-form-stacked" onsubmit="return false;">
+					<fieldset>
+						<legend class="cwhite">Settings</legend>
+						<div class="pure-g">
+							<div class="pure-u-1 pure-u-md-1-3 cwhite">
+								<label for="fs-pos">Positives</label>
+								<input type="file" id="fs-pos" class="pure-u-23-24" onchange="loadFile(this, 'tpos')">
+							</div>
+							<div class="pure-u-1 pure-u-md-1-3 cwhite">
+								<label for="fs-neg">Negatives (optional)</label>
+								<input type="file" id="fs-neg" class="pure-u-23-24" onchange="loadFile(this, 'tneg')">
+							</div>
+							<div class="pure-u-1 pure-u-md-1-3 cwhite">
+								<label for="fs-gen">Genome</label>
+								<input type="file" id="fs-gen" class="pure-u-23-24" onchange="loadFile(this, 'gen')">
+							</div>
+							<div class="pure-u-1 pure-u-md-1-3">
+								<label for="model" class="cwhite">Model</label>
+								<select name="model" class="pure-input-1-2" id="model">
+									<option value="SVM-MOCCA">SVM-MOCCA</option>
+									<option value="RF-MOCCA">RF-MOCCA</option>
+									<option value="CPREdictor">CPREdictor</option>
+									<option value="DummyPREdictor">DummyPREdictor</option>
+								</select>
+							</div>
+							<div class="pure-u-1 pure-u-md-1-3">
+								<label for="motifs" class="cwhite">Motifs</label>
+								<textarea id="motifs" name="motifs" class="pure-input-1-2" rows="4" cols="30">
+En,GSNMACGCCCC,1
+G10,GAGAGAGAGA,1
+GAF,GAGAG,0
+PF,GCCATHWY,0
+PM,CNGCCATNDNND,0
+PS,GCCAT,0
+Z,YGAGYG,0
+CG,GTGT,0
+								</textarea>
+							</div>
+						</div>
+						<button class="pure-button pure-button-primary" onclick="runMOCCA()">Run</button>
+					</fieldset>
+				</form>
+			</div>
+			<div id="output">
+				<div class="home-menu pure-menu pure-menu-horizontal"></div>
+				<div id="output-acc"></div>
+				<div id="output-cl"></div>
+			</div>
+		</div>
+		<script type='text/javascript'>
+			var filesLoaded = {};
+			var _running = false;
+			function MOCCAExitedJS(status) {
+				console.log("MOCCA exited with status:", status);
+				_running = false;
+				if (status != 0) return;
+				console.log("Saving predictions");
+				let content = Module.FS.readFile('pred');
+				var a = document.createElement('a');
+				a.download = "predictions.gff";
+				a.href = URL.createObjectURL(new Blob([content], {type: 'text/plain'}));
+				a.style.display = 'none';
+				document.body.appendChild(a);
+				a.click();
+				setTimeout(() => {
+					document.body.removeChild(a);
+					URL.revokeObjectURL(a.href);
+				}, 2000);
+			}
+			function runMOCCA() {
+				if (_running) return;
+				_running = true;
+				callMain(getArgs());
+			}
+			function getArgs() {
+				args = ''
+				
+				// Get motifs
+				var eMotifs = document.getElementById("motifs");
+				var motifs = eMotifs.value.split('\n').map((m) => m.split(','));
+				for (var i = 0; i < motifs.length; i++) {
+					if (motifs[i].length < 3) break;
+					if (i) args += ' ';
+					args += '-motif:IUPAC ' + motifs[i].join(' ');
+				}
+				
+				// Add training set
+				if (filesLoaded['tneg']) {
+					args += ' ' + '-train:FASTA tpos + full';
+					args += ' ' + '-train:FASTA tneg - full';
+				}
+				else {
+					args += ' ' + '-auto:FASTA tpos';
+				}
+				if (filesLoaded['gen']) args += ' ' + '-genome:FASTA gen';
+				
+				// Get model
+				var eModel = document.getElementById("model");
+				if (eModel.value === "SVM-MOCCA") {
+					args += ' ' + '-C:SVM-MOCCA';
+				} else if (eModel.value === "RF-MOCCA") {
+					args += ' ' + '-C:RF-MOCCA';
+				} else if (eModel.value === "CPREdictor") {
+					args += ' ' + '-C:CPREdictor';
+				} else if (eModel.value === "DummyPREdictor") {
+					args += ' ' + '-C:DummyPREdictor';
+				}
+				
+				// Add final arguments
+				args += ' ' + '-predict:GFF pred';
+				console.log('Calling MOCCA with arguments: ' + args)
+				var oacc = document.getElementById('output-acc');
+				if (oacc) {
+					var cel = document.createElement('span');
+					cel.className = 'cline';
+					cel.innerHTML = ' &gt; mocca ' + args;
+					oacc.appendChild(cel);
+				}
+				return args.split(' ');
+			}
+			function loadFile(fi, fname) {
+				if (fi.files.length == 0) return;
+				console.log("loadFile", fi);
+				var f = fi.files[0];
+				var fr = new FileReader();
+				console.log("loadFile", f.name, fi, f, fr);
+				fr.onload = function() {
+					var b = new Uint8Array(fr.result);
+					console.log("onload", b);
+					Module['FS_createDataFile']('/', fname, b, true, true, true);
+					filesLoaded[fname] = true;
+				}
+				fr.readAsArrayBuffer(f);
+			}
+			var Module = {
+				preRun: [],
+				postRun: [],
+				arguments: [ ],
+				noInitialRun: true,
+				print: (function() {
+					var oacc = document.getElementById('output-acc');
+					var ocl = document.getElementById('output-cl');
+					if (oacc) oacc.value = '';
+					if (ocl) ocl.value = '';
+					return function(text) {
+						if (!oacc || !ocl) return;
+						if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+						var repl = false;
+						var nl = false;
+						text = text.replace(/&/g, "&amp;");
+						text = text.replace(/</g, "&lt;");
+						text = text.replace(/>/g, "&gt;");
+						text = text.replace(/%&lt;/g, "<");
+						text = text.replace(/%&gt;/g, ">");
+						text = text.replace(/\n/g, "");
+						if (text.startsWith('\r')) {
+							text = text.replace(/\r/g, "");
+							repl = true;
+						}
+						if (text.endsWith('#N')) {
+							text = text.slice(0, text.length-2);
+							nl = true;
+						}
+						var cel = document.createElement('span');
+						cel.className = 'cline';
+						cel.innerHTML = text;
+						if (!repl) {
+							for (var x = 0; x < ocl.children.length; x++)
+								oacc.appendChild(ocl.children[x].cloneNode());
+						}
+						if (nl) {
+							oacc.appendChild(cel);
+							ocl.replaceChildren([]);
+						} else {
+							ocl.replaceChildren([]);
+							ocl.appendChild(cel);
+						}
+						window.scrollTo(0,document.body.scrollHeight);
+					};
+				})(),
+				printErr: function(text) {
+					if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+					console.error(text);
+				},
+				totalDependencies: 0,
+				monitorRunDependencies: function(left) {
+					this.totalDependencies = Math.max(this.totalDependencies, left);
+				}
+			};
+		</script>
+		<script async type="text/javascript" src="mocca.js"></script>
+	</body>
+</html>
+
+
+

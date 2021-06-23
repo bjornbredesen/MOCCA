@@ -34,17 +34,23 @@ void cmdBoldLine(std::string X);
 
 //----------------------------------------------
 
-#define cmdSepline() cmdColor("-----------------------------------------------------------------\n", cmdColMag);
+#ifdef __EMSCRIPTEN__
+#define cmdNewline "#N\n"
+#else
+#define cmdNewline "\n"
+#endif
 
-#define cmdLogo() { cmdBoldColor(" MOCCA", cmdColBlue); cout << "\n Copyright, Bjørn Bredesen, 2013-2021\n bjorn@bjornbredesen.no\n"; }
+#define cmdSepline() { cmdColor("-----------------------------------------------------------------", cmdColMag); cout << cmdNewline; }
 
-#define cmdSection(txt) cmdBoldUnderline(txt + std::string("\n"))
+#define cmdLogo() { cmdBoldColor(" MOCCA", cmdColBlue); cout << cmdNewline << " Copyright, Bjørn Bredesen, 2013-2021" << cmdNewline << " bjorn@bjornbredesen.no" << cmdNewline; }
 
-#define cmdError(errt) { cout << "\r "; cmdBold("! "); cmdBoldColor("Error", cmdColRed); cout << ": " << errt << "\n"; }
+#define cmdSection(txt) { cmdBoldUnderline(txt); cout << cmdNewline; }
 
-#define cmdWarning(warnt) { cout << "\r "; cmdBold("! "); cmdBoldColor("Warning", cmdColGreen); cout << ": " << warnt << "\n"; }
+#define cmdError(errt) { cout << "\r "; cmdBold("! "); cmdBoldColor("Error", cmdColRed); cout << ": " << errt << cmdNewline; }
 
-#define cmdTaskComplete(compt) { cmdTask::wipe(); cmdBoldColor(" * ", cmdColBlue); cmdBold(compt); cout << t_indent; cmdBoldColor("Complete", cmdColGreen); }
+#define cmdWarning(warnt) { cout << "\r "; cmdBold("! "); cmdBoldColor("Warning", cmdColGreen); cout << ": " << warnt << cmdNewline; }
+
+#define cmdTaskComplete(compt) { cmdTask::wipe(); cmdBoldColor(" * ", cmdColBlue); cmdBold(compt); cout << t_indent; cmdBoldColor("Complete", cmdColGreen); cout << cmdNewline; }
 
 #define outOfMemory() cmdError("Out of memory.")
 

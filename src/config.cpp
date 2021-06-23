@@ -61,13 +61,13 @@ config*getConfiguration(){
 
 void config::printInfo(){
 	cmdSection("Settings");
-	cout << t_indent << "Random seed: " << randSeed << "\n";
-	cout << t_indent << "IUPAC parsing: " << (useFSM?(char*)"Finite State Machine":(char*)"Naive") << "\n";
-	cout << t_indent << "Standard threshold: " << threshold << "\n";
+	cout << t_indent << "Random seed: " << randSeed << cmdNewline;
+	cout << t_indent << "IUPAC parsing: " << (useFSM?(char*)"Finite State Machine":(char*)"Naive") << cmdNewline;
+	cout << t_indent << "Standard threshold: " << threshold << cmdNewline;
 	string cv="None";
-	cout << t_indent << "Window size: " << windowSize << "\n"
-		<< t_indent << "Window stepping: " << windowStep << "\n"
-		<< t_indent << "Window stepping (training): " << windowStepTrain << "\n";
+	cout << t_indent << "Window size: " << windowSize << cmdNewline
+		<< t_indent << "Window stepping: " << windowStep << cmdNewline
+		<< t_indent << "Window stepping (training): " << windowStepTrain << cmdNewline;
 	cout << t_indent << "Distance mode: ";
 	switch(distanceMode){
 		case dmCenters:cout << "Centers";break;
@@ -83,7 +83,7 @@ void config::printInfo(){
 		case cpmMotifsStrong:cout << "Motifs (strong)";break;
 	}
 	if(corePredictionMax) cout << " - maximum";
-	cout << "\n";
+	cout << cmdNewline;
 	cout << t_indent << "Log-odds mode: ";
 	switch(wmMode){
 		case wmPREdictor:cout << "PREdictor";break;
@@ -93,9 +93,9 @@ void config::printInfo(){
 		case wmBiPPV:cout << "Bi-directional Positive Predictive Value weights";break;
 		default:{}
 	}
-	cout << "\n";
+	cout << cmdNewline;
 	if(classifier == cSVMMOCCA || classifier == cSEQSVM)
-		cout << t_indent << "SVM kernel: " << getKernelName(kernel) << "\n";
-	if(genomeFASTAPath.length() > 0) cout << t_indent << "Genome: " << genomeFASTAPath << "\n";
+		cout << t_indent << "SVM kernel: " << getKernelName(kernel) << cmdNewline;
+	if(genomeFASTAPath.length() > 0) cout << t_indent << "Genome: " << genomeFASTAPath << cmdNewline;
 }
 

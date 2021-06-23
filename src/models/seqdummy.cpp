@@ -76,12 +76,12 @@ double SEQDummy::do_applyWindow(char*buf,long long pos,int bufs){
 }
 
 bool SEQDummy::printInfo(){
-	cout << t_indent << "SEQDummy classifier\n";
+	cout << t_indent << "SEQDummy classifier" << cmdNewline;
 	return true;
 }
 
 bool SEQDummy::exportAnalysisData(string path){
-	cout << "No model analysis for dummy model";
+	cout << "No model analysis for dummy model" << cmdNewline;
 	return false;
 }
 

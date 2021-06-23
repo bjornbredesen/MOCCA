@@ -85,7 +85,7 @@ double SEQLO::do_applyWindow(char*buf,long long pos,int bufs){
 }
 
 bool SEQLO::printInfo(){
-	cout << t_indent << "SEQLO classifier\n";
+	cout << t_indent << "SEQLO classifier" << cmdNewline;
 	classifier.ptr->printInfo((char*)"Log-odds");
 	return true;
 }
@@ -105,7 +105,7 @@ bool SEQLO::exportAnalysisData(string path){
 	}
 	fclose(f);
 	cout << "Saved classifier analysis data to \"" << path << "\"\n";*/
-	cout << "Model analysis export not yet supported for SEQLO";
+	cout << "Model analysis export not yet supported for SEQLO" << cmdNewline;
 	return false;
 }
 

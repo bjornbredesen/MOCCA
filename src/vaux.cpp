@@ -8,6 +8,10 @@
 #include "common.hpp"
 #include "vaux.hpp"
 
+#ifdef __EMSCRIPTEN__
+#include <emscripten.h>
+#endif
+
 /*
 cloneString
 	Returns a clone of a 0-terminated string, or 0 on failure.
@@ -41,6 +45,8 @@ void cmdColor(std::string text, int col) {
 		SetConsoleTextAttribute(hConsole, winColorMap[col]);
 		cout << text;
 		SetConsoleTextAttribute(hConsole, oldAttr);
+		#elif __EMSCRIPTEN__
+		cout << "%<span class=\"tc" << (col&7) << "\"%>" << text << "%</span%>";
 		#else
 		cout << "\033[0;24;" << int(col+30) << "m" << text << "\033[0m";
 		#endif
@@ -52,6 +58,8 @@ void cmdBold(std::string text) {
 	if (cmdColorsEnabled) {
 		#ifdef WINDOWS
 		cout << text;
+		#elif __EMSCRIPTEN__
+		cout << "%<b%>" << text << "%</b%>";
 		#else
 		cout << "\033[1;24m" << text << "\033[0m";
 		#endif
@@ -63,6 +71,8 @@ void cmdBoldUnderline(std::string text) {
 	if (cmdColorsEnabled) {
 		#ifdef WINDOWS
 		cout << text;
+		#elif __EMSCRIPTEN__
+		cout << "%<b%>%<u%>" << text << "%</u%>%</b%>";
 		#else
 		cout << "\033[1;4m" << text << "\033[0m";
 		#endif
@@ -80,6 +90,8 @@ void cmdBoldColor(std::string text, int col) {
 		SetConsoleTextAttribute(hConsole, winColorMap[col]);
 		cout << text;
 		SetConsoleTextAttribute(hConsole, oldAttr);
+		#elif __EMSCRIPTEN__
+		cout << "%<span class=\"tc" << (col&7) << "\"%>%<b%>" << text << "%</b%>%</span%>";
 		#else
 		cout << "\033[1;24;" << int(col+30) << "m" << text << "\033[0m";
 		#endif
@@ -148,6 +160,11 @@ cmdTask::~cmdTask(){
 	refresh();
 }
 
+#ifdef __EMSCRIPTEN__
+#define EMSCRIPTEN_NCNT 100
+int emscripten_sleep_cnt = 0;
+#endif
+
 /*
 refresh
 	Call to redraw.
@@ -175,6 +192,14 @@ void cmdTask::refresh(){
 	}
 	cmdBold(" ]");
 	cout << flush;
+	#ifdef __EMSCRIPTEN__
+	cout << "\n";
+	emscripten_sleep_cnt++;
+	if (emscripten_sleep_cnt == EMSCRIPTEN_NCNT) {
+		emscripten_sleep(0);
+		emscripten_sleep_cnt = 0;
+	}
+	#endif
 }
 
 /*
@@ -183,7 +208,16 @@ wipe
 */
 void cmdTask::wipe(){
 	if(cmdTaskSilent)return;
+	#ifdef __EMSCRIPTEN__
+	cout << "\r";
+	emscripten_sleep_cnt++;
+	if (emscripten_sleep_cnt == EMSCRIPTEN_NCNT) {
+		emscripten_sleep(0);
+		emscripten_sleep_cnt = 0;
+	}
+	#else
 	cout << "\r\033[K" << flush;
+	#endif
 }
 
 // Progress indication methods.

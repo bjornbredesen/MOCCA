@@ -85,13 +85,13 @@ double SEQRF::do_applyWindow(char*buf,long long pos,int bufs){
 }
 
 bool SEQRF::printInfo(){
-	cout << t_indent << "SEQRF classifier\n";
+	cout << t_indent << "SEQRF classifier" << cmdNewline;
 	classifier.ptr->printInfo((char*)"Random Forest");
 	return true;
 }
 
 bool SEQRF::exportAnalysisData(string path){
-	cout << "Model analysis export not yet supported for SEQRF";
+	cout << "Model analysis export not yet supported for SEQRF" << cmdNewline;
 	return false;
 }
 

@@ -293,7 +293,7 @@ bool sequenceClassifier::predictGenomewideFASTA(std::string inFASTAPath, std::st
 		// Save predictions
 		for(auto&p: fpred){
 			cmdTask::wipe();
-			cout << t_indent << "Predicted: " << chromName << ":" << p.start << ".." << p.end << " (" << (p.end-p.start) << " bp) - score: " << p.score << "\n";
+			cout << t_indent << "Predicted: " << chromName << ":" << p.start << ".." << p.end << " (" << (p.end-p.start) << " bp) - score: " << p.score << cmdNewline;
 			cmdTask::refresh();
 			if(ofGFF.is_open())
 				ofGFF << chromName << "\tMOCCA\tPrediction\t" << p.start << "\t" << p.end << "\t" << p.score << "\t.\t.\t1\n";
@@ -303,7 +303,7 @@ bool sequenceClassifier::predictGenomewideFASTA(std::string inFASTAPath, std::st
 	}
 	delete ssfb;
 	cmdTask::wipe();
-	cout << t_indent << "Made " << nPredictions << " predictions genome-wide\n";
+	cout << t_indent << "Made " << nPredictions << " predictions genome-wide" << cmdNewline;
 	return true;
 }
 
@@ -320,7 +320,7 @@ bool sequenceClassifier::predictCoreSequence(std::string inpath, std::string out
 		fclose(fout);
 		return false;
 	}
-	cout << "Predicted sequence core:\n";
+	cout << "Predicted sequence core:" << cmdNewline;
 	for(seqStreamFastaBatchBlock*ssfbblk;(ssfbblk=ssfb.ptr->getBlock());){
 		char*sname=ssfbblk->getName();
 		if(!sname)sname=(char*)"Unnamed";
@@ -357,7 +357,7 @@ bool sequenceClassifier::predictCoreSequence(std::string inpath, std::string out
 			}
 		}
 		fprintf(fout,"%s\t%d\t%d\t%f\n",sname,mwA,mwB,mwScore);
-		cout << " - " << sname << ": " << mwA << ".." << mwB << " (" << (mwB-mwA) << " / " << bufs << " bp) - Score: " << mwScore << "\n";
+		cout << " - " << sname << ": " << mwA << ".." << mwB << " (" << (mwB-mwA) << " / " << bufs << " bp) - Score: " << mwScore << cmdNewline;
 	}
 	fclose(fout);
 	return true;
@@ -413,8 +413,8 @@ bool sequenceClassifier::calibrateThresholdGenomewidePrecision(seqList*calpos,do
 	if(aPrec!=bPrec)
 		threshold = aThr + (wantPrecision-aPrec)*((bThr-aThr)/(bPrec-aPrec));
 	cmdTask::wipe();
-	cout << "Precision: " << wantPrecision << "\n";
-	cout << "Calibrated threshold: " << threshold << "\n";
+	cout << "Precision: " << wantPrecision << cmdNewline;
+	cout << "Calibrated threshold: " << threshold << cmdNewline;
 	return true;
 }
 
