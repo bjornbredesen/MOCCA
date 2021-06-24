@@ -47,7 +47,7 @@ seqClass*getSeqClassByValue(double cls){
 void printSeqClasses(){
 	cmdSection("Classes");
 	for(auto& c: seqClasses)
-		cout << t_indent << c.name << t_indent << "Value: " << c.cls << t_indent << "Binary flag: " << (c.flag?"+":"-") << "\n";
+		cout << t_indent << c.name << t_indent << "Value: " << c.cls << t_indent << "Binary flag: " << (c.flag?"+":"-") << cmdNewline;
 }
 
 seqClass*registerSeqClass(double cls,std::string name,bool flag){
@@ -270,7 +270,7 @@ void seqList::printInfo(char*title){
 	cmdSection(title);
 	seqListSeq*s=seq;
 	for(int l=0;l<nseq;l++,s++){
-		cout << t_indent << "\"" << s->name << "\"" << t_indent << "Class: " << s->cls->name << t_indent << "Length: " << s->bufs << " bp" << t_indent << "Training mode: " << (s->trainMode==train_Windows?"Windows":"Full, normalized") << "\n";
+		cout << t_indent << "\"" << s->name << "\"" << t_indent << "Class: " << s->cls->name << t_indent << "Length: " << s->bufs << " bp" << t_indent << "Training mode: " << (s->trainMode==train_Windows?"Windows":"Full, normalized") << cmdNewline;
 	}
 }
 
