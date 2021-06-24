@@ -168,6 +168,14 @@ CG,GTGT,0</textarea>
 								<input type="text" id="fs-gen-url" class="pure-u-23-24" placeholder="Enter URL to file, or select from local storage below" value="data/dmel-all-chromosome-r5.57.fasta" />
 								<input type="file" id="fs-gen" class="pure-u-1 pure-u-md-1-2" onchange="loadFile(this, 'gen')">
 							</div>
+							<div class="pure-u-1 pure-u-md-1-2">
+								<label for="precision" class="cwhite">E(precision)</label>
+								<input type="text" id="precision" value="0.8" class="pure-u-23-24" />
+							</div>
+							<div class="pure-u-1 pure-u-md-1-2">
+								<label for="MCOrder" class="cwhite">Markov chain order</label>
+								<input type="text" id="MCOrder" value="4" class="pure-u-23-24" />
+							</div>
 						</div>
 					</fieldset>
 				</form>
@@ -307,6 +315,16 @@ CG,GTGT,0</textarea>
 				var genURL = document.getElementById("fs-gen-url");
 				if (genURL.value.length > 0) {
 					downloads.push({ 'url': genURL.value, 'target': 'gen' });
+				}
+				
+				// Threshold calibration
+				var eprecision = document.getElementById("precision");
+				if (eprecision.value.length > 0) {
+					args += ' ' + '-calibrate:precision ' + eprecision.value;
+				}
+				var eMCOrder = document.getElementById("MCOrder");
+				if (eMCOrder.value.length > 0) {
+					args += ' ' + '-auto:order ' + eMCOrder.value;
 				}
 				
 				// Add final arguments
