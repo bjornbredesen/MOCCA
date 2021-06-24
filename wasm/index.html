@@ -7,6 +7,7 @@
 		<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/pure-min.css" integrity="sha384-Uu6IeWbM+gzNVXJcM9XV3SohHtmWE+3VGi496jvgX1jyvDTXfdK+rfZc8C1Aehk5" crossorigin="anonymous">
 		<link rel="stylesheet" href="https://unpkg.com/purecss@2.0.6/build/grids-responsive-min.css" crossorigin="anonymous">
 		<link rel="stylesheet" href="assets/theme.css">
+		<link rel="stylesheet" href="http://bjornbredesen.no/assets/font-awesome-4.7.0/css/font-awesome.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 	</head>
 	<body>
@@ -18,9 +19,14 @@
 							<img src="assets/mocca.svg" height="60"/>
 						</div>
 						<div class="pure-u-1 pure-u-md-1-2 pure-u-lg-1-2">
-							<!--(c) Bjørn Bredesen 2021-->
-							<a class="author">
-								<span>(c) Bjørn Bredesen 2021</span>
+							<a class="rbtn" title="Scroll to top" onclick="window.scrollTo(0, 0);">
+								<span class="fa fa-arrow-up rbtni"/>
+							</a>
+							<a class="rbtn" title="Github" href="https://github.com/bjornbredesen/MOCCA/">
+								<span class="fa fa-github rbtni"/>
+							</a>
+							<a class="rbtn" title="Article" href="https://doi.org/10.1186/s12859-021-04143-2">
+								<span class="fa fa-newspaper-o rbtni"/>
 							</a>
 						</div>
 					</div>
@@ -34,11 +40,13 @@
 						<p><b>About:</b> MOCCA (Motif Occurrence Combinatorics Classification Algorithms) is a suite of tools for machine learning of <i>cis</i>-regulatory elements (CREs) in DNA sequences.</p>
 						<p><b>Using:</b> Select a positive training set (FASTA format file) and a genome (FASTA format file) from local storage. Optionally select a negative training set, modify motifs or select a different model. Then click "Run". Once the genome-wide prediction has finished running, the predictions can be saved as a GFF file.</p>
 						
-						<p><b>Disclaimers:</b> You yourself are responsible for your use of this program. This is a WebAssembly version of the MOCCA suite. All computation will be run on the client side (your current computing device). For your own safety, please ensure that your current computing device has adequate cooling before running MOCCA. The functionality in this web version is limited, and the runtime performance is generally inferior to that of a natively compiled version. For improved runtime performance, please use the native version of the MOCCA suite. The default motifs are from Polycomb/Trithorax Response Elements in the fruit fly <i>D. melanogaster</i> and may not be appropriate for other classes of regulatory elements or organisms. Genome files can be large, and we recommend downloading genomes to local storage before running MOCCA.</p>
+						<p><b>Disclaimers:</b> You yourself are responsible for your use of this program. This is a WebAssembly version of the MOCCA suite. All computation will be run on the client side (your current computing device). For your own safety, please ensure that your current computing device has adequate cooling before running MOCCA. The functionality in this web version is limited, and the runtime performance is generally inferior to that of a natively compiled version. For improved runtime performance, please use the native version of the MOCCA suite. The default motifs are from Polycomb/Trithorax Response Elements in the fruit fly <i>D. melanogaster</i> and may not be appropriate for other classes of regulatory elements or organisms. Genome files can be large. In order to save bandwidth, we recommend downloading genomes to local storage before running MOCCA.</p>
 						
 						<p><b>Source code:</b> The source code for the MOCCA suite is available on Github, at: <a href="https://github.com/bjornbredesen/MOCCA">https://github.com/bjornbredesen/MOCCA</a></p>
 						
 						<p><b>License:</b> MOCCA is free and open source and has been released under the MIT license.</p>
+						
+						<p><b>Copyright</b> Bjørn André Bredesen-Aa, 2021</p>
 						
 						<p><b>Citing:</b> If you use MOCCA in published research, the following publication must be cited: "MOCCA: a flexible suite for modelling DNA sequence motif occurrence combinatorics", Bredesen, B.A., Rehmsmeier, M., BMC Bioinformatics 22, 234 (2021) <a href="https://doi.org/10.1186/s12859-021-04143-2">https://doi.org/10.1186/s12859-021-04143-2</a>. If you use SVM-MOCCA in published research, the following publication must additionally be cited: "DNA sequence models of genome-wide <i>Drosophila melanogaster</i> Polycomb binding sites improve generalization to independent Polycomb Response Elements", Bredesen, B.A., Rehmsmeier, M., Nucleic Acids Research, Volume 47, Issue 15, 05 September 2019, Pages 7781–7797, <a href="https://doi.org/10.1093/nar/gkz617">https://doi.org/10.1093/nar/gkz617</a></p>
 						
