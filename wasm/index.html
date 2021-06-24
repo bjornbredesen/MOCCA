@@ -38,7 +38,8 @@
 				<div class="pure-g">
 					<div class="pure-u-1 pure-u-md-1-1 pure-u-lg-1-1 infobox">
 						<p><b>About:</b> MOCCA (Motif Occurrence Combinatorics Classification Algorithms) is a suite of tools for machine learning of <i>cis</i>-regulatory elements (CREs) in DNA sequences.</p>
-						<p><b>Using:</b> Select a positive training set (FASTA format file) and a genome (FASTA format file) from local storage. Optionally select a negative training set, modify motifs or select a different model. Then click "Run". Once the genome-wide prediction has finished running, the predictions can be saved as a GFF file.</p>
+						
+						<p><b>Using:</b> Use defaults or input a training set and genome (FASTA format files) by selecting files from local storage or inputing URLs to data in the appropriate fields. Optionally select a negative training set, modify motifs or select a different model. Finally click "Run MOCCA" to start. Once the genome-wide prediction has finished running, the predictions can be saved as a GFF file.</p>
 						
 						<p><b>Disclaimers:</b> You yourself are responsible for your use of this program. This is a WebAssembly version of the MOCCA suite. All computation will be run on the client side (your current computing device). For your own safety, please ensure that your current computing device has adequate cooling before running MOCCA. The functionality in this web version is limited, and the runtime performance is generally inferior to that of a natively compiled version. For improved runtime performance, please use the native version of the MOCCA suite. The default motifs are from Polycomb/Trithorax Response Elements in the fruit fly <i>D. melanogaster</i> and may not be appropriate for other classes of regulatory elements or organisms. Genome files can be large. In order to save bandwidth, we recommend downloading genomes to local storage before running MOCCA.</p>
 						
@@ -53,6 +54,21 @@
 						<p><b>Phishing:</b> We will never call you and tell you to visit this website. If you have been called and told to visit this website, you are likely subject to a scam and you should report it to the appropriate authorities.</p>
 					</div>
 				</div>
+				
+				<h1 class="cwhite">Downloads</h1>
+				<ul>
+					<li>Genome: BDGP <i>D. mel.</i> genome release R5 (mirrored from FlyBase): <a href="data/dmel-all-chromosome-r5.57.fasta">Download</a></li>
+					<li>PRE training set (from Kahn et al. 2014): <a href="data/tPREsKahn2014.fa">Download</a></li>
+				</ul>
+				
+				<h1 class="cwhite">References</h1>
+				<ul>
+					<li>Bredesen et al. 2019: <a href="https://academic.oup.com/nar/article/47/15/7781/5538007">https://academic.oup.com/nar/article/47/15/7781/5538007</a></li>
+					<li>Kahn et al. 2014: <a href="https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1004495">https://journals.plos.org/plosgenetics/article?id=10.1371/journal.pgen.1004495</a></li>
+					<li>FlyBase: <a href="https://academic.oup.com/nar/article/41/D1/D751/1051942">https://academic.oup.com/nar/article/41/D1/D751/1051942</a></li>
+					<li>Ringrose et al. 2003: <a href="https://www.sciencedirect.com/science/article/pii/S153458070300337X">https://www.sciencedirect.com/science/article/pii/S153458070300337X</a></li>
+				</ul>
+				
 				<form class="pure-form pure-form-stacked" onsubmit="return false;">
 					<fieldset>
 						<h1 class="cwhite">Settings</h1>
@@ -140,6 +156,7 @@ CG,GTGT,0</textarea>
 				cel.className = 'cline';
 				cel.innerHTML = ' &gt; ' + t;
 				oacc.appendChild(cel);
+				window.scrollTo(0,document.body.scrollHeight);
 			}
 			
 			async function downloadFile(dl) {
@@ -180,7 +197,7 @@ CG,GTGT,0</textarea>
 				await downloadFiles();
 				var sargs = args.join(' ');
 				console.log('Calling MOCCA with arguments: ' + sargs);
-				addLog(' &gt; mocca ' + sargs);
+				addLog('mocca ' + sargs);
 				callMain(args);
 			}
 			
